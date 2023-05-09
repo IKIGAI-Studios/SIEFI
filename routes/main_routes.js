@@ -6,7 +6,27 @@ routes.get('/login', (req, res) => {
     res.render('login', { session: req.session });
 });
 
+routes.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          res.redirect('/login');
+        }
+    });
+});
+
 routes.get('/registerEjecutor', (req, res) => {
+    // No existe la sesión
+    if (req.session.user === undefined) {
+        res.redirect('/login');
+        return;
+    }
+    // No es administrador
+    if (req.session.user.tipo != 'admin') {
+        res.redirect('/login');
+        return;
+    }
     res.render('registerEjecutor', { session: req.session });
     req.session.registerEjecutor = '';
 });
@@ -20,7 +40,7 @@ routes.post('/login', async (req, res) => {
             where: {
                 user: username
             },
-            attributes: ['pass', 'type', 'status']
+            attributes: ['clave_eje', 'nombre', 'pass', 'type', 'status']
         });
 
         // No existe el usuario
@@ -46,15 +66,19 @@ routes.post('/login', async (req, res) => {
             return;
         }
 
+        // Crear la sesión del Usuario
+        req.session.user = { nombre: user.nombre, clave_eje: user.clave_eje, tipo: user.type };
+
         // Redireccionar al tipo de usuario
         if (user.type == "ejecutor") {
+            console.log(req.session.user)
             res.json('Ejecutor')
         } else {
-            res.json('Administrador')
+            res.redirect('/registerEjecutor');
         }
     } catch (error) {
         // Regresar un mensaje de error
-        req.session.loginError = 'Error al hacer la consulta';
+        req.session.loginError = `Error al hacer la consulta | Error: ${error}`;
         res.redirect('/login');
     }
 });
@@ -71,6 +95,14 @@ routes.post('/registerEjecutor', async (req, res) => {
         const existingUser = await Ejecutor.findOne({ where: { user } });
         if (existingUser) {
             req.session.registerEjecutor = `El usuario ${user} ya ha sido registrado`;
+            res.redirect('/registerEjecutor');
+            return;
+        }
+
+        // Validar que la clave sea unica
+        const existingClave = await Ejecutor.findOne({ where: { clave_eje } });
+        if (existingClave) {
+            req.session.registerEjecutor = `La clave ${clave_eje} ya ha sido registrada`;
             res.redirect('/registerEjecutor');
             return;
         }
@@ -92,7 +124,7 @@ routes.post('/registerEjecutor', async (req, res) => {
         res.redirect('/registerEjecutor');
     } catch (error) {
         // Regresar un mensaje de error
-        req.session.registerEjecutor = 'No se pudo registrar el ultimo Ejecutor';
+        req.session.registerEjecutor = `No se pudo registrar el ultimo Ejecutor | Error: ${error}`;
         res.redirect('/registerEjecutor');
     }
 });
