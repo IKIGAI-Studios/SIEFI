@@ -22,19 +22,25 @@ routes.get('/registerEjecutor', (req, res) => {
         res.redirect('/login');
         return;
     }
+
     // No es administrador
     if (req.session.user.tipo != 'admin') {
         res.redirect('/login');
         return;
     }
+
     res.render('registerEjecutor', { session: req.session });
     req.session.registerEjecutor = '';
 });
 
-routes.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+routes.get('/loadInfo', (req, res) => {
+    res.render('loadInfo', { session: req.session });
+});
 
+routes.post('/login', async (req, res) => {
     try {
+        const { username, password } = req.body;
+
         // Buscar el usuario
         const user = await Ejecutor.findOne({
             where: {

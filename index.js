@@ -5,6 +5,9 @@ const dotenv = require('dotenv');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const main_routes = require('./routes/main_routes');
+const $ = require('jquery');
+const XLSX = require('xlsx');
+
 
 const app = express();
 dotenv.config();
