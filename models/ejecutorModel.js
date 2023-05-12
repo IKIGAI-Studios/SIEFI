@@ -1,5 +1,5 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../database");
+import { DataTypes } from "sequelize";
+import sequelize from "../database.js" ;
 
 const Ejecutor = sequelize.define(
   "ejecutor",
@@ -44,4 +44,4 @@ const Ejecutor = sequelize.define(
   }
 );
 
-module.exports = Ejecutor;
+export default Ejecutor;

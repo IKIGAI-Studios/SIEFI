@@ -1,6 +1,8 @@
-const routes = require('express').Router();
-const bcrypt = require('bcrypt');
-const Ejecutor = require('../models/ejecutorModel');
+import express from 'express';
+import bcrypt from 'bcrypt';
+import Ejecutor from '../models/ejecutorModel.js';
+
+const routes = express.Router();
 
 routes.get('/login', (req, res) => {
     res.render('login', { session: req.session });
@@ -135,4 +137,4 @@ routes.post('/registerEjecutor', async (req, res) => {
     }
 });
   
-module.exports = routes;
+export default routes;
