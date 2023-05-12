@@ -1,36 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In</title>
-</html>
-<body>
-  <form action="login" method="post">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEFI | Iniciar Sesión</title>
+    <%- include('templates/header')%>
 
-    <h1>SIEFI</h1>
+    <div class="space-around">
+      <h2 class="texto-green">SIEFI</h2>
+      <h3 class="texto-green">SISTEMA DE EJECUCIÓN FISCAL</h3>
 
-    <div class="container" style="width: 20%">
-        <label for="user">Usuario</label>
-        <input type="text" name="username" id="username"/>
-    </div>
-    
-    <div class="container" style="width: 20%">
-      <label for="password">Contraseña</label>
-      <input type="password" name="password" id="password"/>
-    </div>
+      <div class="space-around mt-xl-5">
+        <div class="row">
+          <div class="col-lg-2"></div>
+          <div class="col-lg-4">
+            <img src="/imgs/placeholder.png" alt="placeholder" style="width: 80%; height: auto;">
+          </div>
 
-    <div>
-      <div class="container mt-3">
-        <button type="submit">Ingresar</button>
+          <!--LOG IN-->
+          <div class="col-lg-4 space-around">
+            <form action="/login" method="post">
+              <div class="d-flex justify-content-end mt-5">
+                <label class="texto-green" for="user">USUARIO</label>
+                <input
+                  type="text"
+                  name="username"
+                  id="username"
+                  class="text-input-beige"
+                />
+              </div>
+
+              <div class="d-flex justify-content-end mt-3">
+                <label class="texto-green" for="password">CONTRASEÑA</label>
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  class="text-input-beige"
+                />
+              </div>
+
+              <div>
+                <div class="d-flex space-around">
+                  <button type="submit" class="btn-beige">INGRESAR</button>
+                </div>
+              </div>
+
+              <% if (session.loginError) { %>
+                <p class="light-label"><%= session.loginError %></p>
+              <% } %>
+            </form>
+          </div>
+          <div class="col-lg-2"></div>
+        </div>
       </div>
     </div>
 
-    <% if (session.loginError) { %>
-      <p><%= session.loginError %></p>
-    <% } %>
-
-  </form>
-</body>
-</html>
+    <%- include('templates/footer')%>

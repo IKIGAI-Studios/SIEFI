@@ -5,57 +5,96 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Ejecutor</title>
-</html>
-<body>
-  <form action="registerEjecutor" method="post">
 
-    <h1>Registrar Ejecutor</h1>
+    <%- include('templates/header')%>
 
-    <div class="container" style="width: 20%">
-        <label for="clave_eje">Clave eje</label>
-        <input type="text" name="clave_eje" id="clave_eje"/>
-    </div>
+    <%- include('templates/banner')%>
     
-    <div class="container" style="width: 20%">
-      <label for="nombre">Nombre</label>
-      <input type="text" name="nombre" id="nombre"/>
-    </div>
+    <div class="container mt-5">
+      <div class="d-flex"> 
+          <div class="col-2 sidebar">
+              <ul>
+                <li class="dropdown active">
+                  <a href="#" class="sidebar-item">INFORMACIÓN</a>
+                  <ul class="dropdown-menu">
+                      <li><a href="#" class="sidebar-item">CARGAR INFORMACIÓN</a></li>
+                      <li><a href="#" class="sidebar-item">REGISTRAR AFIL</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown active">
+                  <a href="#" class="sidebar-item">ESTADÍSTICAS</a>
+                  <ul class="dropdown-menu">
+                      <li><a href="#" class="sidebar-item">INDIVIDUALES</a></li>
+                      <li><a href="#" class="sidebar-item">GLOBALES</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown active">
+                  <a href="#" class="sidebar-item activo">EJECUTOR</a>
+                  <ul class="dropdown-menu">
+                      <li><a href="#" class="sidebar-item">ACTUALIZAR</a></li>
+                      <li><a href="#" class="sidebar-item-sec">REGISTRAR</a></li>
+                  </ul>
+                </li>
+                <br><br>
+                <li><a href="#" class="logout mt-3">CERRAR SESIÓN</a></li>
+              </ul>
+          </div>
+          <div class="col-10 space-around">
+            <div id="perfil" class="contenido activo text-center">
+              <form action="registerEjecutor" method="post">
 
-    <div class="container" style="width: 20%">
-      <label for="rfc">RFC</label>
-      <input type="text" name="rfc" id="rfc"/>
-    </div>
-
-    <div class="container" style="width: 20%">
-      <label for="cp">CP</label>
-      <input type="number" name="cp" id="cp"/>
-    </div>
-
-    <div class="container" style="width: 20%">
-      <label for="user">Usuario</label>
-      <input type="text" name="user" id="user"/>
-    </div>
-
-    <div class="container" style="width: 20%">
-      <label for="pass">Contraseña</label>
-      <input type="password" name="pass" id="pass"/>
-    </div>
-
-    <div class="container" style="width: 20%">
-      <label for="type">Tipo</label>
-      <input type="text" name="type" id="type"/>
-    </div>
-
-    <div>
-      <div class="container mt-3">
-        <button type="submit">Registrar</button>
+                <h1 class="texto-green">Registrar Ejecutor</h1>
+            
+                <div class="container" style="width: 20%">
+                    <label for="clave_eje">Clave eje</label>
+                    <input type="text" name="clave_eje" id="clave_eje"/>
+                </div>
+                
+                <div class="container" style="width: 20%">
+                  <label for="nombre">Nombre</label>
+                  <input type="text" name="nombre" id="nombre"/>
+                </div>
+            
+                <div class="container" style="width: 20%">
+                  <label for="rfc">RFC</label>
+                  <input type="text" name="rfc" id="rfc"/>
+                </div>
+            
+                <div class="container" style="width: 20%">
+                  <label for="cp">CP</label>
+                  <input type="number" name="cp" id="cp"/>
+                </div>
+            
+                <div class="container" style="width: 20%">
+                  <label for="user">Usuario</label>
+                  <input type="text" name="user" id="user"/>
+                </div>
+            
+                <div class="container" style="width: 20%">
+                  <label for="pass">Contraseña</label>
+                  <input type="password" name="pass" id="pass"/>
+                </div>
+            
+                <div class="container" style="width: 20%">
+                  <label for="type">Tipo</label>
+                  <input type="text" name="type" id="type"/>
+                </div>
+            
+                <div>
+                  <div class="container mt-3">
+                    <button type="submit">Registrar</button>
+                  </div>
+                </div>
+            
+                <% if (session.registerEjecutor) { %>
+                  <p><%= session.registerEjecutor %></p>
+                <% } %>
+            
+              </form>
+            </div>
+          </div>  
       </div>
     </div>
-
-    <% if (session.registerEjecutor) { %>
-      <p><%= session.registerEjecutor %></p>
-    <% } %>
-
-  </form>
+    <script src="/js/sidebar.js"></script>
 </body>
 </html>

@@ -1,439 +1,313 @@
-// tanukitchen colors
-$tk-darkblue: #272f3f;
-$tk-violet: #4B6CB7;
-$tk-green: #06BEB6;
-$tk-blue: #48B1BF;
-$tk-white: #D9D9D9;
 
-// tanukitchen map
-$tanukitchen-colors: (
-    "tk-darkblue": $tk-darkblue,
-    "tk-green": $tk-green,
-    "tk-white": $tk-white,
-    "tk-blue": $tk-blue,
-    "tk-violet": $tk-violet
+// Colorsitos
+// 005A4E
+$imss-verde: #005A4E;
+$imss-beige:#D9C9A8;
+$imss-gris: #D9D9D9;
+$rojo: #5A0000;
+$azul: #003A5A;
+
+// IMSS map
+$paleta-imss: (
+    "imss-verde":$imss-verde,
+    "imss-beige": $imss-beige,
+    "imss-gris": $imss-gris,
+    "rojo": $rojo,
+    "azul": $azul
 );
 
-// -- overriding variables --
-$body-bg: $tk-darkblue;
-$font-family-base: url(../../fonts/Manrope.ttf);
+@font-face {
+    font-family: 'Montserrat-Light';
+    src: url('../../fonts/Montserrat-Light.ttf') format('truetype');
+  }
 
-// importing stuff
-@import "../../../node_modules/bootstrap/scss/bootstrap";
+@font-face {
+    font-family: 'Montserrat-Regular';
+    src: url('../../fonts/Montserrat-Regular.ttf') format('truetype');
+  }
 
-// mergin maps 
-$theme-colors: map-merge($theme-colors, $tanukitchen-colors);
+@font-face {
+    font-family: 'Montserrat-Medium';
+    src: url('../../fonts/Montserrat-Medium.ttf') format('truetype');
+  } 
+  
+@font-face {
+    font-family: 'Montserrat-Bold';
+    src: url('../../fonts/Montserrat-Bold.ttf') format('truetype');
+  } 
 
-//
-//   ICONS
-//
+@import '../../../node_modules/bootstrap/scss/bootstrap-grid';
 
-//
-//  mixins 
-//
+// Importa los estilos básicos de Bootstrap
+@import "../../../node_modules/bootstrap/scss/functions";
+@import "../../../node_modules/bootstrap/scss/variables";
+@import "../../../node_modules/bootstrap/scss/mixins";
 
-@mixin text-manrope{
-    font-family: 'manrope';
+// Importa los estilos del navbar y sus dependencias
+@import "../../../node_modules/bootstrap/scss/navbar";
+@import "../../../node_modules/bootstrap/scss/nav";
+@import "../../../node_modules/bootstrap/scss/dropdown";
+
+
+$theme-colors: map-merge($theme-colors, $paleta-imss);
+
+
+
+// MIXINS 
+@mixin shadow{
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
 }
 
-@mixin text-somatic {
-    font-family: 'somatic';
+
+
+// HTML TAGS
+
+html, body{
+    margin: 0 !important;
+    height: 100%;
 }
 
-@mixin tk-shadow{
-    box-shadow:  -3px 4px 4px rgba(0, 0, 0, 0.25);
-}
-//
-// animations
-// 
 
-@keyframes move-bg {
-    to{
-        background-position: var(--bg-size) 0;
-    }
+
+h2, h3, h4{
+    text-align: center;
+    font-family: 'Montserrat-Light', sans-serif;
+    color: $imss-gris;
 }
 
-.tk-text{
-    @include text-manrope();
-    text-decoration: none;
-    color: $tk-white !important; 
+h1,h5{
+    text-align: left;
+    font-family: 'Montserrat-Medium';
+    color: $imss-gris;
 }
 
-.tk-dark-text{
-    @include text-manrope();
-    text-decoration: none;
-    color: $tk-darkblue !important; 
-}
-
-.tk-ani-grad{
-    --bg-size: 300%;
-    @include text-manrope();
-    font-weight: bold;
-    background: linear-gradient(90deg, $tk-green, $tk-violet, $tk-blue) 0 0 / var(--bg-size) 100%;
-    color: transparent;
-    background-clip: text;
-    -webkit-background-clip: text;
-    animation: move-bg 8s infinite linear;
-}
-
-.tk-link{
-    @include text-manrope();
-    color: $tk-green;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-.tk-link:hover{
-    --bg-size: 400%;
-    font-weight: bold;
-    background: linear-gradient(270deg, $tk-green, $tk-violet) 0 0 / var(--bg-size) 100%;
-    background-clip: text;
-    animation: move-bg 8s infinite linear;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent; 
-}
-
-.tk-form{
-    margin-left: 4rem;
-}
-
-.tk-form-label{
-    @include text-manrope(); 
-    color: $tk-white;
-    font-size: 1rem;
-    font-weight: normal;
-}
-
-.tk-form-input{
-    @include text-manrope();
-    margin-bottom: 1rem;
-    background-color: $tk-white;
-    border: 3px solid $tk-darkblue;
-    border-radius: 15px;
-    transition: border 0.4s ease-in-out;
-}
-
-.tk-form-input:focus{
-    border: 3px solid $tk-blue;
-    background-color: $tk-white;
-}
-
-.tk-form-chkbx{
-    border: 3px solid $tk-white;
-    background-color: $tk-white;
-}
-
-.tk-form-chkbx:checked{
-    border: 3px solid $tk-violet;
-    background-color: $tk-violet;
-}
-
-.tk-form-btn{
-    color: $tk-darkblue;
-    background: $tk-green;
-    overflow: hidden;
-    transform: translate(0);
-    @include text-manrope();
-    font-weight: bold;
-}
-
-.tk-form-btn::before{
-    content: "";
+footer{
+    justify-content: space-between;
+    background-color: $imss-verde;
     position: absolute;
-    z-index: -1;
-    top: 0;
-    left: 0;
-    right: 0;
     bottom: 0;
-    background: linear-gradient( $tk-green, $tk-violet); 
-    transition: 0.5s ease;
-    transform: scaleX(0);
-}
-
-.tk-form-btn:hover::before{
-    transform: scaleX(1) scaleY(1);
-}
-
-// user profile
-
-.usr-pfp{
-    margin: 5rem;
-    border: 3px solid $tk-green;
-    border-radius: 100%;
-    height: 15rem;
-    width: auto;
-}
-
-.tk-usr-label{
-    @include text-manrope(); 
-    color: $tk-white;
-    padding-left: 0;
-    width: 10rem;
-    font-size: 1rem;
-    font-weight: normal;
-}
-
-.tk-usr-input{
-    @include text-manrope();
-    color: $tk-darkblue;
-    width: 40%;
-    margin-bottom: 3rem;
-    background-color: $tk-white;
-    border: 3px solid $tk-darkblue;
-    border-radius: 15px;
-    transition: border 0.4s ease-in-out;
-
-    &:focus{
-        border: 3px solid $tk-blue;
-        background-color: $tk-white;
-    }
-
-    &:disabled{
-        background-color: $tk-darkblue;
-        border: 2px solid $tk-violet;
-        color: $tk-white;
-    }
-}
-
-.tk-green-line{
     width: 100%;
-    border: 3px solid $tk-green;
-    border-radius: 10px;
-    }
-
-////
-/// CONTROL PANEL
-/// 
-
-.modulos, .consola{
-    padding: 3rem;
-    margin: 2rem;
-    border: 2px solid $tk-green;
-    border-radius: 3rem;
-    box-shadow: rgba(7, 3, 31, 0.534) 0px 5px 15px;
 }
 
-#tConsole{
-    overflow: auto;
-    max-height: 60em; 
-    font-family: 'Courier New', Courier, monospace; 
-    font-size: small;           
-    color: $tk-white;
-    &:focus {
-        border: none;
-    }
+//
 
-    &:active {
-        border: none;
-    }
-}
-
-.tk-showData{
-    @include tk-shadow();
-    @include text-manrope();
-    padding: 1rem;
-    color: $tk-white;
-    background-color: $tk-darkblue;
+.space-around{
     margin: 1rem;
-    border-left: 2px solid $tk-violet;
-    &:hover{
-        color: $tk-blue;
-        background-color: #1f242e;
-        cursor:default;
-    }
+    justify-content: space-around;
+    align-items: center;
 }
 
-.tk-btn-panel{
-    color: $tk-darkblue;
-    background: $tk-blue;
-    @include text-manrope();
-    font-weight: bold;
-    padding: .5rem;
-    border: none;
-    border-radius: 1rem;
-    margin: 0 0 1rem 2rem; 
-    transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
-
-    &:hover{
-     background-color: $tk-violet;
-     color: $tk-white !important;   
-    }
-}
-
-.tk-cli{
-    @include text-manrope();
-    color: $tk-darkblue;
-    background-color: $tk-white;
-    border-radius: 2rem;
-    transition: border 0.4s ease-in-out;
-
-    &:focus{
-        border: 3px solid $tk-blue;
-        background-color: $tk-white;
-    }
-}
-
-.tk-modal{
-    background-color: $tk-darkblue;
-}
-
-.tk-card{
-    background-color: $tk-darkblue;
-    border: 2px solid $tk-blue;
-    @include tk-shadow();
-}
-
-thead{
-    @include text-manrope();
-    color: $tk-violet;
-    font-weight: bold;
-    border-style: none;
-}
-
-tbody, td, th, table{
-    border-style: none !important;
-}
-
-// NEW CONTROL PANEL
-
-.tk-panel-label{
-    @include text-manrope();
-    @include tk-shadow();
-    background-color: $tk-white;
-    color: $tk-darkblue;
-    font-weight: bolder;
-    font-size: 1rem;
-    width: 75%;
-    border-radius: 0 10px 10px 0;
-    text-align: center;
-    margin: 4rem 3rem 1rem 3rem;
-    padding: 2px;
-}
-
-.tk-recipes-label{
-    @include text-manrope();
-    @include tk-shadow();
-    width: 100%;
-    background-color: $tk-white;
-    color: $tk-darkblue;
-    font-weight: bolder;
-    font-size: 1rem;
-    border-radius: 0 10px 10px 0;
-    text-align: center;
-    margin: 4rem 1rem 1rem 1rem;
-    padding: 2px;
-}
-
-.tk-panel-data{
-    @include text-manrope();
-    color: $tk-white;
-    margin-top: 10px;
-    text-align: center;
-}
-
-.tk-divider{
-    border-style: solid;
-    border-color: $tk-white;
-    width: 90%;
-    margin: 1rem;
-}
-
-.tk-dark-divider{
-    border-style: solid;
-    border-color: $tk-darkblue;
-    width: 90%;
-    margin: 1rem;
-}
-
-#toStove:focus, #toOven:focus, #toGas:focus,
-#toSmoke:focus, #toScale:focus{
-    box-shadow: 5px $tk-violet; 
-}
-
-#toStove:checked, #toOven:checked, #toGas:checked,
-#toSmoke:checked, #toScale:checked{
-    background-color: $tk-green; 
-}
-
-
-// USER AVATAR
-
-.tk-nb-avatar{
-    border-radius: 100%;
-    height: 40px;
-    width: auto;
-}
-
-a[aria-current='page']{
-    border-bottom-style: solid;
-    border-color: $tk-green;
-    box-shadow: 0px 3px  rgba(0, 0, 0, 0.25);
-}
-
-.tk-recipe-type{
-    width: 80%;
-    height: auto;
-}
-
-// profiles
-
-@keyframes profile-hover {
-    from {
-        height: 10rem;
-        width: 10rem;
-    }
-    to {
-        height: 11rem;
-        width: 11rem;
-    }   
-}
-
-.profile-card{
+.vertical-center{
     display: flex;
     flex-direction: column;
-    padding: 1rem;
     justify-content: center;
     align-items: center;
-    text-decoration: none;
+    align-content: center;
+    align-self: center;
 }
 
-.avatar{
-    height: 10rem;
-    width: auto;
-    border: solid;
-    border-color: $tk-violet;
-    border-radius: 100%;
+//
+
+
+.light-label{
+    font-family: 'Montserrat-Bold';
+    color: $imss-gris;
+    font-weight: bolder;
+    align-self: center;
+}
+
+.dark-label{
+    font-family: 'Montserrat-Bold';
+    color: $imss-verde;
+    align-self: left;
     margin: 1rem;
-    @include tk-shadow();
-    object-fit: cover;
-    }
-
-.avatar:hover{
-    animation-name: profile-hover;
-    animation-duration: 1s;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
 }
 
-.statistics-card{
-    @include text-manrope();
-    @include tk-shadow();
-    background-color: $tk-white;
-    border-radius: 20px;
+.text-input-beige{
+    background-color: $imss-gris;
+    border:$imss-verde;
+    border-radius: 5px;
+    color: $imss-verde;
+    margin-left: 1rem;
+    padding: 5px;
+    font-family: 'Montserrat-Medium';
+    @include shadow();
+}
+
+// DETALLITO
+.text-input-beige:focus-visible{
+    border: $imss-verde;    
+}
+
+.text-input{
+    background-color: white;
+    font-family: 'Montserrat-Medium';
+    font-size: 12px;
+    color: $imss-verde;
+    width: 100%;
+    border-radius: 10px;
+    border: none;
+    padding: 5px;
+    @include shadow();
+}
+
+td .text-input{
+    text-align: end;
+}
+
+.text-input.bloqueado{
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.btn-beige{
+    background-color: $imss-beige;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: 'Montserrat-Bold';
+    color: $imss-verde;
+    @include shadow();
+}
+
+.btn-verde{
+    background-color: $imss-verde;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-family: 'Montserrat-Bold';
+    color: $imss-gris;
+    margin-top: 1rem;
+    @include shadow();
+}
+
+.btn-beige:hover, .btn-verde:hover{
+    cursor: pointer;
+}
+
+// BANNER 
+
+.banner{
+    background-color: $imss-verde;
+}
+
+.linea{
+    border-style: solid;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    border-color: $imss-gris;
+    margin: 1rem;
+    padding-left: 1rem;
+}
+
+.barra{
+    height: 20px;
+    width: 100%;
+    background-color: $imss-beige;
+}
+
+// ICONO USUARIO
+
+.nombre-usuario{
+    font-family: 'Montserrat-Bold';
+    font-size: 12px;
+    text-align: start;
+    color: $imss-verde;
+}
+
+.tipo-usuario{
+    font-family: 'Montserrat-Medium';
+    font-size: 12px;
+    text-align: left;
+    color: $imss-verde;
+}
+
+.texto-hint{
+    font-family: 'Montserrat-Bold';
+    font-size: 1rem;
+    color: $imss-verde;
+}
+
+// SIDEBAR
+
+/* Estilos para la barra lateral */
+.sidebar {
+    overflow-y: hidden;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+.sidebar ul {
+    list-style: none;
+    margin-top: 0;
+    padding: 0;
+  }
+  
+.sidebar-item, .sbi {
+    font-family: 'Montserrat-Bold';
+    display: block;
     padding: 1rem;
-    margin: 1rem;
+    color: $imss-verde;
+    text-decoration: none;
+    border-radius: 20px 0 0 20px;
+  }
+  
+.sidebar-item:hover, .sbi:hover {
+    background-color: #eeeeee;
+  }
+  
+.sidebar-item.activo {
+    background-color: $imss-gris;
+  }
+
+
+.dropdown{
+    position: relative;
 }
 
-.tk-stats-icon{
-    height: 5rem;
-    width: auto;
+.dropdown-menu {
+    display: none;
+    position: relative;
+    left: 10px;
+    padding: 10px;
+  }
+  
+.dropdown-menu .sidebar-item{
+    font-family: 'Montserrat-Regular';
+    display: block;
+    padding: 10px;
+    color: $imss-verde;
+    text-decoration: none;
+    border-radius: 20px 0 0 20px;
+}  
+
+.dropdown.active .dropdown-menu {
+    display: block;
+}
+  
+.logout{
+    font-family: 'Montserrat-Medium';
+    font-size: 12px;
+    text-decoration: none;
+    color: $imss-verde;
+    border-radius: 20px;
+    padding: 10px;
 }
 
-.tk-progress{
-    background-color: $tk-darkblue;
-    color: $tk-darkblue; 
+.logout:hover{
+    background-color: $imss-beige;
 }
 
-.tk-progress-bar{
-    background-color: $tk-green;
+  .contenido {
+    display: none;
+}
+
+.contenido.activo {
+    padding: 1rem;
+    display: block;
+    background-color: $imss-gris;
+    height: auto;
+    border-radius: 0 20px 20px 0;
 }

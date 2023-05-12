@@ -20,16 +20,16 @@ routes.get('/logout', (req, res) => {
 
 routes.get('/registerEjecutor', (req, res) => {
     // No existe la sesión
-    if (req.session.user === undefined) {
-        res.redirect('/login');
-        return;
-    }
+    // if (req.session.user === undefined) {
+    //     res.redirect('/login');
+    //     return;
+    // }
 
-    // No es administrador
-    if (req.session.user.tipo != 'admin') {
-        res.redirect('/login');
-        return;
-    }
+    // // No es administrador
+    // if (req.session.user.tipo != 'admin') {
+    //     res.redirect('/login');
+    //     return;
+    // }
 
     res.render('registerEjecutor', { session: req.session });
     req.session.registerEjecutor = '';

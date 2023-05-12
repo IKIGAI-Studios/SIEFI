@@ -21,7 +21,8 @@ socket.on('result-coin', (data) => {
     
     // Crea el encabezado de la tabla
     const headerRow = $('<tr>');
-
+    const headerSelCell = $('<th>').text('SELEC.');
+    headerSelCell.appendTo(headerRow);
     data[0].forEach((header) => {
         const headerCell = $('<th>').text(header);
         headerCell.appendTo(headerRow);
@@ -32,15 +33,18 @@ socket.on('result-coin', (data) => {
     data.forEach((row, i) => {
         if (i == 0) return;
         const dataRow = $('<tr>');
-        
+
         // Crea la celda del checkbox
         const checkboxCell = $('<td>');
-        const checkbox = $('<input>')
-                        .attr('type', 'checkbox')
-                        .val(row[0])
-                        .prop('checked', i != data.length - 1);
-        checkboxCell.append(checkbox);
 
+        if (i != data.length - 1) {
+            const checkbox = $('<input>')
+                            .attr('type', 'checkbox')
+                            .val(row[0])
+                            .prop('checked', true);
+            checkboxCell.append(checkbox);
+        }
+        
         // Agrega la celda del checkbox a la fila de datos
         checkboxCell.appendTo(dataRow);
 

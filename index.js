@@ -39,8 +39,9 @@ httpServer.listen(port, () => {
 
 app.use('/', express.static(path.join(__dirname, '/public')));
 app.use('/', main_routes);
-app.use("/img", express.static(path.join(__dirname, 'src/img')));
-app.use("/fonts", express.static(path.join(__dirname, 'src/fonts')));
-app.use("/js", express.static(path.join(__dirname, 'src/js')));
+app.use("/scss", express.static(join(__dirname, 'src/assets/scss')));
+app.use("/icons", express.static(join(__dirname, 'src/icons')));
+app.use("/imgs", express.static(join(__dirname, 'src/imgs')));
+app.use("/fonts", express.static(join(__dirname, 'src/fonts')));
+app.use("/js", express.static(join(__dirname, 'src/js')));
 app.set('view engine', 'ejs');
-app.use("/scss", express.static(path.join(__dirname, 'src/assets/scss')));
