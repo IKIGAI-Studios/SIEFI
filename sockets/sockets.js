@@ -5,9 +5,8 @@ function socket(io) {
     console.log('Client connected');
 
     // Cargar Coin
-    socket.on('load-coin', (file) => {
+    socket.on('load-coin', ({ file }) => {
       const result = processFile(file);
-
       // Envía el resultado al cliente
       socket.emit('result-coin', result);
     });
@@ -20,12 +19,10 @@ function socket(io) {
 }
 
 function processFile(file) {
-    // Procesa el archivo utilizando la biblioteca XLSX
-    const workbook = XLSX.read(file, { type: 'binary' });
-    // Realiza las operaciones necesarias con el archivo y obtén el resultado deseado
-    console.log(workbook);
-    // Devuelve el resultado
-    return result;
+  const workbook = XLSX.read(file, { type: 'array' });
+  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+  const result = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+  return result;
 }
 
 export default socket;
