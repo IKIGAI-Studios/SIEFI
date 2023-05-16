@@ -4,8 +4,8 @@ import sequelize from "../database.js" ;
 const Coin = sequelize.define('Coin', {
   id_coin: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true
   },
   deleg_control: {
     type: DataTypes.INTEGER,
@@ -71,11 +71,11 @@ const Coin = sequelize.define('Coin', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  insidencia: {
+  incidencia: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  fec_inicio: {
+  fec_incidencia: {
     type: DataTypes.DATE,
     allowNull: false
   },
@@ -102,7 +102,6 @@ const Coin = sequelize.define('Coin', {
 }, {
   tableName: 'coin',
   timestamps: false,
-  autoIncrement: false
 });
 
 export default Coin;

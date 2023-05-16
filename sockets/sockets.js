@@ -21,37 +21,45 @@ function socket(io) {
 
     // Registrar COIN en la BD
     socket.on('insert-coin', ( coin ) => {
-      console.log(coin)
+      let coinValidado = [];
       coin.forEach((reg, i) => {
-        if (i == 0) return;
-        if (i == 2) {
-          const regValid = [
-            reg[0],
-            reg[1],
-            reg[2],
-            reg[3],
-            reg[4],
-            reg[5] == 'S',
-            reg[6],
-            reg[7],
-            reg[8],
-            reg[9],
-            reg[10],
-            reg[11],
-            reg[12],
-            reg[13],
-            reg[14],
-            reg[15],
-            reg[16],
-            reg[17],
-            reg[18] == "PROGRAMABLE",
-            reg[19] == "SI",
-            reg[20] == "SI",
-            reg[21]? reg[21] : "",
-            reg[22]? reg[22] : "",
-          ]
-          console.log(regValid);
-        }
+        const regValid = {
+          id_coin : null,
+          deleg_control : reg['deleg_control'] ? reg['deleg_control'] : "",
+          subdeleg_control : reg['subdeleg_control'] ? reg['subdeleg_control'] : "",
+          deleg_emi : reg['deleg_emision'] ? reg['deleg_emision'] : "",
+          subdeleg_emi : reg['subdeleg_emision'] ? reg['subdeleg_emision'] : "",
+          reg_pat : reg['rp'] ? reg['rp'] : "",
+          escencial : reg['esencial'] ? reg['esencial']  == 'S' : false,
+          clasificacion : reg['clasificacion'] ? reg['clasificacion'] : "",
+          cve_mov_p : reg['cve_mov_pat'] ? reg['cve_mov_pat'] : "",
+          fec_mov : reg['fecha_mov_pat'] ? reg['fecha_mov_pat'] : "",
+          razon_social : reg['razon_social'] ? reg['razon_social'] : "",
+          num_credito : reg['num_credito'] ? reg['num_credito'] : "",
+          periodo : reg['periodo'] ? reg['periodo'] : "",
+          importe : reg['importe'] ? reg['importe'] : "",
+          tipo_documento : reg['tipo_documento'] ? reg['tipo_documento'] : "",
+          seguro : reg['seguro'] ? reg['seguro'] : "",
+          dias_estancia : reg['dias_estancia'] ? reg['dias_estancia'] : "",
+          incidencia : reg['incidencia'] ? reg['incidencia'] : "",
+          fec_incidencia : reg['fecha_incidencia'] ? reg['fecha_incidencia'] : "",
+          estado : reg['estado'] ? reg['estado'] == "PROGRAMABLE" : "",
+          por_importe : reg['POR IMPORTE'] ? reg['POR IMPORTE'] == "SI" : "",
+          por_antiguedad : reg['POR ANTIGUEDAD'] ? reg['POR ANTIGUEDAD'] == "SI" : "",
+          inc_actual : reg['INC ACTUAL'] ? reg['INC ACTUAL'] : "",
+          resultado : reg['RESULTADO'] ? reg['RESULTADO'] : "",
+        };
+        coinValidado.push(regValid);
+      });
+
+      Coin.bulkCreate(coinValidado)
+      .then(() => {
+        socket.emit('insert-coin-rslt', { msg: 'Archivo COIN insertado correctamente en la Base de Datos', success: true });
+        console.log("Insertado BN")
+      })
+      .catch((e) => {
+        socket.emit('insert-coin-rslt', { msg: `Error: ${e}`, success: false });
+        console.log(`Insertado Mal: ${e}`)
       })
     });
 
@@ -65,7 +73,18 @@ function socket(io) {
 function processFile(file) {
   const workbook = XLSX.read(file, { type: 'array' });
   const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-  const result = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+  const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+  const headers = data.shift();
+
+  const result = data.map((row) => {
+    const obj = {};
+    headers.forEach((header, index) => {
+      obj[header] = row[index];
+    });
+    return obj;
+  });
+
   return result;
 }
 
