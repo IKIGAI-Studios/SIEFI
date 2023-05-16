@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Ejecutor</title>
+
+</html>
+
+<body>
+    <form action="actualizarEjecutor" method="post">
+
+        <h1>Actualizar Ejecutor</h1>
+
+
+        <select name="clave_eje" id="clave_eje" onchange="itemSeleccionado('<%= JSON.stringify(ejecutores) %>')">
+            <option value="">Selecciona una clave</option>
+            <% for(var i=0; i<ejecutores.length; i++) { %>
+                <option value="<%= ejecutores[i].clave_eje %>">
+                    <%= ejecutores[i].clave_eje %>
+                </option>
+                <% } %>
+        </select>
+
+
+        <div class="container" style="width: 20%">
+            <label for="nombre">Nombre</label>
+            <input type="text" name="nombre" id="nombre" />
+        </div>
+
+        <div class="container" style="width: 20%">
+            <label for="rfc">RFC</label>
+            <input type="text" name="rfc" id="rfc" value="" />
+        </div>
+
+        <div class="container" style="width: 20%">
+            <label for="cp">CP</label>
+            <input type="cp" name="cp" id="cp" value="" />
+        </div>
+
+        <div class="container" style="width: 20%">
+            <label for="estatus">Estatus</label>
+        </div>
+        <div>
+            <label for="option1">Habilitado</label>
+            <input type="radio" id="habilitado" name="opcion" onclick="statusSeleccionado()" value="">
+
+            <label for="option2">Deshabilitado</label>
+            <input type="radio" id="deshabilitado" name="opcion" onclick="statusSeleccionado()" value="">
+            <input type="hidden" name="status" id="status" value="" />
+        </div>
+
+        <div class="container" style="width: 20%">
+            <label for="ubicacion">Tipo</label>
+            <select name="typeS" id="typeS" onchange="tipoSeleccionado()">
+                <option id="admin" value="admin">Admin</option>
+                <option id="ejecutor" value="ejecutor">Ejecutor</option>
+            </select>
+            <input type="hidden" name="type" id="type" value="" />
+        </div>
+
+
+
+        <div class="container" style="width: 20%">
+            <label for="user">Usuario</label>
+            <input type="text" name="user" id="user" disabled value="" />
+        </div>
+
+
+
+        <div>
+            <div class="container mt-3">
+                <button type="submit">Actualizar</button>
+            </div>
+        </div>
+
+
+        <% if (session.actualizarEjecutor) { %>
+            <p>
+                <%= session.actualizarEjecutor %>
+            </p>
+            <% } %>
+
+    </form>
+
+
+<div>
+    <table style="border: 1px solid black;">
+        <thead>
+            <tr>
+                <th>Patrones asignados</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td> <input type="checkbox"> </td>
+                <td>RegPat</td>
+                <td>Ubicación</td>
+            </tr>
+
+            <tr>
+                <td> <input type="checkbox"> </td>
+                <td>RegPat</td>
+                <td>Ubicación</td>
+            </tr>
+
+            <tr>
+                <td> <input type="checkbox"> </td>
+                <td>RegPat</td>
+                <td>Ubicación</td>
+            </tr>
+
+            <tr>
+                <td> <button>Desasignar</button> </td>
+            </tr>   
+        </tbody>
+    </table>
+
+
+    <table style="border: 1px solid black;">
+        <thead>
+            <tr>
+                <th>Patrones no asignados</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td> <input type="checkbox"> </td>
+                <td>RegPat</td>
+                <td>Ubicación</td>
+            </tr>
+
+            <tr>
+                <td> <input type="checkbox"> </td>
+                <td>RegPat</td>
+                <td>Ubicación</td>
+            </tr>
+
+            <tr>
+                <td> <input type="checkbox"> </td>
+                <td>RegPat</td>
+                <td>Ubicación</td>
+            </tr>
+
+            <tr>
+                <td> <button>Asignar</button> </td>
+            </tr>   
+        </tbody>
+    </table>
+
+</div>
+
+    <script>
+        function itemSeleccionado(ejecutores) {
+            ejecutores = JSON.parse(ejecutores);
+            console.log(ejecutores);
+            var clave = document.getElementById("clave_eje").value; // Obtener la clave seleccionada
+            console.log(clave);
+            var ejecutor = {}; // Variable para almacenar la información del ejecutor seleccionado
+
+            // Buscar el ejecutor con la clave seleccionada y almacenar su información en la variable 'ejecutor'
+            for (var i = 0; i < ejecutores.length; i++) {
+                if (ejecutores[i].clave_eje == clave) {
+                    ejecutor = ejecutores[i];
+                    break;
+                }
+            }
+
+            console.log(ejecutor);
+
+            // Actualizar los valores de los campos del formulario con la información del ejecutor seleccionado
+            document.getElementById("nombre").value = ejecutor.nombre;
+            document.getElementById("rfc").value = ejecutor.rfc;
+            document.getElementById("cp").value = ejecutor.cp;
+            document.getElementById("user").value = ejecutor.user;
+            document.getElementById("type").value = ejecutor.type;
+            document.getElementById("status").value = ejecutor.status;
+
+
+            if (ejecutor.type == 'ejecutor') {
+                document.getElementById("ejecutor").selected = true;
+            }
+            if (ejecutor.type == 'admin') {
+                document.getElementById("admin").selected = true;
+            }
+
+            if (ejecutor.status == '0') {
+                document.getElementById("deshabilitado").checked = true;
+            }
+            if (ejecutor.status == '1') {
+                document.getElementById("habilitado").checked = true;
+            }
+
+        }
+
+        function statusSeleccionado() {
+            if ((document.getElementById("deshabilitado").checked) == true) {
+                document.getElementById("status").value = '0';
+            }
+            if ((document.getElementById("habilitado").checked) == true) {
+                document.getElementById("status").value = '1';
+            }
+        }
+
+        function tipoSeleccionado() {
+            var tipo = document.getElementById("typeS").value; // Obtener la clave seleccionada
+            console.log('tipo: ', tipo);
+
+            if (tipo == 'admin') {
+                document.getElementById("type").value = 'admin';
+            } else {
+                if (tipo == 'ejecutor') {
+                    document.getElementById("type").value = 'ejecutor';
+                }
+            }
+        }
+
+    </script>
+
+
+
+
+
+</body>
+
+</html>

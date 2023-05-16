@@ -137,6 +137,46 @@ routes.post('/registerEjecutor', async (req, res) => {
     }
 });
 
+routes.get('/actualizarEjecutor', async (req, res) => {
+    try{
+        const ejecutores = await Ejecutor.findAll();
+        res.render('actualizarEjecutor', { session: req.session, ejecutores });
+        req.session.actualizarEjecutor = '';
+    } catch(error){
+        console.log(error);
+    }
+});
+
+    
+routes.post('/actualizarEjecutor', async (req, res) =>{
+    try{
+        const { clave_eje, nombre, rfc, cp, status, user, type } = req.body;
+        
+        //No ha seleccionado la clave del ejecutor. 
+        if (clave_eje == ''){
+            req.session.actualizarEjecutor = 'Favor de elegir la clave del ejecutor.';
+            res.redirect('/actualizarEjecutor');
+            return;
+        }
+
+        // Alguno de los campos no fue llenado
+        if (nombre == '' || rfc=='' || cp == '' || status =='' || user=='' || type == ''){
+            req.session.actualizarEjecutor = 'Favor de llenar todos los campos';
+            res.redirect('/actualizarEjecutor');
+            return;
+        }
+
+        const actualizarEjecutor = await Ejecutor.update({nombre : nombre, rfc : rfc, cp : cp, status : status, user : user, type : type}, {where: {clave_eje : clave_eje}});
+        req.session.actualizarEjecutor = 'Usuario actualizado correctamente';
+        res.redirect('/actualizarEjecutor');
+    
+    }catch(error){
+        console.log("Error ", error);
+        req.session.actualizarEjecutor = 'Error en la actualización del usuario';
+        res.redirect('/actualizarEjecutor');
+    }
+})
+
 routes.post('/loadCoin', async (req, res) => {
     try {
         res.json(req.body)
