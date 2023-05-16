@@ -1,37 +1,106 @@
 <!DOCTYPE html>
-<head lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In</title>
-</head>
-<body>
-  <form action="login" method="post">
+    <title>Cargar Información</title>
 
-    <h1>Cargar Información</h1>
+    <%- include('templates/header')%>
 
-    <div class="container" style="width: 20%">
-        <label for="afil">Afil</label>
-        <a href="" id="afil">Registrar Afil</a>
-    </div>
+    <%- include('templates/banner')%>
     
-    <div class="container">
-      <label for="Coin">Coin</label>
-      <input type="file" name="Coin" id="Coin_input" accept=".xlsx"/>
-      <div id="div-coin"></div>
-    </div>
+    <div class="container mt-5">
+      <div class="d-flex"> 
+          <div class="col-2 sidebar">
+              <ul>
+                <li class="active">
+                  <h5>INFORMACIÓN</h5>
+                  <ul class="">
+                      <li><a href="/loadInfo" class="sidebar-item activo">CARGAR INFORMACIÓN</a></li>
+                      <li><a href="#" class="sidebar-item">REGISTRAR AFIL</a></li>
+                  </ul>
+                </li>
+                <li class="active mt-3">
+                  <h5>ESTADÍSTICAS</h5>
+                  <ul class="">
+                      <li><a href="#" class="sidebar-item">INDIVIDUALES</a></li>
+                      <li><a href="#" class="sidebar-item">GLOBALES</a></li>
+                  </ul>
+                </li>
+                <li class="active mt-3">
+                  <h5>EJECUTOR</h5>
+                  <ul class="">
+                      <li><a href="#" class="sidebar-item">ACTUALIZAR</a></li>
+                      <li><a href="/registerEjecutor" class="sidebar-item">REGISTRAR</a></li>
+                  </ul>
+                </li>
+                <br><br>
+                <li><a href="#" class="logout mt-3">CERRAR SESIÓN</a></li>
+              </ul>
+          </div>
+          <div class="col-10 space-around">
+            <div id="perfil" class="contenido activo text-center">
+              <h2 class="texto-green text-center mt-5">Cargar Información</h2>
 
-    <div>
-      <div class="container mt-3">
-        <button type="submit">Ingresar</button>
+              <div class="row mt-5 mb-5">
+                <div class="col-3">
+                  <div class="container">
+                    <label for="afil">Afil</label>
+                    <a href="" class="form-control" id="afil">Registrar Afil</a>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="container">
+                    <label for="Coin">Coin</label>
+                    <input type="file" class="form-control" name="Coin" id="Coin_input" accept=".xlsx"/>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="container">
+                    <label for="Coin">Rale COP</label>
+                    <input type="file" class="form-control" name="RaleCOP" id="RaleCOP_input" accept=".xlsx"/>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="container">
+                    <label for="Coin">Rale RCV</label>
+                    <input type="file" class="form-control" name="RaleRCV" id="RaleRCV_input" accept=".xlsx"/>
+                  </div>
+                </div>
+              </div>
+              
+                <!-- <% if (session.registerEjecutor) { %>
+                  <p><%= session.registerEjecutor %></p>
+                <% } %> -->
+            
+            </div>
+          </div>  
       </div>
     </div>
 
-  </form>
+    <!-- Modal -->
+    <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="validateModal" tabindex="-1" aria-labelledby="validateModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="validateModalLabel"><h5 class="texto-green" id="modal_title">PLACEHOLDER</h5></h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+            <div class="modal-body">
+              <div id="div-table"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-success" id="btn_insertar">Insertar</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
 </body>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 <script src="socket.io/socket.io.min.js"></script>
 <script src="/js/loadInfo.js"></script>
 </html>
+

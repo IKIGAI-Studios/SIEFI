@@ -136,5 +136,15 @@ routes.post('/registerEjecutor', async (req, res) => {
         res.redirect('/registerEjecutor');
     }
 });
+
+routes.post('/loadCoin', async (req, res) => {
+    try {
+        res.json(req.body)
+    } catch (error) {
+        // Regresar un mensaje de error
+        // req.session.loginError = `Error al hacer la consulta | Error: ${error}`;
+        res.json(error);
+    }
+});
   
 export default routes;
