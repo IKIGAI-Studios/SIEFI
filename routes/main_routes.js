@@ -184,5 +184,47 @@ routes.post('/loadCoin', async (req, res) => {
         res.json(error);
     }
 });
+
+routes.get('/registrarAfil', async (req, res) => {
+    try{
+        const usuEjecutores = await Ejecutor.findAll({where: {type : 'ejecutor', status:'1'}});
+        res.render('registrarAfil', { session: req.session, usuEjecutores });
+        req.session.registrarAfil = '';
+    } catch(error){
+        console.log(error);
+    }
+});
+
+routes.post('/registrarAfil', async (req, res) => {
+    try {
+        const { reg_pat, patron, actividad, domicilio, localidad, rfc, cp, ejecutor, clave_eje } = req.body;
+
+        //Todos los campos no son llenados 
+        if(reg_pat == '' || patron == '' || actividad == '' || domicilio =='' || localidad == '' ||  cp == '' || ejecutor == '' || clave_eje =='' ){
+            req.session.registrarAfil = 'Todos los campos no han sido llenados';
+            res.redirect('/registrarAfil');
+            return;
+        }
+
+        //Los campos de RFC y CP no cumplen la longitud
+        if(rfc == ''){
+            req.session.registrarAfil = 'Ingresa un RFC válido';
+            res.redirect('/registrarAfil');
+            return;
+        }
+
+        
+        // Registrar el afil
+        const newAfil = await Afil63.create({ reg_pat, patron, actividad, domicilio, localidad, rfc, cp, ejecutor, clave_eje  });
+
+        // Regresar un mensaje de confirmación
+        req.session.registrarAfil = `Registrado Correctamente`;
+        res.redirect('/registrarAfil');
+    } catch (error) {
+        // Regresar un mensaje de error
+        req.session.registrarAfil = `No se pudo registrar el ultimo Afil | Error: ${error}`;
+        res.redirect('/registrarAfil');
+    }
+});
   
 export default routes;
