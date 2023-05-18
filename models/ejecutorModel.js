@@ -13,14 +13,6 @@ const Ejecutor = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
-    rfc: {
-      type: DataTypes.STRING(15),
-      allowNull: false,
-    },
-    cp: {
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-    },
     user: {
       type: DataTypes.STRING(30),
       allowNull: false,

@@ -8,9 +8,9 @@
             </div>
             <div class="col-lg-6">
                 <div class="d-flex space-around">
-                    <h1>SIMAPE</h1>
+                    <h1>SIEFI</h1>
                     <div class="linea">
-                        <h5>SISTEMA DE MANEJO DE EXPEDIENTES DEL DEPARTAMENTO DE PENSIONES</h5>   
+                        <h5>SISTEMA DE EJECUCIÓN FISCAL</h5>   
                     </div>
                 </div>
             </div>
@@ -22,4 +22,20 @@
         </div>
     </div>
 </div>
+<script>
+    const bsAlert = (msg, type) => {
+        const wrapper = document.createElement('div')
+        wrapper.innerHTML = [
+            `<div class="alert alert-${type} tk-dark-text alert-dismissible" role="alert" id="alert_navbar">`,
+            `   <div>${msg}</div>`,
+            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '</div>'
+        ].join('')
+
+        $('#div_alert').append(wrapper)
+    }
+</script>
 <div class="barra"></div>
+<div class="container">
+    <div id="div_alert" class="mt-2"></div>
+</div>

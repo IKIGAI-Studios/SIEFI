@@ -1,6 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import Ejecutor from '../models/ejecutorModel.js';
+import Afil63 from '../models/afilModel.js';
 
 const routes = express.Router();
 
@@ -93,7 +94,7 @@ routes.post('/login', async (req, res) => {
 
 routes.post('/registerEjecutor', async (req, res) => {
     try {
-        const { clave_eje, nombre, rfc, cp, user, pass, type } = req.body;
+        const { clave_eje, nombre,  user, pass, type } = req.body;
         
         // Encriptar contraseña
         const saltRounds = 10;
@@ -119,8 +120,6 @@ routes.post('/registerEjecutor', async (req, res) => {
         const newEjecutor = await Ejecutor.create({
             clave_eje,
             nombre,
-            rfc,
-            cp,
             user,
             pass: hashedPassword,
             type,
@@ -134,6 +133,48 @@ routes.post('/registerEjecutor', async (req, res) => {
         // Regresar un mensaje de error
         req.session.registerEjecutor = `No se pudo registrar el ultimo Ejecutor | Error: ${error}`;
         res.redirect('/registerEjecutor');
+    }
+});
+
+routes.get('/registrarAfil', async (req, res) => {
+    try{
+        const usuEjecutores = await Ejecutor.findAll({where: {type : 'ejecutor', status:'1'}});
+        res.render('registrarAfil', { session: req.session, usuEjecutores });
+        req.session.registrarAfil = '';
+    } catch(error){
+        console.log(error);
+    }
+});
+
+routes.post('/registrarAfil', async (req, res) => {
+    try {
+        const { reg_pat, patron, actividad, domicilio, localidad, rfc, cp, ejecutor, clave_eje } = req.body;
+
+        //Todos los campos no son llenados 
+        if(reg_pat == '' || patron == '' || actividad == '' || domicilio =='' || localidad == '' ||  cp == '' || ejecutor == '' || clave_eje =='' ){
+            req.session.registrarAfil = 'Todos los campos no han sido llenados';
+            res.redirect('/registrarAfil');
+            return;
+        }
+
+        //Los campos de RFC y CP no cumplen la longitud
+        if(rfc == ''){
+            req.session.registrarAfil = 'Ingresa un RFC válido';
+            res.redirect('/registrarAfil');
+            return;
+        }
+
+        
+        // Registrar el afil
+        const newAfil = await Afil63.create({ reg_pat, patron, actividad, domicilio, localidad, rfc, cp, ejecutor, clave_eje  });
+
+        // Regresar un mensaje de confirmación
+        req.session.registrarAfil = `Registrado Correctamente`;
+        res.redirect('/registrarAfil');
+    } catch (error) {
+        // Regresar un mensaje de error
+        req.session.registrarAfil = `No se pudo registrar el ultimo Afil | Error: ${error}`;
+        res.redirect('/registrarAfil');
     }
 });
   

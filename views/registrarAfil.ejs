@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Ejecutor</title>
+
+    <%- include('templates/header')%>
+
+    <%- include('templates/banner')%>
+    
+    <div class="container mt-5">
+      <div class="d-flex"> 
+          <div class="col-2 sidebar">
+              <ul>
+                <li class="dropdown active">
+                  <a href="#" class="sidebar-item">INFORMACIÓN</a>
+                  <ul class="dropdown-menu">
+                      <li><a href="#" class="sidebar-item">CARGAR INFORMACIÓN</a></li>
+                      <li><a href="#" class="sidebar-item activo">REGISTRAR AFIL</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown active">
+                  <a href="#" class="sidebar-item">ESTADÍSTICAS</a>
+                  <ul class="dropdown-menu">
+                      <li><a href="#" class="sidebar-item">INDIVIDUALES</a></li>
+                      <li><a href="#" class="sidebar-item">GLOBALES</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown active">
+                  <a href="#" class="sidebar-item">EJECUTOR</a>
+                  <ul class="dropdown-menu">
+                      <li><a href="#" class="sidebar-item">ACTUALIZAR</a></li>
+                      <li><a href="#" class="sidebar-item-sec">REGISTRAR</a></li>
+                  </ul>
+                </li>
+                <br><br>
+                <li><a href="#" class="logout mt-3">CERRAR SESIÓN</a></li>
+              </ul>
+          </div>
+          <div class="col-10 space-around">
+            <div id="perfil" class="contenido activo text-center">
+
+
+              <form action="registrarAfil" method="post">
+
+                <h1 class="texto-green">Registrar Afil</h1>
+            
+                <div class="container" style="width: 20%">
+                    <label for="reg_pat">Registro Patronal</label>
+                    <input type="text" name="reg_pat" id="reg_pat"/>
+                </div>
+                
+                <div class="container" style="width: 20%">
+                  <label for="patron">Patrón</label>
+                  <input type="text" name="patron" id="patron"/>
+                </div>
+            
+                <div class="container" style="width: 20%">
+                  <label for="actividad">Actividad</label>
+                  <input type="text" name="actividad" id="actividad"/>
+                </div>
+            
+                <div class="container" style="width: 20%">
+                  <label for="domicilio">Domicilio</label>
+                  <input type="text" name="domicilio" id="domicilio"/>
+                </div>
+            
+
+                <div class="container" style="width: 20%">
+                  <label for="localidad">Localidad</label>
+                  <input type="text" name="localidad" id="localidad"/>
+                </div>
+
+
+                <div class="container" style="width: 20%">
+                    <label for="rfc">RFC</label>
+                    <input type="text" name="rfc" id="rfc" onblur="validarRFC()"/>
+                  </div>
+              
+
+                  <div class="container" style="width: 20%">
+                    <label for="cp">Código Postal</label>
+                    <input type="number" name="cp" id="cp" onblur="validarCP()"/>
+                  </div>
+
+                  <div class="container" style="width: 20%">
+                    <label for="ejecutorS">Ejecutor</label>
+                    <select name="ejecutorS" id="ejecutorS" onchange="itemSeleccionado('<%= JSON.stringify(usuEjecutores) %>')">
+                        <option value="">Selecciona un ejecutor</option>
+                        <% for(var i=0; i<usuEjecutores.length; i++) { %>
+                            <option value="<%= usuEjecutores[i].nombre %>">
+                                <%= usuEjecutores[i].nombre %>
+                            </option>
+                            <% } %>
+                    </select>
+                    <input type="hidden" id="ejecutor" name="ejecutor">
+                  </div>
+
+
+                  <div class="container" style="width: 20%">
+                    <label for="clave_eje">Clave</label>
+                    <input type="text" name="clave_eje" id="clave_eje" readonly/>
+                  </div>
+            
+
+            
+                <div>
+                  <div class="container mt-3">
+                    <button type="submit">Registrar</button>
+                  </div>
+                </div>
+            
+                <% if (session.registrarAfil) { %>
+                  <p><%= session.registrarAfil %></p>
+                <% } %>
+            
+              </form>
+            </div>
+          </div>  
+      </div>
+    </div>
+    <script src="/js/sidebar.js"></script>
+    
+    <script>
+
+function validarRFC(){
+        var rfc = document.getElementById('rfc').value;
+
+        if(rfc.length <= 11 || rfc.length>= 14){
+          document.getElementById('rfc').value = '';
+          bsAlert('Ingresa un RFC válido', 'info');
+      }
+      }
+
+
+      function validarCP(){
+        var cp = document.getElementById('cp').value;
+        if(cp.length <= 4 || cp.length>= 6){
+          document.getElementById('cp').value = '';
+          bsAlert('Ingresa un código postal válido', 'info');
+      }
+      }
+            function itemSeleccionado(usuEjecutores) {
+            usuEjecutores = JSON.parse(usuEjecutores);
+            console.log(usuEjecutores);
+            var nombre = document.getElementById("ejecutorS").value; // Obtener la clave seleccionada
+            console.log(nombre);
+            var ejecutor = {}; // Variable para almacenar la información del ejecutor seleccionado
+
+            // Buscar el ejecutor con la clave seleccionada y almacenar su información en la variable 'ejecutor'
+            for (var i = 0; i < usuEjecutores.length; i++) {
+                if (usuEjecutores[i].nombre == nombre) {
+                    ejecutor = usuEjecutores[i];
+                    break;
+                }
+            }
+
+            console.log(ejecutor);
+
+            // Actualizar los valores de los campos del formulario con la información del ejecutor seleccionado
+            document.getElementById("clave_eje").value = ejecutor.clave_eje;
+            document.getElementById("ejecutor").value = ejecutor.nombre;
+
+        }
+    </script>
+
+</body>
+</html>
