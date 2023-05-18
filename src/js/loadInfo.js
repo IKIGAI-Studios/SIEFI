@@ -1,6 +1,12 @@
 // Instanciar los sockets
 const socket = io('http://localhost:3000');
+
 let objCoin;
+let objAfil;
+let objRaleCOP;
+let objRaleRCV;
+
+let insrt;
 
 $('#Coin_input').on('change', function(e) {
     $('#div-table').empty();
@@ -24,12 +30,44 @@ $('#Coin_input').on('change', function(e) {
         // Enviar por el socket el archivo para procesar con librearia XLSX
         reader.onload = function (e) {
             const content = new Uint8Array(e.target.result);
-            socket.emit('load-file', { file: content, type: 'coin' });
+            console.log(content)
+            socket.emit('load-coin', { file: content });
         };
 
         reader.readAsArrayBuffer(file);
     }
     else bsAlert(`No has seleccionado ningun archivo COIN`, 'danger');
+});
+
+$('#Afil_input').on('change', function(e) {
+    $('#div-table').empty();
+    // Obtener el archivo
+    const file = e.target.files[0];
+    
+    // Validar si existe el archivo
+    if (file) {
+        // Estructurar el modal
+        $('#validateModal').modal('show');
+        $('#modal_title').text('AFIL');
+
+        $(`<h3 class="text-primary">Procesando EXCEL</h3>`).appendTo('#div-table');
+        $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
+
+        $('#btn_cancelar').prop('disabled', true);
+        $('#btn_insertar').prop('disabled', true);
+
+        const reader = new FileReader();
+
+        // Enviar por el socket el archivo para procesar con librearia XLSX
+        reader.onload = function (e) {
+            const content = new Uint8Array(e.target.result);
+            console.log(content)
+            socket.emit('load-afil', { file: content });
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
+    else bsAlert(`No has seleccionado ningun archivo AFIL`, 'danger');
 });
 
 socket.on('result-coin', (data) => {
@@ -141,6 +179,7 @@ socket.on('result-coin', (data) => {
 
     // Guardar el objeto
     objCoin = data;
+    insrt = "coin";
 
     // Crear tabla
     const table = $('<table class="table">').attr('id', 'coin-table');
@@ -182,9 +221,59 @@ socket.on('result-coin', (data) => {
     $(`<b >Se encontraron ${data.length} registros<b>`).appendTo(tableContainer);
     table.appendTo(tableContainer);
     tableContainer.appendTo('#div-table'); 
+});
 
-    // Cambiar action del form
-    $('#form_load_info').attr('action', '/loadCoin');
+socket.on('result-afil', (data) => {
+    // Vaciar div del modal
+    $('#div-table').empty();
+
+    $('#btn_cancelar').prop('disabled', false);
+    $('#btn_insertar').prop('disabled', false);
+
+    // Guardar el objeto
+    objAfil = data;
+    insrt = "afil";
+
+    // Crear tabla
+    const table = $('<table class="table">').attr('id', 'afil-table');
+
+    // Crear el encabezado de la tabla
+    const thead = $('<thead>');
+    const headerRow = $('<tr>');
+
+    // Obtener los nombres de las propiedades del primer objeto
+    const headers = Object.keys(data[0]);
+
+    // Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+    headers.forEach((header) => {
+    const headerCell = $('<th scope="col">').text(header);
+    headerCell.appendTo(headerRow);
+    });
+    headerRow.appendTo(thead);
+    thead.appendTo(table);
+
+    // Crear el cuerpo de la tabla
+    const tbody = $('<tbody>');
+
+    // Recorrer los objetos y agregar filas a la tabla
+    data.forEach((obj) => {
+    const dataRow = $('<tr>');
+
+    // Recorrer las propiedades de cada objeto y agregar celdas a la fila
+    Object.values(obj).forEach((value) => {
+        const dataCell = $('<td>').text(value);
+        dataCell.appendTo(dataRow);
+    });
+
+    dataRow.appendTo(tbody);
+    });
+    tbody.appendTo(table);
+
+    // Mostrar la tabla con el numero de registros que tiene
+    const tableContainer = $('<div>').attr('id', 'tb-show-coin');
+    $(`<b >Se encontraron ${data.length} registros<b>`).appendTo(tableContainer);
+    table.appendTo(tableContainer);
+    tableContainer.appendTo('#div-table'); 
 });
 
 $('#btn_insertar').on('click', function(e) {
@@ -192,13 +281,28 @@ $('#btn_insertar').on('click', function(e) {
 
     $(`<h3 class="text-primary">Insertando en la Base de Datos</h3>`).appendTo('#div-table');
     $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
-    socket.emit('insert-coin', objCoin);
+    switch (insrt) {
+        case "coin":
+            socket.emit('insert-coin', objCoin);
+            break;
+        case "afil":
+            socket.emit('insert-afil', objAfil);
+            break;
+        case "RaleCOP":
+            socket.emit('insert-rale-cop', objRaleCOP);
+            break;
+        case "RaleRCV":
+            socket.emit('insert-rale-rcv', objRaleRCV);
+            break;
+        default:
+            break;
+    }
 
     $('#btn_cancelar').prop('disabled', true);
     $('#btn_insertar').prop('disabled', true);
 });
 
-socket.on('insert-coin-rslt', ( rslt ) => {
+socket.on('insert-rslt', ( rslt ) => {
     console.log(rslt)
     $('#div-table').empty();
 

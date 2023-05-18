@@ -10,7 +10,29 @@
 
     <%- include('templates/banner')%>
     
-    <div class="container mt-5">
+    <div class="container mt-1">
+
+      <div class="row space-around">
+        <div class="col-lg-4">
+            <div class="row justify-content-start align-items-center">
+                <div class="col-2">
+                    <img src="/icons/pfp.png" alt="">
+                </div>
+                <div class="col-10">
+                    <div class="row"><span class="nombre-usuario" id=""><%= session.user ? session.user.nombre : "Nombre" %></span></div>
+                    <div class="row"><span class="nombre-usuario" id=""><%= session.user ? session.user.apellidos : "Apellidos" %></span></div>
+                    <div class="row"><p class="tipo-usuario"><%= session.user ? session.user.tipo_usuario : "Administrador" %></p></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-center">
+                <div class="col-2"><img src="/icons/hint.png" alt="hint"></div>
+                <div class="col-10"><p class="texto-hint mt-2">REGISTRAR NUEVOS EJECUTORES</p></div>
+            </div>
+        </div>
+    </div>
+
       <div class="d-flex"> 
           <div class="col-2 sidebar">
               <ul>
@@ -43,46 +65,40 @@
             <div id="perfil" class="contenido activo text-center">
               <form action="registerEjecutor" method="post">
 
-                <h2 class="texto-green text-center">Registrar Ejecutor</h2>
+                <h2 class="texto-green text-center mt-2">Registrar</h2>
             
-                <div class="container" style="width: 20%">
+                <div class="container">
                     <label for="clave_eje">Clave eje</label>
-                    <input type="text" name="clave_eje" id="clave_eje"/>
+                    <input class="form-control" type="text" name="clave_eje" id="clave_eje"/>
                 </div>
                 
-                <div class="container" style="width: 20%">
+                <div class="container">
                   <label for="nombre">Nombre</label>
-                  <input type="text" name="nombre" id="nombre"/>
+                  <input class="form-control" type="text" name="nombre" id="nombre"/>
                 </div>
             
-                <div class="container" style="width: 20%">
-                  <label for="rfc">RFC</label>
-                  <input type="text" name="rfc" id="rfc"/>
-                </div>
-            
-                <div class="container" style="width: 20%">
-                  <label for="cp">CP</label>
-                  <input type="number" name="cp" id="cp"/>
-                </div>
-            
-                <div class="container" style="width: 20%">
+                <div class="container">
                   <label for="user">Usuario</label>
-                  <input type="text" name="user" id="user"/>
+                  <input class="form-control" type="text" name="user" id="user"/>
                 </div>
             
-                <div class="container" style="width: 20%">
+                <div class="container">
                   <label for="pass">Contraseña</label>
-                  <input type="password" name="pass" id="pass"/>
+                  <input class="form-control" type="password" name="pass" id="pass"/>
                 </div>
             
-                <div class="container" style="width: 20%">
+                <div class="container">
                   <label for="type">Tipo</label>
-                  <input type="text" name="type" id="type"/>
+                  <select class="form-control input-group-text" name="type" id="type">
+                    <option id="admin" value="admin">Admin</option>
+                    <option id="ejecutor" value="ejecutor">Ejecutor</option>
+                  </select>
                 </div>
             
                 <div>
                   <div class="container mt-3">
-                    <button type="submit">Registrar</button>
+                    <button type="reset" class="btn btn-danger">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Registrar</button>
                   </div>
                 </div>
             

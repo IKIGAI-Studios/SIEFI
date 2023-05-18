@@ -101,7 +101,7 @@ const Coin = sequelize.define('Coin', {
   }
 }, {
   tableName: 'coin',
-  timestamps: false,
+  timestamps: true,
 });
 
 export default Coin;

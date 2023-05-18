@@ -10,72 +10,90 @@
 
     <%- include('templates/banner')%>
     
-    <div class="container mt-5">
-      <div class="d-flex"> 
-          <div class="col-2 sidebar">
-              <ul>
-                <li class="active">
-                  <h5>INFORMACIÓN</h5>
-                  <ul class="">
-                      <li><a href="/loadInfo" class="sidebar-item activo">CARGAR INFORMACIÓN</a></li>
-                      <li><a href="#" class="sidebar-item">REGISTRAR AFIL</a></li>
-                  </ul>
-                </li>
-                <li class="active mt-3">
-                  <h5>ESTADÍSTICAS</h5>
-                  <ul class="">
-                      <li><a href="#" class="sidebar-item">INDIVIDUALES</a></li>
-                      <li><a href="#" class="sidebar-item">GLOBALES</a></li>
-                  </ul>
-                </li>
-                <li class="active mt-3">
-                  <h5>EJECUTOR</h5>
-                  <ul class="">
-                      <li><a href="/actualizarEjecutor" class="sidebar-item">ACTUALIZAR</a></li>
-                      <li><a href="/registerEjecutor" class="sidebar-item">REGISTRAR</a></li>
-                  </ul>
-                </li>
-                <br><br>
-                <li><a href="#" class="logout mt-3">CERRAR SESIÓN</a></li>
-              </ul>
-          </div>
-          <div class="col-10 space-around">
-            <div id="perfil" class="contenido activo text-center">
-              <h2 class="texto-green text-center mt-5">Cargar Información</h2>
+    <div class="container mt-1">
 
-              <div class="row mt-5 mb-5">
-                <div class="col-3">
-                  <div class="container">
-                    <label for="afil">Afil</label>
-                    <a href="" class="form-control" id="afil">Registrar Afil</a>
-                  </div>
+      <div class="row space-around">
+        <div class="col-lg-4">
+            <div class="row justify-content-start align-items-center">
+                <div class="col-2">
+                    <img src="/icons/pfp.png" alt="">
                 </div>
-                <div class="col-3">
-                  <div class="container">
-                    <label for="Coin">Coin</label>
-                    <input type="file" class="form-control" name="Coin" id="Coin_input" accept=".xlsx"/>
-                  </div>
+                <div class="col-10">
+                    <div class="row"><span class="nombre-usuario" id=""><%= session.user ? session.user.nombre : "Nombre" %></span></div>
+                    <div class="row"><span class="nombre-usuario" id=""><%= session.user ? session.user.apellidos : "Apellidos" %></span></div>
+                    <div class="row"><p class="tipo-usuario"><%= session.user ? session.user.tipo_usuario : "Administrador" %></p></div>
                 </div>
-                <div class="col-3">
-                  <div class="container">
-                    <label for="Coin">Rale COP</label>
-                    <input type="file" class="form-control" name="RaleCOP" id="RaleCOP_input" accept=".xlsx"/>
-                  </div>
-                </div>
-                <div class="col-3">
-                  <div class="container">
-                    <label for="Coin">Rale RCV</label>
-                    <input type="file" class="form-control" name="RaleRCV" id="RaleRCV_input" accept=".xlsx"/>
-                  </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-center">
+                <div class="col-2"><img src="/icons/hint.png" alt="hint"></div>
+                <div class="col-10"><p class="texto-hint mt-2">SUBIR ARCHIVOS EXCEL</p></div>
+            </div>
+        </div>
+      </div>
+
+      <div class="d-flex"> 
+        <div class="col-2 sidebar">
+            <ul>
+              <li class="active">
+                <h5>INFORMACIÓN</h5>
+                <ul class="">
+                    <li><a href="/loadInfo" class="sidebar-item activo">CARGAR INFORMACIÓN</a></li>
+                    <li><a href="#" class="sidebar-item">REGISTRAR AFIL</a></li>
+                </ul>
+              </li>
+              <li class="active mt-3">
+                <h5>ESTADÍSTICAS</h5>
+                <ul class="">
+                    <li><a href="#" class="sidebar-item">INDIVIDUALES</a></li>
+                    <li><a href="#" class="sidebar-item">GLOBALES</a></li>
+                </ul>
+              </li>
+              <li class="active mt-3">
+                <h5>EJECUTOR</h5>
+                <ul class="">
+                    <li><a href="/actualizarEjecutor" class="sidebar-item">ACTUALIZAR</a></li>
+                    <li><a href="/registerEjecutor" class="sidebar-item">REGISTRAR</a></li>
+                </ul>
+              </li>
+              <br><br>
+              <li><a href="#" class="logout mt-3">CERRAR SESIÓN</a></li>
+            </ul>
+        </div>
+        <div class="col-10 space-around">
+          <div id="perfil" class="contenido activo text-center">
+            <h2 class="texto-green text-center mt-2">Cargar Información</h2>
+
+            <div class="row mt-5 mb-5">
+              <div class="col-3">
+                <div class="container">
+                  <label for="afil">Afil</label>
+                  <a href="" class="form-control" id="afil">Registrar Afil</a>
+                  <input type="hidden" class="form-control" name="Afil" id="Afil_input" accept=".xlsx"/>
                 </div>
               </div>
-              
-                <!-- <% if (session.registerEjecutor) { %>
-                  <p><%= session.registerEjecutor %></p>
-                <% } %> -->
-            
+              <div class="col-3">
+                <div class="container">
+                  <label for="Coin">Coin</label>
+                  <input type="file" class="form-control" name="Coin" id="Coin_input" accept=".xlsx"/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="container">
+                  <label for="Coin">Rale COP</label>
+                  <input type="file" class="form-control" name="RaleCOP" id="RaleCOP_input" accept=".xlsx"/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="container">
+                  <label for="Coin">Rale RCV</label>
+                  <input type="file" class="form-control" name="RaleRCV" id="RaleRCV_input" accept=".xlsx"/>
+                </div>
+              </div>
             </div>
-          </div>  
+          </div>
+        </div>  
       </div>
     </div>
 
@@ -91,7 +109,7 @@
               <div id="div-table" class="text-center"></div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btn_cancelar">Cancelar</button>
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btn_cancelar" onclick="location.reload()">Cancelar</button>
               <button type="submit" class="btn btn-success" id="btn_insertar">Insertar</button>
             </div>
         </div>

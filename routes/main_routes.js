@@ -93,7 +93,7 @@ routes.post('/login', async (req, res) => {
 
 routes.post('/registerEjecutor', async (req, res) => {
     try {
-        const { clave_eje, nombre, rfc, cp, user, pass, type } = req.body;
+        const { clave_eje, nombre, user, pass, type } = req.body;
         
         // Encriptar contraseña
         const saltRounds = 10;
@@ -119,8 +119,6 @@ routes.post('/registerEjecutor', async (req, res) => {
         const newEjecutor = await Ejecutor.create({
             clave_eje,
             nombre,
-            rfc,
-            cp,
             user,
             pass: hashedPassword,
             type,
@@ -150,7 +148,7 @@ routes.get('/actualizarEjecutor', async (req, res) => {
     
 routes.post('/actualizarEjecutor', async (req, res) =>{
     try{
-        const { clave_eje, nombre, rfc, cp, status, user, type } = req.body;
+        const { clave_eje, nombre, status, user, type } = req.body;
         
         //No ha seleccionado la clave del ejecutor. 
         if (clave_eje == ''){
@@ -160,13 +158,13 @@ routes.post('/actualizarEjecutor', async (req, res) =>{
         }
 
         // Alguno de los campos no fue llenado
-        if (nombre == '' || rfc=='' || cp == '' || status =='' || user=='' || type == ''){
+        if (nombre == '' || status =='' || user=='' || type == ''){
             req.session.actualizarEjecutor = 'Favor de llenar todos los campos';
             res.redirect('/actualizarEjecutor');
             return;
         }
 
-        const actualizarEjecutor = await Ejecutor.update({nombre : nombre, rfc : rfc, cp : cp, status : status, user : user, type : type}, {where: {clave_eje : clave_eje}});
+        const actualizarEjecutor = await Ejecutor.update({nombre : nombre, status : status, user : user, type : type}, {where: {clave_eje : clave_eje}});
         req.session.actualizarEjecutor = 'Usuario actualizado correctamente';
         res.redirect('/actualizarEjecutor');
     

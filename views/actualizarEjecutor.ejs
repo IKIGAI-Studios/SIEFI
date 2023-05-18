@@ -1,229 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Actualizar Ejecutor</title>
 
-</html>
+    <%- include('templates/header')%>
 
-<body>
-    <form action="actualizarEjecutor" method="post">
+    <%- include('templates/banner')%>
+    
+    <div class="container mt-1">
 
-        <h1>Actualizar Ejecutor</h1>
-
-
-        <select name="clave_eje" id="clave_eje" onchange="itemSeleccionado('<%= JSON.stringify(ejecutores) %>')">
-            <option value="">Selecciona una clave</option>
-            <% for(var i=0; i<ejecutores.length; i++) { %>
-                <option value="<%= ejecutores[i].clave_eje %>">
-                    <%= ejecutores[i].clave_eje %>
-                </option>
-                <% } %>
-        </select>
-
-
-        <div class="container" style="width: 20%">
-            <label for="nombre">Nombre</label>
-            <input type="text" name="nombre" id="nombre" />
-        </div>
-
-        <div class="container" style="width: 20%">
-            <label for="rfc">RFC</label>
-            <input type="text" name="rfc" id="rfc" value="" />
-        </div>
-
-        <div class="container" style="width: 20%">
-            <label for="cp">CP</label>
-            <input type="cp" name="cp" id="cp" value="" />
-        </div>
-
-        <div class="container" style="width: 20%">
-            <label for="estatus">Estatus</label>
-        </div>
-        <div>
-            <label for="option1">Habilitado</label>
-            <input type="radio" id="habilitado" name="opcion" onclick="statusSeleccionado()" value="">
-
-            <label for="option2">Deshabilitado</label>
-            <input type="radio" id="deshabilitado" name="opcion" onclick="statusSeleccionado()" value="">
-            <input type="hidden" name="status" id="status" value="" />
-        </div>
-
-        <div class="container" style="width: 20%">
-            <label for="ubicacion">Tipo</label>
-            <select name="typeS" id="typeS" onchange="tipoSeleccionado()">
-                <option id="admin" value="admin">Admin</option>
-                <option id="ejecutor" value="ejecutor">Ejecutor</option>
-            </select>
-            <input type="hidden" name="type" id="type" value="" />
-        </div>
-
-
-
-        <div class="container" style="width: 20%">
-            <label for="user">Usuario</label>
-            <input type="text" name="user" id="user" disabled value="" />
-        </div>
-
-
-
-        <div>
-            <div class="container mt-3">
-                <button type="submit">Actualizar</button>
+        <div class="row space-around">
+            <div class="col-lg-4">
+                <div class="row justify-content-start align-items-center">
+                    <div class="col-2">
+                        <img src="/icons/pfp.png" alt="">
+                    </div>
+                    <div class="col-10">
+                        <div class="row"><span class="nombre-usuario" id=""><%= session.user ? session.user.nombre : "Nombre" %></span></div>
+                        <div class="row"><span class="nombre-usuario" id=""><%= session.user ? session.user.apellidos : "Apellidos" %></span></div>
+                        <div class="row"><p class="tipo-usuario"><%= session.user ? session.user.tipo_usuario : "Administrador" %></p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-center">
+                    <div class="col-2"><img src="/icons/hint.png" alt="hint"></div>
+                    <div class="col-10"><p class="texto-hint mt-2">ACTUALIZAR DATOS DEL EJECUTOR</p></div>
+                </div>
             </div>
         </div>
 
+      <div class="d-flex"> 
+          <div class="col-2 sidebar">
+              <ul>
+                <li class="active">
+                  <h5>INFORMACIÓN</h5>
+                  <ul class="">
+                      <li><a href="/loadInfo" class="sidebar-item">CARGAR INFORMACIÓN</a></li>
+                      <li><a href="#" class="sidebar-item">REGISTRAR AFIL</a></li>
+                  </ul>
+                </li>
+                <li class="active mt-3">
+                  <h5>ESTADÍSTICAS</h5>
+                  <ul class="">
+                      <li><a href="#" class="sidebar-item">INDIVIDUALES</a></li>
+                      <li><a href="#" class="sidebar-item">GLOBALES</a></li>
+                  </ul>
+                </li>
+                <li class="active mt-3">
+                  <h5>EJECUTOR</h5>
+                  <ul class="">
+                      <li><a href="/actualizarEjecutor" class="sidebar-item activo">ACTUALIZAR</a></li>
+                      <li><a href="/registerEjecutor" class="sidebar-item">REGISTRAR</a></li>
+                  </ul>
+                </li>
+                <br><br>
+                <li><a href="#" class="logout mt-3">CERRAR SESIÓN</a></li>
+              </ul>
+          </div>
+          <div class="col-10 space-around">
+            <div id="perfil" class="contenido activo text-center">
 
-        <% if (session.actualizarEjecutor) { %>
-            <p>
-                <%= session.actualizarEjecutor %>
-            </p>
-            <% } %>
+                <form action="actualizarEjecutor" method="post">
+                    <h2 class="texto-green text-center mt-2">Actualizar Ejecutor</h2>
+        
+                    <div class="container">
+                        <label for="clave_eje">Clave de Ejecutor</label>
+                        <select name="clave_eje" id="clave_eje" class="form-control input-group-text" onchange="itemSeleccionado('<%= JSON.stringify(ejecutores) %>')">
+                            <option value="">Selecciona una clave</option>
+                            <% for(var i=0; i<ejecutores.length; i++) { %>
+                                <option value="<%= ejecutores[i].clave_eje %>">
+                                    <%= ejecutores[i].clave_eje %>
+                                </option>
+                                <% } %>
+                        </select>
+                    </div>
+            
+                    <div class="container">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" name="nombre" id="nombre" class="form-control text-center"/>
+                    </div>
+                    
+                    Estatus
+                    <div class="container mt-2">
+                        <label for="option1">Habilitado</label>
+                        <input class="form-check-input mt-0" type="radio" id="habilitado" name="opcion" onclick="statusSeleccionado()" value="">
+            
+                        <label for="option2">Deshabilitado</label>
+                        <input class="form-check-input mt-0" type="radio" id="deshabilitado" name="opcion" onclick="statusSeleccionado()" value="">
+                        <input type="hidden" name="status" id="status" value="" />
+                    </div>
+            
+                    Tipo
+                    <div class="container">
+                        <select class="form-control input-group-text" name="typeS" id="typeS" onchange="tipoSeleccionado()">
+                            <option id="admin" value="admin">Admin</option>
+                            <option id="ejecutor" value="ejecutor">Ejecutor</option>
+                        </select>
+                        <input type="hidden" name="type" id="type" value="" />
+                    </div>
+            
+                    <div class="container">
+                        <label for="user">Usuario</label>
+                        <input type="text" name="user" id="user" disabled value=""  class="form-control text-center"/>
+                    </div>
+            
+                    <div>
+                        <div class="container mt-3">
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </div>
+            
+                    <% if (session.actualizarEjecutor) { %>
+                        <p>
+                            <%= session.actualizarEjecutor %>
+                        </p>
+                        <% } %>
+                </form>
+            
+                <div class="row m-3">
+                    <div class="col">
+                        <h4>Patrones Asignados</h4>
+                        <table style="border: 1px solid black;" class="col m-2 table">
+                            <thead>
+                                <tr>
+                                    <th>Seleccionar</th>
+                                    <th>Registro Patronal</th>
+                                    <th>Ubicación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td> <input type="checkbox" class="form-check-input"> </td>
+                                    <td>RegPat</td>
+                                    <td>Ubicación</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td> <input type="checkbox" class="form-check-input"> </td>
+                                    <td>RegPat</td>
+                                    <td>Ubicación</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td> <input type="checkbox" class="form-check-input"> </td>
+                                    <td>RegPat</td>
+                                    <td>Ubicación</td>
+                                </tr> 
+                            </tbody>
+                        </table>
+                        <button class="btn btn-danger">Desasignar</button>
+                    </div>
+                    <div class="col">
+                        <h4>Patrones No Asignados</h4>
+                        <table style="border: 1px solid black;" class="col m-2 table">
+                            <thead>
+                                <tr>
+                                    <th>Seleccionar</th>
+                                    <th>Registro Patronal</th>
+                                    <th>Ubicación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td> <input type="checkbox" class="form-check-input"> </td>
+                                    <td>RegPat</td>
+                                    <td>Ubicación</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td> <input type="checkbox" class="form-check-input"> </td>
+                                    <td>RegPat</td>
+                                    <td>Ubicación</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td> <input type="checkbox" class="form-check-input"> </td>
+                                    <td>RegPat</td>
+                                    <td>Ubicación</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button class="btn btn-success">Asignar</button>
+                    </div>
+                </div>
+            </div>
+          </div>  
+      </div>
+    </div>
 
-    </form>
-
-
-<div>
-    <table style="border: 1px solid black;">
-        <thead>
-            <tr>
-                <th>Patrones asignados</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td> <input type="checkbox"> </td>
-                <td>RegPat</td>
-                <td>Ubicación</td>
-            </tr>
-
-            <tr>
-                <td> <input type="checkbox"> </td>
-                <td>RegPat</td>
-                <td>Ubicación</td>
-            </tr>
-
-            <tr>
-                <td> <input type="checkbox"> </td>
-                <td>RegPat</td>
-                <td>Ubicación</td>
-            </tr>
-
-            <tr>
-                <td> <button>Desasignar</button> </td>
-            </tr>   
-        </tbody>
-    </table>
-
-
-    <table style="border: 1px solid black;">
-        <thead>
-            <tr>
-                <th>Patrones no asignados</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td> <input type="checkbox"> </td>
-                <td>RegPat</td>
-                <td>Ubicación</td>
-            </tr>
-
-            <tr>
-                <td> <input type="checkbox"> </td>
-                <td>RegPat</td>
-                <td>Ubicación</td>
-            </tr>
-
-            <tr>
-                <td> <input type="checkbox"> </td>
-                <td>RegPat</td>
-                <td>Ubicación</td>
-            </tr>
-
-            <tr>
-                <td> <button>Asignar</button> </td>
-            </tr>   
-        </tbody>
-    </table>
-
-</div>
-
-    <script>
-        function itemSeleccionado(ejecutores) {
-            ejecutores = JSON.parse(ejecutores);
-            console.log(ejecutores);
-            var clave = document.getElementById("clave_eje").value; // Obtener la clave seleccionada
-            console.log(clave);
-            var ejecutor = {}; // Variable para almacenar la información del ejecutor seleccionado
-
-            // Buscar el ejecutor con la clave seleccionada y almacenar su información en la variable 'ejecutor'
-            for (var i = 0; i < ejecutores.length; i++) {
-                if (ejecutores[i].clave_eje == clave) {
-                    ejecutor = ejecutores[i];
-                    break;
-                }
-            }
-
-            console.log(ejecutor);
-
-            // Actualizar los valores de los campos del formulario con la información del ejecutor seleccionado
-            document.getElementById("nombre").value = ejecutor.nombre;
-            document.getElementById("rfc").value = ejecutor.rfc;
-            document.getElementById("cp").value = ejecutor.cp;
-            document.getElementById("user").value = ejecutor.user;
-            document.getElementById("type").value = ejecutor.type;
-            document.getElementById("status").value = ejecutor.status;
-
-
-            if (ejecutor.type == 'ejecutor') {
-                document.getElementById("ejecutor").selected = true;
-            }
-            if (ejecutor.type == 'admin') {
-                document.getElementById("admin").selected = true;
-            }
-
-            if (ejecutor.status == '0') {
-                document.getElementById("deshabilitado").checked = true;
-            }
-            if (ejecutor.status == '1') {
-                document.getElementById("habilitado").checked = true;
-            }
-
-        }
-
-        function statusSeleccionado() {
-            if ((document.getElementById("deshabilitado").checked) == true) {
-                document.getElementById("status").value = '0';
-            }
-            if ((document.getElementById("habilitado").checked) == true) {
-                document.getElementById("status").value = '1';
-            }
-        }
-
-        function tipoSeleccionado() {
-            var tipo = document.getElementById("typeS").value; // Obtener la clave seleccionada
-            console.log('tipo: ', tipo);
-
-            if (tipo == 'admin') {
-                document.getElementById("type").value = 'admin';
-            } else {
-                if (tipo == 'ejecutor') {
-                    document.getElementById("type").value = 'ejecutor';
-                }
-            }
-        }
-
-    </script>
-
-
-
-
+    <!-- Modal -->
+    <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="validateModal" tabindex="-1" aria-labelledby="validateModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="validateModalLabel"><h5 class="texto-green" id="modal_title">PLACEHOLDER</h5></h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+            <div class="modal-body">
+              <div id="div-table" class="text-center"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btn_cancelar">Cancelar</button>
+              <button type="submit" class="btn btn-success" id="btn_insertar">Insertar</button>
+            </div>
+        </div>
+      </div>
+    </div>
 
 </body>
+<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+<script src="socket.io/socket.io.min.js"></script>
+<script src="/js/actualizarEjecutor.js"></script>
 
 </html>
+
