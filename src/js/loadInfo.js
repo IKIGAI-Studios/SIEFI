@@ -70,6 +70,37 @@ $('#Afil_input').on('change', function(e) {
     else bsAlert(`No has seleccionado ningun archivo AFIL`, 'danger');
 });
 
+$('#RaleCOP_input').on('change', function(e) {
+    $('#div-table').empty();
+    // Obtener el archivo
+    const file = e.target.files[0];
+    
+    // Validar si existe el archivo
+    if (file) {
+        // Estructurar el modal
+        $('#validateModal').modal('show');
+        $('#modal_title').text('Rale COP');
+
+        $(`<h3 class="text-primary">Procesando EXCEL</h3>`).appendTo('#div-table');
+        $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
+
+        $('#btn_cancelar').prop('disabled', true);
+        $('#btn_insertar').prop('disabled', true);
+
+        const reader = new FileReader();
+
+        // Enviar por el socket el archivo para procesar con librearia XLSX
+        reader.onload = function (e) {
+            const content = new Uint8Array(e.target.result);
+            console.log(content)
+            socket.emit('load-rale-cop', { file: content });
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
+    else bsAlert(`No has seleccionado ningun archivo RALE COP`, 'danger');
+});
+
 socket.on('result-coin', (data) => {
     // Vaciar div del modal
     $('#div-table').empty();
@@ -193,8 +224,8 @@ socket.on('result-coin', (data) => {
 
     // Recorrer los nombres de las propiedades para agregar encabezados a la tabla
     headers.forEach((header) => {
-    const headerCell = $('<th scope="col">').text(header);
-    headerCell.appendTo(headerRow);
+        const headerCell = $('<th scope="col">').text(header);
+        headerCell.appendTo(headerRow);
     });
     headerRow.appendTo(thead);
     thead.appendTo(table);
@@ -204,15 +235,15 @@ socket.on('result-coin', (data) => {
 
     // Recorrer los objetos y agregar filas a la tabla
     data.forEach((obj) => {
-    const dataRow = $('<tr>');
+        const dataRow = $('<tr>');
 
-    // Recorrer las propiedades de cada objeto y agregar celdas a la fila
-    Object.values(obj).forEach((value) => {
-        const dataCell = $('<td>').text(value);
-        dataCell.appendTo(dataRow);
-    });
+        // Recorrer las propiedades de cada objeto y agregar celdas a la fila
+        Object.values(obj).forEach((value) => {
+            const dataCell = $('<td>').text(value);
+            dataCell.appendTo(dataRow);
+        });
 
-    dataRow.appendTo(tbody);
+        dataRow.appendTo(tbody);
     });
     tbody.appendTo(table);
 
@@ -276,6 +307,135 @@ socket.on('result-afil', (data) => {
     tableContainer.appendTo('#div-table'); 
 });
 
+socket.on('result-rale-cop', (data) => {
+    // Vaciar div del modal
+    $('#div-table').empty();
+
+    var err = false;
+    // Validar que sea un archivo COIN verificando cada columna
+    if ( !data[0]['REG. PATRONAL'] ) {
+        alert(`La columna REG. PATRONAL no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['M'] ) {
+        alert(`La columna M no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['OV. PATRONA'] ) {
+        alert(`La columna OV. PATRONA no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['L SE'] ) {
+        alert(`La columna L SE no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['CT NUM.CRED.'] ) {
+        alert(`La columna CT NUM.CRED. no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['C'] ) {
+        alert(`La columna C no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['E  PERIODO'] ) {
+        alert(`La columna E  PERIODO no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['TD'] ) {
+        alert(`La columna TD no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['FECHA ALTA'] ) {
+        alert(`La columna FECHA ALTA no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['FEC. NOTIF'] ) {
+        alert(`La columna FEC. NOTIF no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['. INC'] ) {
+        alert(`La columna . INC no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['. FEC. INCID'] ) {
+        alert(`La columna . FEC. INCID no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['. DIAS'] ) {
+        alert(`La columna . DIAS no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['I M P O R T E'] ) {
+        alert(`La columna I M P O R T E no se encontró en el archivo`);
+        err = true;
+    }
+    if ( !data[0]['DC SC'] ) {
+        alert(`La columna DC SC no se encontró en el archivo`);
+        err = true;
+    }
+
+    // Si hubo alguna diferente mostrar el error
+    if (err) {
+        $('#modal_title').text('ERROR');
+        $('<h3 class="text-danger">Error: Los campos introducidos del excel no coinciden con la estructura predeterminada</h3>').appendTo('#div-table');
+        $('<img src="imgs/rale_example.png" class="mt-3">').appendTo('#div-table');
+        $('<h3 class="mt-3 text-primary">Por favor asegurate de que la estructura coincida con la siguiente</h3>').appendTo('#div-table');
+        
+        $('#btn_cancelar').prop('disabled', false);
+        $('#btn_insertar').prop('disabled', true);
+        
+        return;
+    }
+
+    $('#btn_cancelar').prop('disabled', false);
+    $('#btn_insertar').prop('disabled', false);
+
+    // Guardar el objeto
+    objRaleCOP = data;
+    insrt = "raleCOP";
+
+    // Crear tabla
+    const table = $('<table class="table">').attr('id', 'rale-cop-table');
+
+    // Crear el encabezado de la tabla
+    const thead = $('<thead>');
+    const headerRow = $('<tr>');
+
+    // Obtener los nombres de las propiedades del primer objeto
+    const headers = Object.keys(data[0]);
+
+    // Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+    headers.forEach((header) => {
+        const headerCell = $('<th scope="col">').text(header);
+        headerCell.appendTo(headerRow);
+    });
+    headerRow.appendTo(thead);
+    thead.appendTo(table);
+
+    // Crear el cuerpo de la tabla
+    const tbody = $('<tbody>');
+
+    // Recorrer los objetos y agregar filas a la tabla
+    data.forEach((obj) => {
+        const dataRow = $('<tr>');
+
+        // Recorrer las propiedades de cada objeto y agregar celdas a la fila
+        Object.values(obj).forEach((value) => {
+            const dataCell = $('<td>').text(value);
+            dataCell.appendTo(dataRow);
+        });
+
+        dataRow.appendTo(tbody);
+    });
+    tbody.appendTo(table);
+
+    // Mostrar la tabla con el numero de registros que tiene
+    const tableContainer = $('<div>').attr('id', 'tb-show-rale-cop');
+    $(`<b >Se encontraron ${data.length} registros<b>`).appendTo(tableContainer);
+    table.appendTo(tableContainer);
+    tableContainer.appendTo('#div-table'); 
+});
+
 $('#btn_insertar').on('click', function(e) {
     $('#div-table').empty();
 
@@ -288,10 +448,10 @@ $('#btn_insertar').on('click', function(e) {
         case "afil":
             socket.emit('insert-afil', objAfil);
             break;
-        case "RaleCOP":
+        case "raleCOP":
             socket.emit('insert-rale-cop', objRaleCOP);
             break;
-        case "RaleRCV":
+        case "raleRCV":
             socket.emit('insert-rale-rcv', objRaleRCV);
             break;
         default:

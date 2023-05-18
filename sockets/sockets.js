@@ -1,6 +1,7 @@
 import XLSX from 'xlsx';
 import Coin from '../models/coinModel.js';
 import Afil from '../models/afilModel.js';
+import RaleCop from '../models/raleCOPModel.js';
 
 function socket(io) {
   io.on('connection', (socket) => {
@@ -13,6 +14,11 @@ function socket(io) {
     socket.on('load-afil', ({ file }) => {
       const result = processFile(file);
       socket.emit('result-afil', result);
+    });
+
+    socket.on('load-rale-cop', ({ file }) => {
+      const result = processFile(file);
+      socket.emit('result-rale-cop', result);
     });
 
     // Registrar COIN en la BD
@@ -89,8 +95,46 @@ function socket(io) {
       })
       .catch((e) => {
         socket.emit('insert-rslt', { msg: `Error: ${e}`, success: false });
-        console.log(`Insertado Mal: ${e}`)
+        console.log(`Insertado Mal: ${e}`) 
       })
+    });
+
+    socket.on('insert-rale-cop', ( rale ) => {
+      let raleValidado = [];
+      rale.forEach((reg, i) => {
+        if (!reg['REG. PATRONAL']) {
+          alert(`La fila ${i} no tiene registro patronal`)
+          return;
+        }
+        const regValid = {
+          reg_pat,
+          mov : reg['M'] ? reg['M'] : "",
+          patronal : reg['OV. PATRONA'] ? reg['OV. PATRONA'] : "",
+          sect : reg['L SE'] ? reg['L SE'] : "",
+          nom_cred : reg['CT NUM.CRED.'] ? reg['CT NUM.CRED.']  == 'S' : false,
+          ce : reg['C'] ? reg['C'] : "",
+          periodo : reg['E  PERIODO'] ? reg['E  PERIODO'] : "",
+          td : reg['TD'] ? reg['TD'] : "",
+          fec_alta : reg['FECHA ALTA'] ? reg['FECHA ALTA'] : "",
+          fec_notif : reg['FEC. NOTIF'] ? reg['FEC. NOTIF'] : "",
+          inc : reg['. INC'] ? reg['. INC'] : "",
+          fec_insid : reg['. FEC. INCID'] ? reg['. FEC. INCID'] : "",
+          dias : reg['. DIAS'] ? reg['. DIAS'] : "",
+          importe : reg['I M P O R T E'] ? reg['I M P O R T E'] : "",
+          dcsc : reg['DC SC'] ? reg['DC SC'] : ""
+        };
+        raleValidado.push(regValid);
+      });
+
+      // RaleCop.bulkCreate(raleValidado)
+      // .then(() => {
+      //   socket.emit('insert-rslt', { msg: 'Archivo COIN insertado correctamente en la Base de Datos', success: true });
+      //   console.log("Insertado BN")
+      // })
+      // .catch((e) => {
+      //   socket.emit('insert-rslt', { msg: `Error: ${e}`, success: false });
+      //   console.log(`Insertado Mal: ${e}`)
+      // })
     });
 
     // Maneja el evento de desconexión del cliente
