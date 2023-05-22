@@ -199,7 +199,7 @@ routes.post('/registrarAfil', async (req, res) => {
     try {
         const { reg_pat, patron, actividad, domicilio, localidad, rfc, cp, ejecutor, clave_eje } = req.body;
 
-        //Todos los campos no son llenados 
+        // Todos los campos no son llenados 
         if(reg_pat == '' || patron == '' || actividad == '' || domicilio =='' || localidad == '' ||  cp == '' || ejecutor == '' || clave_eje =='' ){
             req.session.registrarAfil = 'Todos los campos no han sido llenados';
             res.redirect('/registrarAfil');
@@ -213,7 +213,6 @@ routes.post('/registrarAfil', async (req, res) => {
             return;
         }
 
-        
         // Registrar el afil
         const newAfil = await Afil63.create({ reg_pat, patron, actividad, domicilio, localidad, rfc, cp, ejecutor, clave_eje  });
 

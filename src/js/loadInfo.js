@@ -30,8 +30,7 @@ $('#Coin_input').on('change', function(e) {
         // Enviar por el socket el archivo para procesar con librearia XLSX
         reader.onload = function (e) {
             const content = new Uint8Array(e.target.result);
-            console.log(content)
-            socket.emit('load-coin', { file: content });
+            socket.emit('client:load-coin', { file: content });
         };
 
         reader.readAsArrayBuffer(file);
@@ -61,8 +60,7 @@ $('#Afil_input').on('change', function(e) {
         // Enviar por el socket el archivo para procesar con librearia XLSX
         reader.onload = function (e) {
             const content = new Uint8Array(e.target.result);
-            console.log(content)
-            socket.emit('load-afil', { file: content });
+            socket.emit('client:load-afil', { file: content });
         };
 
         reader.readAsArrayBuffer(file);
@@ -92,8 +90,7 @@ $('#RaleCOP_input').on('change', function(e) {
         // Enviar por el socket el archivo para procesar con librearia XLSX
         reader.onload = function (e) {
             const content = new Uint8Array(e.target.result);
-            console.log(content)
-            socket.emit('load-rale-cop', { file: content });
+            socket.emit('client:load-rale-cop', { file: content });
         };
 
         reader.readAsArrayBuffer(file);
@@ -101,8 +98,7 @@ $('#RaleCOP_input').on('change', function(e) {
     else bsAlert(`No has seleccionado ningun archivo RALE COP`, 'danger');
 });
 
-socket.on('result-coin', (data) => {
-    // Vaciar div del modal
+socket.on('server:result-coin', ( data ) => {
     $('#div-table').empty();
 
     var err = false;
@@ -254,7 +250,7 @@ socket.on('result-coin', (data) => {
     tableContainer.appendTo('#div-table'); 
 });
 
-socket.on('result-afil', (data) => {
+socket.on('server:result-afil', ( data ) => {
     // Vaciar div del modal
     $('#div-table').empty();
 
@@ -307,69 +303,69 @@ socket.on('result-afil', (data) => {
     tableContainer.appendTo('#div-table'); 
 });
 
-socket.on('result-rale-cop', (data) => {
+socket.on('server:result-rale-cop', ( data ) => {
     // Vaciar div del modal
     $('#div-table').empty();
 
     var err = false;
     // Validar que sea un archivo COIN verificando cada columna
-    if ( !data[0]['REG. PATRONAL'] ) {
+    if ( !data.some(obj => 'REG. PATRONAL' in obj) ) {
         alert(`La columna REG. PATRONAL no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['M'] ) {
+    if ( !data.some(obj => 'M' in obj) ) {
         alert(`La columna M no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['OV. PATRONA'] ) {
+    if ( !data.some(obj => 'OV. PATRONA' in obj) ) {
         alert(`La columna OV. PATRONA no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['L SE'] ) {
+    if ( !data.some(obj => 'L SE' in obj) ) {
         alert(`La columna L SE no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['CT NUM.CRED.'] ) {
+    if ( !data.some(obj => 'CT NUM.CRED.' in obj) ) {
         alert(`La columna CT NUM.CRED. no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['C'] ) {
+    if ( !data.some(obj => 'C' in obj) ) {
         alert(`La columna C no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['E  PERIODO'] ) {
-        alert(`La columna E  PERIODO no se encontró en el archivo`);
+    if ( !data.some(obj => 'E  PERIODO' in obj) ) {
+        alert(`La columna E PERIODO no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['TD'] ) {
+    if ( !data.some(obj => 'TD' in obj) ) {
         alert(`La columna TD no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['FECHA ALTA'] ) {
+    if ( !data.some(obj => 'FECHA ALTA' in obj) ) {
         alert(`La columna FECHA ALTA no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['FEC. NOTIF'] ) {
+    if ( !data.some(obj => 'FEC. NOTIF' in obj) ) {
         alert(`La columna FEC. NOTIF no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['. INC'] ) {
+    if ( !data.some(obj => '. INC' in obj) ) {
         alert(`La columna . INC no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['. FEC. INCID'] ) {
+    if ( !data.some(obj => '. FEC. INCID' in obj) ) {
         alert(`La columna . FEC. INCID no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['. DIAS'] ) {
+    if ( !data.some(obj => '. DIAS' in obj) ) {
         alert(`La columna . DIAS no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['I M P O R T E'] ) {
+    if ( !data.some(obj => 'I M P O R T E' in obj)) {
         alert(`La columna I M P O R T E no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['DC SC'] ) {
+    if ( !data.some(obj => 'DC SC' in obj) ) {
         alert(`La columna DC SC no se encontró en el archivo`);
         err = true;
     }
@@ -397,18 +393,22 @@ socket.on('result-rale-cop', (data) => {
     // Crear tabla
     const table = $('<table class="table">').attr('id', 'rale-cop-table');
 
+    // Obtener todas las propiedades de los objetos en el conjunto de datos
+    const allProperties = Array.from(data.reduce((acc, obj) => {
+        Object.keys(obj).forEach((prop) => acc.add(prop));
+        return acc;
+    }, new Set()));
+
     // Crear el encabezado de la tabla
     const thead = $('<thead>');
     const headerRow = $('<tr>');
 
-    // Obtener los nombres de las propiedades del primer objeto
-    const headers = Object.keys(data[0]);
-
-    // Recorrer los nombres de las propiedades para agregar encabezados a la tabla
-    headers.forEach((header) => {
-        const headerCell = $('<th scope="col">').text(header);
+    // Recorrer todas las propiedades para agregar encabezados a la tabla
+    allProperties.forEach((property) => {
+        const headerCell = $('<th scope="col">').text(property);
         headerCell.appendTo(headerRow);
     });
+
     headerRow.appendTo(thead);
     thead.appendTo(table);
 
@@ -419,8 +419,9 @@ socket.on('result-rale-cop', (data) => {
     data.forEach((obj) => {
         const dataRow = $('<tr>');
 
-        // Recorrer las propiedades de cada objeto y agregar celdas a la fila
-        Object.values(obj).forEach((value) => {
+        // Recorrer todas las propiedades y agregar celdas a la fila
+        allProperties.forEach((property) => {
+            const value = obj[property] || ''; // Obtener el valor de la propiedad o usar una cadena vacía si no existe
             const dataCell = $('<td>').text(value);
             dataCell.appendTo(dataRow);
         });
@@ -436,23 +437,33 @@ socket.on('result-rale-cop', (data) => {
     tableContainer.appendTo('#div-table'); 
 });
 
-$('#btn_insertar').on('click', function(e) {
+$('#btn_insertar').on('click', async function(e) {
     $('#div-table').empty();
 
     $(`<h3 class="text-primary">Insertando en la Base de Datos</h3>`).appendTo('#div-table');
     $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
+
     switch (insrt) {
         case "coin":
-            socket.emit('insert-coin', objCoin);
+            socket.emit('client:insert-coin', objCoin);
             break;
         case "afil":
-            socket.emit('insert-afil', objAfil);
+            socket.emit('client:insert-afil', objAfil);
             break;
         case "raleCOP":
-            socket.emit('insert-rale-cop', objRaleCOP);
+            $('#div-table').empty();
+            let i = 0;
+            while (i < objRaleCOP.length) {
+                const batch = objRaleCOP.slice(i, i + 1000);
+                // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
+                await socket.emit('client:insert-rale-cop', { rale:batch, lote:i }, (res) => {
+                    showResult(res);
+                });
+                i += 1000;
+            }
             break;
         case "raleRCV":
-            socket.emit('insert-rale-rcv', objRaleRCV);
+            socket.emit('client:insert-rale-rcv', objRaleRCV);
             break;
         default:
             break;
@@ -462,11 +473,16 @@ $('#btn_insertar').on('click', function(e) {
     $('#btn_insertar').prop('disabled', true);
 });
 
-socket.on('insert-rslt', ( rslt ) => {
-    console.log(rslt)
-    $('#div-table').empty();
+socket.on('connect', () => {
+    // console.log('Conexión establecida con el servidor');
+});
 
-    if (rslt.success) {
+socket.on('disconnect', () => {
+    // console.log('Conexión perdida con el servidor');
+});  
+
+function showResult( rslt ) {
+    if (rslt.status) {
         $(`<h3 class="text-success">${rslt.msg}</h3>`).appendTo('#div-table');
         $('<img src="imgs/folder_listo.png" class="mt-3">').appendTo('#div-table');
     } else {
@@ -476,4 +492,4 @@ socket.on('insert-rslt', ( rslt ) => {
 
     $('#btn_cancelar').prop('disabled', false).text('Salir');
     $('#btn_insertar').prop('disabled', true);
-});
+}
