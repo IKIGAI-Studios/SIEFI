@@ -90,7 +90,7 @@ $('#RaleCOP_input').on('change', function(e) {
         // Enviar por el socket el archivo para procesar con librearia XLSX
         reader.onload = function (e) {
             const content = new Uint8Array(e.target.result);
-            socket.emit('client:load-rale-cop', { file: content });
+            socket.emit('client:load-rale', { file: content });
         };
 
         reader.readAsArrayBuffer(file);
@@ -99,92 +99,85 @@ $('#RaleCOP_input').on('change', function(e) {
 });
 
 socket.on('server:result-coin', ( data ) => {
+    console.log(data)
     $('#div-table').empty();
 
     var err = false;
     // Validar que sea un archivo COIN verificando cada columna
-    if ( !data[0]['deleg_control'] ) {
+    if ( !data.some(obj => 'deleg_control' in obj) ) {
         alert(`La columna deleg_control no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['subdeleg_control'] ) {
+    if ( !data.some(obj => 'subdeleg_control' in obj) ) {
         alert(`La columna subdeleg_control no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['deleg_emision'] ) {
+    if ( !data.some(obj => 'deleg_emision' in obj) ) {
         alert(`La columna deleg_emision no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['subdeleg_emision'] ) {
+    if ( !data.some(obj => 'subdeleg_emision' in obj) ) {
         alert(`La columna subdeleg_emision no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['rp'] ) {
+    if ( !data.some(obj => 'rp' in obj) ) {
         alert(`La columna rp no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['esencial'] ) {
+    if ( !data.some(obj => 'esencial' in obj) ) {
         alert(`La columna esencial no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['clasificacion'] ) {
+    if ( !data.some(obj => 'clasificacion' in obj) ) {
         alert(`La columna clasificacion no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['cve_mov_pat'] ) {
+    if ( !data.some(obj => 'cve_mov_pat' in obj) ) {
         alert(`La columna cve_mov_pat no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['fecha_mov_pat'] ) {
+    if ( !data.some(obj => 'fecha_mov_pat' in obj) ) {
         alert(`La columna fecha_mov_pat no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['razon_social'] ) {
+    if ( !data.some(obj => 'razon_social' in obj) ) {
         alert(`La columna razon_social no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['num_credito'] ) {
+    if ( !data.some(obj => 'num_credito' in obj) ) {
         alert(`La columna num_credito no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['periodo'] ) {
+    if ( !data.some(obj => 'periodo' in obj) ) {
         alert(`La columna periodo no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['importe'] ) {
+    if ( !data.some(obj => 'importe' in obj) ) {
         alert(`La columna importe no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['tipo_documento'] ) {
+    if ( !data.some(obj => 'tipo_documento' in obj) ) {
         alert(`La columna tipo_documento no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['seguro'] ) {
+    if ( !data.some(obj => 'seguro' in obj) ) {
         alert(`La columna seguro no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['dias_estancia'] ) {
+    if ( !data.some(obj => 'dias_estancia' in obj) ) {
         alert(`La columna dias_estancia no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['incidencia'] ) {
+    if ( !data.some(obj => 'incidencia' in obj) ) {
         alert(`La columna incidencia no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['fecha_incidencia'] ) {
+    if ( !data.some(obj => 'fecha_incidencia' in obj) ) {
         alert(`La columna fecha_incidencia no se encontró en el archivo`);
         err = true;
     }
-    if ( !data[0]['estado'] ) {
+    if ( !data.some(obj => 'estado' in obj) ) {
         alert(`La columna estado no se encontró en el archivo`);
-        err = true;
-    }
-    if ( !data[0]['POR IMPORTE'] ) {
-        alert(`La columna POR IMPORTE no se encontró en el archivo`);
-        err = true;
-    }
-    if ( !data[0]['POR ANTIGUEDAD'] ) {
-        alert(`La columna POR ANTIGUED no se encontró en el archivo`);
         err = true;
     }
 
@@ -208,21 +201,24 @@ socket.on('server:result-coin', ( data ) => {
     objCoin = data;
     insrt = "coin";
 
-    // Crear tabla
     const table = $('<table class="table">').attr('id', 'coin-table');
+
+    // Obtener todas las propiedades de los objetos en el conjunto de datos
+    const allProperties = Array.from(data.reduce((acc, obj) => {
+        Object.keys(obj).forEach((prop) => acc.add(prop));
+        return acc;
+    }, new Set()));
 
     // Crear el encabezado de la tabla
     const thead = $('<thead>');
     const headerRow = $('<tr>');
 
-    // Obtener los nombres de las propiedades del primer objeto
-    const headers = Object.keys(data[0]);
-
-    // Recorrer los nombres de las propiedades para agregar encabezados a la tabla
-    headers.forEach((header) => {
-        const headerCell = $('<th scope="col">').text(header);
+    // Recorrer todas las propiedades para agregar encabezados a la tabla
+    allProperties.forEach((property) => {
+        const headerCell = $('<th scope="col">').text(property);
         headerCell.appendTo(headerRow);
     });
+
     headerRow.appendTo(thead);
     thead.appendTo(table);
 
@@ -233,8 +229,9 @@ socket.on('server:result-coin', ( data ) => {
     data.forEach((obj) => {
         const dataRow = $('<tr>');
 
-        // Recorrer las propiedades de cada objeto y agregar celdas a la fila
-        Object.values(obj).forEach((value) => {
+        // Recorrer todas las propiedades y agregar celdas a la fila
+        allProperties.forEach((property) => {
+            const value = obj[property] || ''; // Obtener el valor de la propiedad o usar una cadena vacía si no existe
             const dataCell = $('<td>').text(value);
             dataCell.appendTo(dataRow);
         });
@@ -443,16 +440,25 @@ $('#btn_insertar').on('click', async function(e) {
     $(`<h3 class="text-primary">Insertando en la Base de Datos</h3>`).appendTo('#div-table');
     $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
 
+    let i = 0;
+
     switch (insrt) {
         case "coin":
-            socket.emit('client:insert-coin', objCoin);
+            $('#div-table').empty();
+            while (i < objCoin.length) {
+                const batch = objCoin.slice(i, i + 100);
+                // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
+                await socket.emit('client:insert-coin', { coin:batch, lote:i }, (res) => {
+                    showResult(res);
+                });
+                i += 100;
+            }
             break;
         case "afil":
             socket.emit('client:insert-afil', objAfil);
             break;
         case "raleCOP":
             $('#div-table').empty();
-            let i = 0;
             while (i < objRaleCOP.length) {
                 const batch = objRaleCOP.slice(i, i + 1000);
                 // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él

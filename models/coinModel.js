@@ -52,7 +52,7 @@ const Coin = sequelize.define('Coin', {
     allowNull: false
   },
   periodo: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.DATE,
     allowNull: false
   },
   importe: {
