@@ -2,6 +2,7 @@ import XLSX from 'xlsx';
 import Coin from '../models/coinModel.js';
 import Afil from '../models/afilModel.js';
 import RaleCop from '../models/raleCOPModel.js';
+import {Op} from 'sequelize';
 
 function socket(io) {
   io.on('connection', (socket) => {
@@ -19,6 +20,22 @@ function socket(io) {
     socket.on('load-rale-cop', ({ file }) => {
       const result = processFile(file);
       socket.emit('result-rale-cop', result);
+    });
+
+    socket.on('cliente:consultarPatronesAsignados', async (clave_eje) => {
+      const pAsignados = await Afil.findAll({
+        where: {clave_eje : clave_eje}
+       });
+      socket.emit('servidor:patronesAsignados', pAsignados);
+    });
+
+    socket.on('cliente:consultarPatronesNoAsignados', async (clave_eje) => {
+      const pNoAsignados = await Afil.findAll({
+        where: {
+          clave_eje: { [Op.not]: clave_eje }
+        }
+       });
+      socket.emit('servidor:patronesNoAsignados', pNoAsignados);
     });
 
     // Registrar COIN en la BD

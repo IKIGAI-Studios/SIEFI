@@ -1,6 +1,9 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import Ejecutor from '../models/ejecutorModel.js';
+import Afil63 from '../models/afilModel.js';
+import {Op} from 'sequelize';
+
 
 const routes = express.Router();
 
@@ -138,7 +141,8 @@ routes.post('/registerEjecutor', async (req, res) => {
 routes.get('/actualizarEjecutor', async (req, res) => {
     try{
         const ejecutores = await Ejecutor.findAll();
-        res.render('actualizarEjecutor', { session: req.session, ejecutores });
+        const afil = await Afil63.findAll();
+        res.render('actualizarEjecutor', { session: req.session, ejecutores, afil });
         req.session.actualizarEjecutor = '';
     } catch(error){
         console.log(error);
@@ -225,6 +229,92 @@ routes.post('/registrarAfil', async (req, res) => {
         req.session.registrarAfil = `No se pudo registrar el ultimo Afil | Error: ${error}`;
         res.redirect('/registrarAfil');
     }
+});
+
+
+routes.post('/desasignarPatrones', async (req, res) => {
+    try {  
+
+        const registros_patA = req.body.patronesA;
+
+        if (typeof registros_patA == 'string') {
+            await Afil63.update(
+                { ejecutor: 'foraneo', clave_eje: 'E-00000000' },
+                { where: { reg_pat: registros_patA } }
+              )
+              .then(() =>{
+                  console.log('Actualizado correctamente');
+              })
+              .catch(() => {
+                  console.log('Error al actualizar');
+              });
+
+              res.redirect('/actualizarEjecutor');
+        } else {
+            registros_patA.map((reg) => {
+                  Afil63.update(
+                    { ejecutor: 'foraneo', clave_eje: 'E-00000000' },
+                    { where: { reg_pat: reg } }
+                  )
+                  .then(() =>{
+                      console.log('Actualizado correctamente');
+                  })
+                  .catch(() => {
+                      console.log('Error al actualizar');
+                  });
+    
+                  res.redirect('/actualizarEjecutor');
+            });
+        }
+  
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  
+
+
+routes.post('/asignarPatrones' , async (req, res) =>{ 
+    try {  
+
+        const registros_patNA = req.body.patronesNA;
+        const clave_eje = req.body.claveEje;
+        const ejecutor = req.body.nomEje;
+
+        if (typeof registros_patNA == 'string') {
+            await Afil63.update(
+                { ejecutor: ejecutor, clave_eje: clave_eje },
+                { where: { reg_pat: registros_patNA } }
+              )
+              .then(() =>{
+                  console.log('Actualizado correctamente');
+              })
+              .catch(() => {
+                  console.log('Error al actualizar');
+              });
+
+              res.redirect('/actualizarEjecutor');
+        } else {
+            registros_patNA.map((reg) => {
+                  Afil63.update(
+                    { ejecutor: ejecutor, clave_eje: clave_eje },
+                    { where: { reg_pat: reg } }
+                  )
+                  .then(() =>{
+                      console.log('Actualizado correctamente');
+                  })
+                  .catch(() => {
+                      console.log('Error al actualizar');
+                  });
+    
+                  res.redirect('/actualizarEjecutor');
+            });
+        }
+  
+    } catch (error) {
+      console.log(error);
+    }
+    
 });
   
 export default routes;

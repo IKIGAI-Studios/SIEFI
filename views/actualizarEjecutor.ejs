@@ -69,8 +69,8 @@
         
                     <div class="container">
                         <label for="clave_eje">Clave de Ejecutor</label>
-                        <select name="clave_eje" id="clave_eje" class="form-control input-group-text" onchange="itemSeleccionado('<%= JSON.stringify(ejecutores) %>')">
-                            <option value="">Selecciona una clave</option>
+                        <select name="clave_eje" id="clave_eje" class="form-control input-group-text" onchange="itemSeleccionado( '<%= JSON.stringify(ejecutores) %>')">
+                            <option value="false">Selecciona una clave</option>
                             <% for(var i=0; i<ejecutores.length; i++) { %>
                                 <option value="<%= ejecutores[i].clave_eje %>">
                                     <%= ejecutores[i].clave_eje %>
@@ -120,73 +120,71 @@
                         </p>
                         <% } %>
                 </form>
-            
-                <div class="row m-3">
-                    <div class="col">
+                
+
+
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-success" onclick="verPatronesAsignados()">
+    Ver patrones asignados
+  </button>
+  
+  <form action="desasignarPatrones" method="post">
+    <!-- Modal -->
+    <div class="modal fade" id="verPatronesAsignadosModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Patrones asignados</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
                         <h4>Patrones Asignados</h4>
-                        <table style="border: 1px solid black;" class="col m-2 table">
-                            <thead>
-                                <tr>
-                                    <th>Seleccionar</th>
-                                    <th>Registro Patronal</th>
-                                    <th>Ubicación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td> <input type="checkbox" class="form-check-input"> </td>
-                                    <td>RegPat</td>
-                                    <td>Ubicación</td>
-                                </tr>
-                    
-                                <tr>
-                                    <td> <input type="checkbox" class="form-check-input"> </td>
-                                    <td>RegPat</td>
-                                    <td>Ubicación</td>
-                                </tr>
-                    
-                                <tr>
-                                    <td> <input type="checkbox" class="form-check-input"> </td>
-                                    <td>RegPat</td>
-                                    <td>Ubicación</td>
-                                </tr> 
-                            </tbody>
-                        </table>
-                        <button class="btn btn-danger">Desasignar</button>
-                    </div>
-                    <div class="col">
-                        <h4>Patrones No Asignados</h4>
-                        <table style="border: 1px solid black;" class="col m-2 table">
-                            <thead>
-                                <tr>
-                                    <th>Seleccionar</th>
-                                    <th>Registro Patronal</th>
-                                    <th>Ubicación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td> <input type="checkbox" class="form-check-input"> </td>
-                                    <td>RegPat</td>
-                                    <td>Ubicación</td>
-                                </tr>
-                    
-                                <tr>
-                                    <td> <input type="checkbox" class="form-check-input"> </td>
-                                    <td>RegPat</td>
-                                    <td>Ubicación</td>
-                                </tr>
-                    
-                                <tr>
-                                    <td> <input type="checkbox" class="form-check-input"> </td>
-                                    <td>RegPat</td>
-                                    <td>Ubicación</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <button class="btn btn-success">Asignar</button>
+                        <div id="div-patrones-asignados"></div> 
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btnACancelar">Cancelar</button>
+                    <button class="btn btn-primary" id="btnADesasignar" type="submit">Desasignar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-warning" onclick="verPatronesNoAsignados()">
+    Ver patrones no asignados
+  </button>
+  
+<form action="asignarPatrones" method="post" id="asignarPatrones">
+    <!-- Modal -->
+    <div class="modal fade" id="verPatronesNoAsignadosModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Patrones no asignados</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <div>
+                    <h4>Patrones no Asignados</h4>
+                    <div id="div-patrones-no-asignados"></div> 
+                        <input type="hidden" id="claveEje" name ="claveEje">
+                        <input type="hidden" id="nomEje" name="nomEje" >
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btnNCancelar">Cancelar</button>
+                <button class="btn btn-primary" id="btnNAsignar">Asignar</button>
+            </div>
+        </div>
+        </div>
+    </div>
+</form>
             </div>
           </div>  
       </div>
