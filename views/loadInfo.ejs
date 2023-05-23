@@ -97,7 +97,7 @@
       </div>
     </div>
 
-    <!-- Modal -->
+    <!-- ! MODAL VALIDATE -->
     <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="validateModal" tabindex="-1" aria-labelledby="validateModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
         <div class="modal-content">
@@ -112,6 +112,72 @@
               <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btn_cancelar">Cancelar</button>
               <button type="submit" class="btn btn-success" id="btn_insertar">Insertar</button>
             </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ? MODAL ELIMINAR AFIL FILTRADO -->
+    <form action="elimarAfilFiltrado" method="post">
+      <div class="modal fade" id="verAfilModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Registros Afil</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h4>Registros Afil</h4>
+              <div id="div-registros-afil"></div>
+              
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-danger" id="btnEliminarAfil" type="submit">Eliminar</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnCerrarAfil">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- * MODAL ELIMINAR COIN FILTRADO -->
+
+    <form action="elimarCoinFiltrado" method="post" >
+      <div class="modal fade" id="verCoinModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Registros Coin</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h4>Registros Coin</h4>
+              <div id="div-registros-coin"></div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-danger" id="btnEliminarCoin" type="submit">Eliminar</button>
+              <button type="button" id="btnCerrarCoin"  class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- TODO MODAL ELIMINAR RALE RCV -->
+
+    <div class="modal fade" id="modalRaleRCV" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Registros de Rale RCV</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h4>Registros Rale RCV</h4>
+            <div id="registros-rale-rcv"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
         </div>
       </div>
     </div>
