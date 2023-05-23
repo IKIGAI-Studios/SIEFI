@@ -3,7 +3,8 @@ import bcrypt from 'bcrypt';
 import Ejecutor from '../models/ejecutorModel.js';
 import Afil63 from '../models/afilModel.js';
 import {Op} from 'sequelize';
-
+import sequelize from '../database.js';
+import RaleCop from '../models/raleCOPModel.js';
 
 const routes = express.Router();
 

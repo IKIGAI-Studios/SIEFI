@@ -3,6 +3,7 @@ import Coin from "../models/coinModel.js";
 import Afil from "../models/afilModel.js";
 import RaleCop from "../models/raleCOPModel.js";
 import RaleRcv from "../models/raleRCVModel.js";
+import sequelize from "../database.js";
 
 function socket(io) {
   io.on("connection", (socket) => {
@@ -486,32 +487,32 @@ function socket(io) {
   });
 }
 
-function processFile(file) {
-  const workbook = XLSX.read(file, { type: "array" });
-  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+// function processFile(file) {
+//   const workbook = XLSX.read(file, { type: "array" });
+//   const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-  const data = XLSX.utils.sheet_to_json(worksheet, {
-    header: 1,
-    raw: true,
-    cellDates: true,
-  });
-  const headers = data.shift();
+//   const data = XLSX.utils.sheet_to_json(worksheet, {
+//     header: 1,
+//     raw: true,
+//     cellDates: true,
+//   });
+//   const headers = data.shift();
 
-  const result = data.map((row) => {
-    const obj = {};
-    headers.forEach((header, index) => {
-      if (typeof row[index] === "object" && row[index] instanceof Date) {
-        // Convertir la fecha a cadena de texto en el formato deseado
-        obj[header] = row[index].toLocaleDateString("es-MX"); // Puedes ajustar el formato según tus necesidades
-      } else {
-        obj[header] = row[index];
-      }
-    });
-    return obj;
-  });
+//   const result = data.map((row) => {
+//     const obj = {};
+//     headers.forEach((header, index) => {
+//       if (typeof row[index] === "object" && row[index] instanceof Date) {
+//         // Convertir la fecha a cadena de texto en el formato deseado
+//         obj[header] = row[index].toLocaleDateString("es-MX"); // Puedes ajustar el formato según tus necesidades
+//       } else {
+//         obj[header] = row[index];
+//       }
+//     });
+//     return obj;
+//   });
 
-  return result;
-}
+//   return result;
+// }
 
 function processCoin(file) {
   const workbook = XLSX.read(file, { type: "array" });

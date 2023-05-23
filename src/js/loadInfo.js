@@ -185,6 +185,60 @@ $('#RaleRCV_input').on('change', function(e) {
     else bsAlert(`No has seleccionado ningun archivo RALE RCV`, 'danger');
 });
 
+$('#btn_insertar').on('click', async function(e) {
+    $('#div-table').empty();
+
+    $(`<h3 class="text-primary">Insertando en la Base de Datos</h3>`).appendTo('#div-table');
+    $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
+
+    let i = 0;
+
+    switch (insrt) {
+        case "coin":
+            while (i < objCoin.length) {
+                const batch = objCoin.slice(i, i + 100);
+                // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
+                await socket.emit('client:insert-coin', { coin:batch, lote:i }, (res) => {
+                    if (i == 0) $('#div-table').empty();
+                    showResult(res);
+                });
+                i += 100;
+            }
+            break;
+        case "afil":
+            socket.emit('client:insert-afil', objAfil);
+            break;
+        case "raleCOP":
+            while (i < objRaleCOP.length) {
+                const batch = objRaleCOP.slice(i, i + 1000);
+                // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
+                await socket.emit('client:insert-rale-cop', { rale:batch, lote:i }, (res) => {
+                    if (i == 0) $('#div-table').empty();
+                    showResult(res);
+                });
+                i += 1000;
+            }
+            break;
+        case "raleRCV":
+            $('#div-table').empty();
+            while (i < objRaleRCV.length) {
+                const batch = objRaleRCV.slice(i, i + 1000);
+                // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
+                await socket.emit('client:insert-rale-rcv', { rale:batch, lote:i }, (res) => {
+                    if (i == 0) $('#div-table').empty();
+                    showResult(res);
+                });
+                i += 1000;
+            }
+            break;
+        default:
+            break;
+    }
+
+    $('#btn_cancelar').prop('disabled', true);
+    $('#btn_insertar').prop('disabled', true);
+});
+
 socket.on('server:result-coin', ( data ) => {
     $('#div-table').empty();
 
@@ -662,58 +716,243 @@ socket.on('server:result-rale-rcv', ( data ) => {
     tableContainer.appendTo('#div-table'); 
 });
 
-$('#btn_insertar').on('click', async function(e) {
-    $('#div-table').empty();
+socket.on('servidor:consultarRegistrosRaleCOP', (data) => {
+    $('#div-registros-rale-cop').empty();
+    $('#btnCerrarRaleCOP').prop('disabled', false);
+  
+    // Crear la etiqueta select
+    const selectRaleCOP = $('<select>').attr({'id' : 'selectRaleCOP', 'name' : 'selectRaleCOP'});
 
-    $(`<h3 class="text-primary">Insertando en la Base de Datos</h3>`).appendTo('#div-table');
-    $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
+    // Crear la opción "Seleccionar" con valor falso y seleccionarla por defecto
+    const defaultOption = $('<option>').text('Seleccionar').val(false).prop('selected', true);
+    selectRaleCOP.append(defaultOption);
 
-    let i = 0;
+    // Recorrer los datos y crear las opciones adicionales
+    data.forEach((item) => {
+        const option = $('<option>').text(item).val(item);
+        selectRaleCOP.append(option);
+    });
 
-    switch (insrt) {
-        case "coin":
-            while (i < objCoin.length) {
-                const batch = objCoin.slice(i, i + 100);
-                // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
-                await socket.emit('client:insert-coin', { coin:batch, lote:i }, (res) => {
-                    if (i == 0) $('#div-table').empty();
-                    showResult(res);
-                });
-                i += 100;
-            }
-            break;
-        case "afil":
-            socket.emit('client:insert-afil', objAfil);
-            break;
-        case "raleCOP":
-            while (i < objRaleCOP.length) {
-                const batch = objRaleCOP.slice(i, i + 1000);
-                // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
-                await socket.emit('client:insert-rale-cop', { rale:batch, lote:i }, (res) => {
-                    if (i == 0) $('#div-table').empty();
-                    showResult(res);
-                });
-                i += 1000;
-            }
-            break;
-        case "raleRCV":
-            $('#div-table').empty();
-            while (i < objRaleRCV.length) {
-                const batch = objRaleRCV.slice(i, i + 1000);
-                // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
-                await socket.emit('client:insert-rale-rcv', { rale:batch, lote:i }, (res) => {
-                    if (i == 0) $('#div-table').empty();
-                    showResult(res);
-                });
-                i += 1000;
-            }
-            break;
-        default:
-            break;
-    }
+    // Agregar un evento de cambio al select
+    selectRaleCOP.on('change', function() {
+        const fechaRaleCOP = $(this).val(); // Obtener el valor de la opción seleccionada
+        socket.emit('cliente:filtrarRaleCOP', fechaRaleCOP); // Enviar el valor al servidor a través del socket
 
-    $('#btn_cancelar').prop('disabled', true);
-    $('#btn_insertar').prop('disabled', true);
+        $('#btnCerrarRaleCOP').prop('disabled', true);
+    });
+  
+    // Agregar el select al elemento con el ID 'div-registros-rale-cop'
+    $('#div-registros-rale-cop').append(selectRaleCOP);
+});
+
+socket.on('servidor:filtrarRaleCOP', (data) => {
+    //$('#div-registros-rale-cop').empty();
+    $('#btnCerrarRaleCOP').prop('disabled', false);
+    $('#btnEliminarRaleCOP').prop('disabled', false);
+    $('#selectRaleCOP').hide();
+
+    // Crear tabla
+    const table = $('<table class="table">').attr('id', 'rale-cop-filtrado-table');
+
+    // Crear el encabezado de la tabla
+    const thead = $('<thead>');
+    const headerRow = $('<tr>');
+
+    // Obtener los nombres de las propiedades del primer objeto
+    const headers = Object.keys(data[0]);
+
+    // Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+    headers.forEach((header) => {
+        const headerCell = $('<th scope="col">').text(header);
+        headerCell.appendTo(headerRow);
+    });
+
+    headerRow.appendTo(thead);
+    thead.appendTo(table);
+
+    // Crear el cuerpo de la tabla
+    const tbody = $('<tbody>');
+
+    // Recorrer los objetos y agregar filas a la tabla
+    data.forEach((obj) => {
+        const dataRow = $('<tr>');
+
+        // Recorrer las propiedades de cada objeto y agregar celdas a la fila
+        Object.values(obj).forEach((value) => {
+            const dataCell = $('<td>').text(value);
+            dataCell.appendTo(dataRow);
+        });
+
+        dataRow.appendTo(tbody);
+    });
+
+    tbody.appendTo(table);
+
+    // Mostrar la tabla con el numero de registros que tiene
+    const tableContainer = $('<div>').attr('id', 'tb-show-rale-cop-filtrado');
+    $(`<b >Se encontraron ${data.length} registros de Rale Cop<b>`).appendTo(tableContainer);
+    table.appendTo(tableContainer);
+    tableContainer.appendTo('#div-registros-rale-cop'); 
+});
+
+socket.on('servidor:filtrarCoin', (data) => {
+    //$('#div-registros-coin').empty();
+    $('#btnCerrarCoin').prop('disabled', false);
+    $('#btnEliminarCoin').prop('disabled', false);
+    $('#selectCoin').hide();
+
+    // Crear tabla
+    const table = $('<table class="table">').attr('id', 'coin-filtrado-table');
+
+    // Crear el encabezado de la tabla
+    const thead = $('<thead>');
+    const headerRow = $('<tr>');
+
+    // Obtener los nombres de las propiedades del primer objeto
+    const headers = Object.keys(data[0]);
+
+    // Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+    headers.forEach((header) => {
+        const headerCell = $('<th scope="col">').text(header);
+        headerCell.appendTo(headerRow);
+    });
+
+    headerRow.appendTo(thead);
+    thead.appendTo(table);
+
+    // Crear el cuerpo de la tabla
+    const tbody = $('<tbody>');
+
+    // Recorrer los objetos y agregar filas a la tabla
+    data.forEach((obj) => {
+        const dataRow = $('<tr>');
+
+        // Recorrer las propiedades de cada objeto y agregar celdas a la fila
+        Object.values(obj).forEach((value) => {
+            const dataCell = $('<td>').text(value);
+            dataCell.appendTo(dataRow);
+        });
+
+    dataRow.appendTo(tbody);
+    });
+
+    tbody.appendTo(table);
+
+    // Mostrar la tabla con el numero de registros que tiene
+    const tableContainer = $('<div>').attr('id', 'tb-show-coin-filtrado');
+    $(`<b >Se encontraron ${data.length} registros de Coin<b>`).appendTo(tableContainer);
+    table.appendTo(tableContainer);
+    tableContainer.appendTo('#div-registros-coin'); 
+});
+
+socket.on('servidor:consultarRegistrosAfil', (data) => {
+    $('#div-registros-afil').empty();
+    $('#btnCerrarAfil').prop('disabled', false);
+  
+    // Crear la etiqueta select
+    const selectAfil = $('<select>').attr({'id' : 'selectAfil', 'name' : 'selectAfil'});
+
+    // Crear la opción "Seleccionar" con valor falso y seleccionarla por defecto
+    const defaultOption = $('<option>').text('Seleccionar').val(false).prop('selected', true);
+    selectAfil.append(defaultOption);
+
+    // Recorrer los datos y crear las opciones adicionales
+    data.forEach((item) => {
+        const option = $('<option>').text(item).val(item);
+        selectAfil.append(option);
+    });
+  
+    // Agregar un evento de cambio al select
+    selectAfil.on('change', function() {
+      const fechaAfil = $(this).val(); // Obtener el valor de la opción seleccionada
+      socket.emit('cliente:filtrarAfil', fechaAfil); // Enviar el valor al servidor a través del socket
+    
+      $('#btnCerrarAfil').prop('disabled', true);
+    });
+  
+    // Agregar el select al elemento con el ID 'div-registros-afil'
+    $('#div-registros-afil').append(selectAfil);
+});
+  
+
+socket.on('servidor:filtrarAfil', (data) => {
+    //$('#div-registros-afil').empty();
+    $('#btnCerrarAfil').prop('disabled', false);
+    $('#btnEliminarAfil').prop('disabled', false);
+    $('#selectAfil').hide();
+
+
+    // Crear tabla
+    const table = $('<table class="table">').attr('id', 'afil-filtrado-table');
+
+    // Crear el encabezado de la tabla
+    const thead = $('<thead>');
+    const headerRow = $('<tr>');
+
+
+    // Obtener los nombres de las propiedades del primer objeto
+    const headers = Object.keys(data[0]);
+
+    // Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+    headers.forEach((header) => {
+        const headerCell = $('<th scope="col">').text(header);
+        headerCell.appendTo(headerRow);
+    });
+    headerRow.appendTo(thead);
+    thead.appendTo(table);
+
+    // Crear el cuerpo de la tabla
+    const tbody = $('<tbody>');
+
+    // Recorrer los objetos y agregar filas a la tabla
+    data.forEach((obj) => {
+        const dataRow = $('<tr>');
+
+        // Recorrer las propiedades de cada objeto y agregar celdas a la fila
+        Object.values(obj).forEach((value) => {
+            const dataCell = $('<td>').text(value);
+            dataCell.appendTo(dataRow);
+        });
+
+        dataRow.appendTo(tbody);
+    });
+    tbody.appendTo(table);
+
+    // Mostrar la tabla con el numero de registros que tiene
+    const tableContainer = $('<div>').attr('id', 'tb-show-afil-filtrado');
+    $(`<b >Se encontraron ${data.length} registros de Afil<b>`).appendTo(tableContainer);
+    table.appendTo(tableContainer);
+    tableContainer.appendTo('#div-registros-afil'); 
+});
+
+socket.on('servidor:consultarRegistrosCoin', (data) => {
+    $('#div-registros-coin').empty();
+    $('#btnCerrarCoin').prop('disabled', false);
+  
+    // Crear la etiqueta select
+    const selectCoin = $('<select>').attr({'id' : 'selectCoin', 'name' : 'selectCoin'});
+
+    // Crear la opción "Seleccionar" con valor falso y seleccionarla por defecto
+    const defaultOption = $('<option>').text('Seleccionar').val(false).prop('selected', true);
+    selectCoin.append(defaultOption);
+
+    // Recorrer los datos y crear las opciones adicionales
+    data.forEach((item) => {
+        const option = $('<option>').text(item).val(item);
+        selectCoin.append(option);
+    });
+
+  
+    // Agregar un evento de cambio al select
+    selectCoin.on('change', function() {
+      const fechaCoin = $(this).val(); // Obtener el valor de la opción seleccionada
+      socket.emit('cliente:filtrarCoin', fechaCoin); // Enviar el valor al servidor a través del socket
+    
+      $('#btnCerrarCoin').prop('disabled', true);
+    });
+  
+    // Agregar el select al elemento con el ID 'div-registros-coin'
+    $('#div-registros-coin').append(selectCoin);
 });
 
 socket.on('connect', () => {
@@ -723,6 +962,7 @@ socket.on('connect', () => {
 socket.on('disconnect', () => {
     // console.log('Conexión perdida con el servidor');
 });  
+
 
 function showResult( rslt ) {
     if (rslt.status) {
@@ -735,4 +975,40 @@ function showResult( rslt ) {
 
     $('#btn_cancelar').prop('disabled', false).text('Salir');
     $('#btn_insertar').prop('disabled', true);
+}
+
+function verRegistrosAfil(){
+    $('#div-registros-afil').empty();
+    
+        socket.emit('cliente:consultarRegistrosAfil');
+        $('#verAfilModal').modal('show');
+    
+        $(`<h3 class="text-primary">Obteniendo registros de Afil</h3>`).appendTo('#div-registros-afil');
+
+        $('#btnCerrarAfil').prop('disabled', true); 
+        $('#btnEliminarAfil').prop('disabled', true); 
+}
+
+function verRegistrosCoin(){
+    $('#div-registros-coin').empty();
+    
+        socket.emit('cliente:consultarRegistrosCoin');
+        $('#verCoinModal').modal('show');
+    
+        $(`<h3 class="text-primary">Obteniendo registros de Coin</h3>`).appendTo('#div-registros-coin');
+
+        $('#btnCerrarCoin').prop('disabled', true); 
+        $('#btnEliminarCoin').prop('disabled', true); 
+}
+
+function verRegistrosRaleCOP(){
+    $('#div-registros-rale-cop').empty();
+    
+    socket.emit('cliente:consultarRegistrosRaleCOP');
+    $('#verRaleCOPModal').modal('show');
+
+    $(`<h3 class="text-primary">Obteniendo registros de Rale COP</h3>`).appendTo('#div-registros-rale-cop');
+
+    $('#btnCerrarRaleCOP').prop('disabled', true); 
+    $('#btnEliminarRaleCop').prop('disabled', true); 
 }
