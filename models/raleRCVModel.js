@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database.js";
 
-const RaleCop = sequelize.define('rale_cop', {
+const RaleRcv = sequelize.define('rale_rcv', {
   reg_pat: {
     type: DataTypes.STRING(12),
     allowNull: false,
@@ -66,11 +66,11 @@ const RaleCop = sequelize.define('rale_cop', {
     allowNull: false
   }
 }, {
-  tableName: 'rale_cop',
+  tableName: 'rale_rcv',
   timestamps: true,
   engine: 'InnoDB',
   charset: 'utf8',
   collate: 'utf8_general_ci'
 });
 
-export default RaleCop;
+export default RaleRcv;

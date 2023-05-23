@@ -2,6 +2,7 @@ import XLSX from "xlsx";
 import Coin from "../models/coinModel.js";
 import Afil from "../models/afilModel.js";
 import RaleCop from "../models/raleCOPModel.js";
+import RaleRcv from "../models/raleRCVModel.js";
 
 function socket(io) {
   io.on("connection", (socket) => {
@@ -12,16 +13,22 @@ function socket(io) {
     });
 
     socket.on("client:load-afil", ({ file }) => {
-      const result = processFile(file);
+      console.log(file)
+      const result = processAfil(file);
       socket.emit("server:result-afil", result);
     });
 
-    socket.on("client:load-rale", ({ file }) => {
+    socket.on("client:load-rale", ({ file }, callback) => {
       const { result, raleType } = processRale(file);
       if (raleType == "COP")
         socket.emit("server:result-rale-cop", result);
       else if (raleType == "RCV")
         socket.emit("server:result-rale-rcv", result);
+      else if (raleType == "")
+        callback({
+          status: false,
+          msg: `Seleccione un archivo RALE valido`,
+        });
     });
 
     // ! INSERT COIN
@@ -54,8 +61,8 @@ function socket(io) {
             estado: reg["estado"],
             por_importe: reg["POR IMPORTE"],
             por_antiguedad: reg["POR ANTIGUEDAD"],
-            inc_actual: reg["INC ACTUAL"] ? reg["INC ACTUAL"] : null,
-            resultado: reg["RESULTADO"] ? reg["RESULTADO"] : null,
+            inc_actual: reg["INC ACTUAL"] ?? null,
+            resultado: reg["RESULTADO"] ?? null,
           };
           coinValidado.push(regValid);
         });
@@ -258,12 +265,103 @@ function socket(io) {
           });
         }
       } catch (e) {
-        callback({
-          status: false,
-          msg: `No se pudo insertar el lote [${lote}-${
-            lote + 999
-          }]. Error: ${e}`,
+        console.error(e);
+      }
+    });
+
+    socket.on("client:insert-rale-rcv", async ({ rale, lote }, callback) => {
+      try {
+        let raleValidado = [];
+        let registrosNoInsertados = []; // Arreglo para almacenar los reg_pat no insertados
+
+        // Recorrer todo el objeto para asignarles los nombres que tienen en la bd
+        rale.forEach((reg, i) => {
+          // Asignar keys
+          const regValid = {
+            reg_pat: reg["REG. PATRONAL"],
+            mov: reg["M"],
+            patronal: reg["OV. PATRONA"],
+            sect: reg["L SE"],
+            nom_cred: reg["CT NUM.CRED."],
+            ce: reg["C"],
+            periodo: reg["E  PERIODO"],
+            td: reg["TD"],
+            fec_alta: reg["FECHA ALTA"],
+            fec_notif: reg["FEC. NOTIF"],
+            inc: reg[". INC"],
+            fec_insid: reg[". FEC. INCID"],
+            dias: reg[". DIAS"],
+            importe: reg["I M P O R T E"],
+            dcsc: reg["DC SC"],
+          };
+          raleValidado.push(regValid);
         });
+
+        // Obtener todos los afil registrados y regresar solo el reg pat como afil
+        const existingRegPats = await Afil.findAll({
+          attributes: ["reg_pat"],
+        }).then((afilRecords) => {
+          return afilRecords.map((afil) => afil.reg_pat);
+        });
+
+        // Realiza una promesa para validar todos los registros, haciendo un map para todo el arreglo de rale
+        const validRecords = await Promise.all(
+          raleValidado.map(async (regValid) => {
+            // Obtiene únicamente el reg_pat de ese objeto iterado
+            const { reg_pat } = regValid;
+
+            // Verificar si el valor de reg_pat ya existe en la tabla afil
+            if (!existingRegPats.includes(reg_pat)) {
+              registrosNoInsertados.push(reg_pat); // Almacenar los reg_pat no insertados
+              return undefined;
+            }
+
+            return regValid;
+          })
+        );
+
+        // Filtrar los registros válidos para insertar en la tabla RaleCop
+        const recordsToInsert = validRecords.filter(
+          (regValid) => regValid !== undefined
+        );
+
+        if (recordsToInsert.length > 0) {
+          // Insertar los registros válidos en la tabla RaleCop
+          await RaleRcv.bulkCreate(recordsToInsert, { logging: false })
+            .then(() => {
+              callback({
+                status: true,
+                msg: `
+                Lote [${lote}-${lote + 999}] insertado correctamente
+                ${
+                  registrosNoInsertados.length > 0
+                    ? `Los siguientes registros patronales no están registrados en la tabla afil: ${registrosNoInsertados.join(
+                        ", "
+                      )}`
+                    : "Todos los registros patronales fueron insertador correctamente"
+                }
+              `,
+              });
+            })
+            .catch((e) => {
+              callback({
+                status: false,
+                msg: `No se pudo insertar el lote [${lote}-${
+                  lote + 999
+                }]. Error: ${e}`,
+              });
+            });
+        } else {
+          // No hay registros válidos para insertar
+          callback({
+            status: false,
+            msg: `No se pudo insertar el lote [${lote}-${
+              lote + 999
+            }]. No hay registros válidos.`,
+          });
+        }
+      } catch (e) {
+        console.error(e);
       }
     });
 
@@ -577,6 +675,89 @@ function processRale(file) {
   }
   let ret = { result, raleType }
   return ret;
+}
+
+function processAfil(file) {
+  const workbook = XLSX.read(file, { type: "array" });
+  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+  const data = XLSX.utils.sheet_to_json(worksheet, {
+    header: 1,
+    raw: false,
+    cellDates: true,
+  });
+
+  // Obtener los índices de las columnas de interés
+  const headerIndex = {
+    "REG PAT": null,
+    "PATRON": null,
+    "ACTIVIDAD": null,
+    "DOMICILIO": null,
+    "LOCALIDAD": null,
+    "RFC": null,
+    "C.P.": null,
+    "EJECUTOR": null,
+    "CLAVE": null
+  };
+
+  // Buscar los índices de las columnas en el encabezado
+  const headers = data[0];
+  for (let i = 0; i < headers.length; i++) {
+    const header = headers[i];
+    if (headerIndex.hasOwnProperty(header)) {
+      headerIndex[header] = i;
+    }
+  }
+
+  // Procesar los datos
+  const result = [];
+  const dict = {
+    "Alonso Ramírez Moreno": "E-10230434",
+    "Claudia Rodríguez Zenteno": "E-10230158",
+    "Griselda Ríco Gómez": "E-10230158",
+    "Iván Germán Gutiérrez Ortega": "E-10230029",
+    "María Magdalena López Ruíz": "E-10230265",
+    "FORANEO": "E-00000000",
+  }
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const obj = {};
+
+    for (const header in headerIndex) {
+      const columnIndex = headerIndex[header];
+      if (columnIndex !== null && columnIndex < row.length) {
+        let value = row[columnIndex];
+
+        // Validar que exista reg_pat
+        if (
+          header === "REG PAT" &&
+          (value === null || value === "" || value === "TOTAL DE")
+        )
+          continue;
+
+        // Poner en nulos los posibles vacíos
+        if (
+          header === "C.P." ||
+          header === "RFC" ||
+          header === "EJECUTOR" ||
+          header === "CLAVE" 
+        )
+          if ( value === null || value === "" || value === undefined )
+            value = null;
+
+        // Convertir a número entero los que son necesarios
+        if ( header === "C.P." )
+          value = value !== null ? parseInt(value) : 0;       
+
+        obj[header] = value;
+      }
+    }  
+    obj.EJECUTOR = obj.EJECUTOR ?? "FORANEO";
+    obj.CLAVE = obj.CLAVE ?? dict[obj.EJECUTOR];
+    result.push(obj);
+  }
+  return result;
 }
 
 export default socket;
