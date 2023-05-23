@@ -383,6 +383,102 @@ function socket(io) {
       socket.emit('servidor:patronesNoAsignados', pNoAsignados);
     });
 
+    // Obtener fechas de registro en la tabla Afil
+    socket.on('cliente:consultarRegistrosAfil', async () => {
+      try {
+        const fechasRegistro = await Afil.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
+        });
+
+        const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
+
+        socket.emit('servidor:consultarRegistrosAfil', fechasDistintas);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al consultar los registros de Afil.');
+      }
+    });
+
+
+    // Filtrar los registros Afil por fecha. 
+    socket.on('cliente:filtrarAfil', async (fechaAfil) => {
+      try {
+        const afilFiltrado = await Afil.findAll({
+          where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaAfil)
+        });
+        socket.emit('servidor:filtrarAfil', afilFiltrado);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al filtrar los registros de Afil por fecha.');
+      }
+    });
+
+
+    // Obtener fechas de registro en la tabla Coin
+    socket.on('cliente:consultarRegistrosCoin', async () => {
+      try {
+        const fechasRegistro = await Coin.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
+        });
+
+        const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
+
+        socket.emit('servidor:consultarRegistrosCoin', fechasDistintas);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al consultar los registros de Coin.');
+      }
+    });
+
+
+    // Filtrar los registros Coin por fecha. 
+    socket.on('cliente:filtrarCoin', async (fechaCoin) => {
+      try {
+        const coinFiltrado = await Coin.findAll({
+          where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaCoin)
+        });
+        socket.emit('servidor:filtrarCoin', coinFiltrado);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al filtrar los registros de Coin por fecha.');
+      }
+    });
+
+    // Obtener fechas de registro en la tabla Rale COP
+    socket.on('cliente:consultarRegistrosRaleCOP', async () => {
+      try {
+        const fechasRegistro = await RaleCop.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
+        });
+
+        const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
+
+        socket.emit('servidor:consultarRegistrosRaleCOP', fechasDistintas);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al consultar los registros de Coin.');
+      }
+    });
+
+    // Filtrar los registros Rale COP por fecha. 
+    socket.on('cliente:filtrarRaleCOP', async (fechaRaleCOP) => {
+      try {
+        const raleCOPFiltrado = await RaleCop.findAll({
+          where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaRaleCOP)
+        });
+        socket.emit('servidor:filtrarRaleCOP', raleCOPFiltrado);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al filtrar los registros de Rale COP por fecha.');
+      }
+    });
+
     // Maneja el evento de desconexión del cliente
     socket.on("disconnect", () => {
       // Programar eventos (innecesarios por ahora)
