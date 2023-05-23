@@ -315,5 +315,68 @@ routes.post('/asignarPatrones' , async (req, res) =>{
     }
     
 });
+
+routes.post('/elimarAfilFiltrado', async(req, res) =>{
+    try {
+        const fechaAfil = req.body.selectAfil;
+        console.log('Fecha: ',fechaAfil);
+
+        const eliminarAfilF = await Afil63.destroy({
+            where: sequelize.where(
+                sequelize.fn('DATE', sequelize.col('createdAt')),
+                fechaAfil
+              )
+        });
+
+        res.redirect('/loadInfo');
+        console.log('Eliminado correctamente');
+
+    } catch(error) {
+        console.log('Error al eliminar el Afil',error);
+        res.redirect('/loadInfo');
+    }
+});
+
+routes.post('/elimarCoinFiltrado', async(req, res) =>{
+    try {
+        const fechaCoin = req.body.selectCoin;
+        console.log('Fecha: ',fechaCoin);
+
+        const eliminarCoinF = await Coin.destroy({
+            where: sequelize.where(
+                sequelize.fn('DATE', sequelize.col('createdAt')),
+                fechaCoin
+              )
+        });
+
+        res.render('loadInfo', { session: req.session});
+        req.session.loadInfo = 'Registros eliminados exitosamente';
+
+    } catch(error) {
+        console.log('Error al eliminar el Coin',error);
+        res.redirect('/loadInfo');
+    }
+});
+
+routes.post('/elimarRaleCOPFiltrado', async(req, res) =>{
+    try {
+        const fechaRaleCOP = req.body.selectRaleCOP;
+        console.log('Fecha: ',fechaRaleCOP);
+
+        const eliminarRaleCOPF = await RaleCop.destroy({
+            where: sequelize.where(
+                sequelize.fn('DATE', sequelize.col('createdAt')),
+                fechaRaleCOP
+              )
+        });
+
+        res.render('loadInfo', { session: req.session});
+        req.session.loadInfo = 'Registros eliminados exitosamente';
+
+    } catch(error) {
+        console.log('Error al eliminar el Rale COP',error);
+        res.redirect('/loadInfo');
+    }
+});
   
 export default routes;
