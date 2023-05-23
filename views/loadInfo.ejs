@@ -71,24 +71,36 @@
                   <label for="afil">Afil</label>
                   <a href="" class="form-control" id="afil">Registrar Afil</a>
                   <input type="file" class="form-control" name="Afil" id="Afil_input" accept=".xlsx"/>
+                  <button type="button" style="display: none;" class="btn btn-secondary"  onclick="verRegistrosAfil()">
+                    Ver registros Afil
+                  </button>
                 </div>
               </div>
               <div class="col-3">
                 <div class="container">
                   <label for="Coin">Coin</label>
                   <input type="file" class="form-control" name="Coin" id="Coin_input" accept=".xlsx"/>
+                  <button type="button" class="btn btn-secondary" onclick="verRegistrosCoin()">
+                    Ver registros Coin
+                  </button>
                 </div>
               </div>
               <div class="col-3">
                 <div class="container">
                   <label for="Coin">Rale COP</label>
                   <input type="file" class="form-control" name="RaleCOP" id="RaleCOP_input" accept=".xlsx"/>
+                  <button type="button" class="btn btn-secondary" onclick="verRegistrosRaleCOP()">
+                    Ver registros de Rale Cop
+                  </button>
                 </div>
               </div>
               <div class="col-3">
                 <div class="container">
                   <label for="Coin">Rale RCV</label>
                   <input type="file" class="form-control" name="RaleRCV" id="RaleRCV_input" accept=".xlsx"/>
+                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalRaleRCV" onclick="verRegistrosRaleRCV()">
+                    Ver registros de Rale RCV
+                  </button>
                 </div>
               </div>
             </div>
@@ -181,6 +193,28 @@
         </div>
       </div>
     </div>
+
+    <!-- ! MODAL ELIMINAR RALE COP -->
+    <form action="eliminarRaleCOPFiltrado" method="post">
+      <div class="modal fade" id="verRaleCOPModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Registros de Rale COP</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h4>Registros Rale COP</h4>
+              <div id="div-registros-rale-cop"></div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-danger" id="btnEliminarRaleCOP" type="submit">Eliminar</button>
+              <button type="button" class="btn btn-secondary" id="btnCerrarRaleCOP" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>    
 
 </body>
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
