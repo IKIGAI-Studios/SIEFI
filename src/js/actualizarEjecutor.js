@@ -1,3 +1,5 @@
+const socket = io('http://localhost:3000');
+
 function itemSeleccionado(ejecutores) {
     ejecutores = JSON.parse(ejecutores);
     var clave = document.getElementById("clave_eje").value; // Obtener la clave seleccionada
@@ -55,3 +57,162 @@ function tipoSeleccionado() {
         }
     }
 }
+
+function verPatronesAsignados(){
+    const clave_eje = $('#clave_eje').val();
+
+    $('#div-patrones-asignados').empty();
+    if (clave_eje != 'false'){
+        socket.emit('cliente:consultarPatronesAsignados', clave_eje);
+        $('#verPatronesAsignadosModal').modal('show');
+    
+        $(`<h3 class="text-primary">Obteniendo patrones asignados</h3>`).appendTo('#div-patrones-asignados');
+        $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-patrones-asignados');
+        
+
+        $('#btnADesasignar').prop('disabled', true);
+        $('#btnACancelar').prop('disabled', true);
+        
+    } else bsAlert("Selecciona la clave de ejecutor", 'warning');
+}
+
+socket.on('servidor:patronesAsignados', (data) => {
+    $('#div-patrones-asignados').empty();
+    $('#btnADesasignar').prop('disabled', false);
+    $('#btnACancelar').prop('disabled', false);
+
+   /// Crear tabla
+const table = $('<table class="table">').attr('id', 'afil-table');
+
+// Crear el encabezado de la tabla
+const thead = $('<thead>');
+const headerRow = $('<tr>');
+
+// Agregar la columna "Seleccionar"
+const selectHeader = $('<th scope="col">').text('Seleccionar');
+headerRow.append(selectHeader);
+
+// Obtener los nombres de las propiedades del primer objeto
+const headers = Object.keys(data[0]);
+
+// Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+headers.forEach((header) => {
+  const headerCell = $('<th scope="col">').text(header);
+  headerCell.appendTo(headerRow);
+});
+headerRow.appendTo(thead);
+thead.appendTo(table);
+
+// Crear el cuerpo de la tabla
+const tbody = $('<tbody>');
+
+// Recorrer los objetos y agregar filas a la tabla
+data.forEach((obj) => {
+  const dataRow = $('<tr>');
+
+  // Obtener el valor de la columna "reg_pat" y agregar checkbox en la columna "Seleccionar"
+  const selectCell = $('<td>');
+  const checkbox = $('<input type="checkbox" name="patronesA">').attr('value', obj.reg_pat);
+  selectCell.append(checkbox);
+  dataRow.append(selectCell);
+
+  // Recorrer las propiedades de cada objeto y agregar celdas a la fila
+  Object.values(obj).forEach((value) => {
+    const dataCell = $('<td>').text(value);
+    dataCell.appendTo(dataRow);
+  });
+
+  dataRow.appendTo(tbody);
+});
+tbody.appendTo(table);
+
+
+    // Mostrar la tabla con el numero de registros que tiene
+    const tableContainer = $('<div>').attr('id', 'tb-show-patrones-asignados');
+    $(`<b >Se encontraron ${data.length} patrones<b>`).appendTo(tableContainer);
+    table.appendTo(tableContainer);
+    tableContainer.appendTo('#div-patrones-asignados'); 
+});
+
+
+function verPatronesNoAsignados(){
+    
+    const clave_eje = $('#clave_eje').val();
+    const nombre = $('#nombre').val();
+
+    $('#div-patrones-no-asignados').empty();
+    if (clave_eje != 'false'){
+        socket.emit('cliente:consultarPatronesNoAsignados', clave_eje);
+        $('#verPatronesNoAsignadosModal').modal('show');
+    
+        $(`<h3 class="text-primary">Obteniendo patrones no asignados</h3>`).appendTo('#div-patrones-no-asignados');
+        $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-patrones-asignados');
+
+        $('#btnNAsignar').prop('disabled', true);
+        $('#btnNCancelar').prop('disabled', true);
+
+        $("#claveEje").val(clave_eje);
+        $("#nomEje").val(nombre);  
+        
+    } else bsAlert("Selecciona la clave de ejecutor", 'warning');
+}
+
+socket.on('servidor:patronesNoAsignados', (data) => {
+    $('#div-patrones-no-asignados').empty();
+    $('#btnNAsignar').prop('disabled', false);
+    $('#btnNCancelar').prop('disabled', false);
+
+    // Crear tabla
+const table = $('<table class="table">').attr('id', 'afil-table');
+
+// Crear el encabezado de la tabla
+const thead = $('<thead>');
+const headerRow = $('<tr>');
+
+// Agregar la columna "Seleccionar"
+const selectHeader = $('<th scope="col">').text('Seleccionar');
+headerRow.append(selectHeader);
+
+// Obtener los nombres de las propiedades del primer objeto
+const headers = Object.keys(data[0]);
+
+// Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+headers.forEach((header) => {
+  const headerCell = $('<th scope="col">').text(header);
+  headerCell.appendTo(headerRow);
+});
+headerRow.appendTo(thead);
+thead.appendTo(table);
+
+// Crear el cuerpo de la tabla
+const tbody = $('<tbody>');
+
+// Recorrer los objetos y agregar filas a la tabla
+data.forEach((obj) => {
+  const dataRow = $('<tr>');
+
+  // Obtener el valor de la propiedad "reg_pat" y agregar checkbox en la columna "Seleccionar"
+  const selectCell = $('<td>');
+  const checkbox = $('<input type="checkbox" name="patronesNA">').attr('value', obj.reg_pat);
+  selectCell.append(checkbox);
+  dataRow.append(selectCell);
+
+  // Recorrer las propiedades de cada objeto y agregar celdas a la fila
+  Object.values(obj).forEach((value) => {
+    const dataCell = $('<td>').text(value);
+    dataCell.appendTo(dataRow);
+  });
+
+  dataRow.appendTo(tbody);
+});
+tbody.appendTo(table);
+
+
+    // Mostrar la tabla con el numero de registros que tiene
+    const tableContainer = $('<div>').attr('id', 'tb-show-patrones-no-asignados');
+    $(`<b >Se encontraron ${data.length} patrones no asignados<b>`).appendTo(tableContainer);
+    table.appendTo(tableContainer);
+    tableContainer.appendTo('#div-patrones-no-asignados'); 
+
+
+});
