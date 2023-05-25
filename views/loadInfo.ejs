@@ -65,41 +65,41 @@
           <div id="perfil" class="contenido activo text-center">
             <h2 class="texto-green text-center mt-2">Cargar Información</h2>
 
-            <div class="row mt-5 mb-5">
-              <div class="col-3">
+            <div class="">
+              <div class="mt-3">
                 <div class="container">
-                  <label for="afil">Afil</label>
-                  <a href="" class="form-control" id="afil">Registrar Afil</a>
-                  <input type="file" class="form-control" name="Afil" id="Afil_input" accept=".xlsx"/>
-                  <button type="button" style="display: block;" class="btn btn-secondary"  onclick="verRegistrosAfil()">
+                  <h4 for="afil">Afil</h4>
+                  <a href="/registrarAfil" class="form-control" id="afil">Registrar Afil</a>
+                  <input type="hidden" class="form-control" name="Afil" id="Afil_input" accept=".xlsx"/>
+                  <button type="button" style="display: none;" class="btn btn-secondary mt-1"  onclick="verRegistrosAfil()">
                     Ver registros Afil
                   </button>
                 </div>
               </div>
-              <div class="col-3">
+              <div class="mt-3">
                 <div class="container">
-                  <label for="Coin">Coin</label>
+                  <h4 for="Coin">Coin</h4>
                   <input type="file" class="form-control" name="Coin" id="Coin_input" accept=".xlsx"/>
-                  <button type="button" class="btn btn-secondary" onclick="verRegistrosCoin()">
+                  <button type="button" class="btn btn-primary mt-1" onclick="verRegistrosCoin()">
                     Ver registros Coin
                   </button>
                 </div>
               </div>
-              <div class="col-3">
+              <div class="mt-3">
                 <div class="container">
-                  <label for="Coin">Rale COP</label>
+                  <h4 for="Coin">Rale COP</h4>
                   <input type="file" class="form-control" name="RaleCOP" id="RaleCOP_input" accept=".xlsx"/>
-                  <button type="button" class="btn btn-secondary" onclick="verRegistrosRaleCOP()">
-                    Ver registros de Rale Cop
+                  <button type="button" class="btn btn-success mt-1" onclick="verRegistrosRaleCOP()">
+                    Ver registros Rale Cop
                   </button>
                 </div>
               </div>
-              <div class="col-3">
+              <div class="mt-3">
                 <div class="container">
-                  <label for="Coin">Rale RCV</label>
+                  <h4 for="Coin">Rale RCV</h4>
                   <input type="file" class="form-control" name="RaleRCV" id="RaleRCV_input" accept=".xlsx"/>
-                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalRaleRCV" onclick="verRegistrosRaleRCV()">
-                    Ver registros de Rale RCV
+                  <button type="button" class="btn btn-light mt-1" data-bs-toggle="modal" data-bs-target="#modalRaleRCV" onclick="verRegistrosRaleRCV()">
+                    Ver registros Rale RCV
                   </button>
                 </div>
               </div>

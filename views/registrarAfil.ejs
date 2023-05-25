@@ -69,47 +69,47 @@
 
                 <h1 class="texto-green">Registrar Afil</h1>
             
-                <div class="container" style="width: 20%">
+                <div class="container">
                     <label for="reg_pat">Registro Patronal</label>
-                    <input type="text" name="reg_pat" id="reg_pat"/>
+                    <input type="text" name="reg_pat" id="reg_pat" class="form-control"/>
                 </div>
                 
-                <div class="container" style="width: 20%">
+                <div class="container">
                   <label for="patron">Patrón</label>
-                  <input type="text" name="patron" id="patron"/>
+                  <input type="text" name="patron" id="patron" class="form-control"/>
                 </div>
             
-                <div class="container" style="width: 20%">
+                <div class="container">
                   <label for="actividad">Actividad</label>
-                  <input type="text" name="actividad" id="actividad"/>
+                  <input type="text" name="actividad" id="actividad" class="form-control"/>
                 </div>
             
-                <div class="container" style="width: 20%">
+                <div class="container">
                   <label for="domicilio">Domicilio</label>
-                  <input type="text" name="domicilio" id="domicilio"/>
+                  <input type="text" name="domicilio" id="domicilio" class="form-control"/>
                 </div>
             
 
-                <div class="container" style="width: 20%">
+                <div class="container">
                   <label for="localidad">Localidad</label>
-                  <input type="text" name="localidad" id="localidad"/>
+                  <input type="text" name="localidad" id="localidad" class="form-control"/>
                 </div>
 
 
-                <div class="container" style="width: 20%">
+                <div class="container">
                     <label for="rfc">RFC</label>
-                    <input type="text" name="rfc" id="rfc" onblur="validarRFC()"/>
+                    <input type="text" name="rfc" id="rfc" onblur="validarRFC()" class="form-control"/>
                   </div>
               
 
-                  <div class="container" style="width: 20%">
+                  <div class="container">
                     <label for="cp">Código Postal</label>
-                    <input type="number" name="cp" id="cp" onblur="validarCP()"/>
+                    <input type="number" name="cp" id="cp" onblur="validarCP()" class="form-control"/>
                   </div>
 
-                  <div class="container" style="width: 20%">
+                  <div class="container">
                     <label for="ejecutorS">Ejecutor</label>
-                    <select name="ejecutorS" id="ejecutorS" onchange="itemSeleccionado('<%= JSON.stringify(usuEjecutores) %>')">
+                    <select name="ejecutorS" id="ejecutorS" onchange="itemSeleccionado('<%= JSON.stringify(usuEjecutores) %>')" class="form-select">
                         <option value="">Selecciona un ejecutor</option>
                         <% for(var i=0; i<usuEjecutores.length; i++) { %>
                             <option value="<%= usuEjecutores[i].nombre %>">
@@ -121,16 +121,16 @@
                   </div>
 
 
-                  <div class="container" style="width: 20%">
+                  <div class="container">
                     <label for="clave_eje">Clave</label>
-                    <input type="text" name="clave_eje" id="clave_eje" readonly/>
+                    <input type="text" name="clave_eje" id="clave_eje" readonly class="form-control"/>
                   </div>
             
 
             
                 <div>
                   <div class="container mt-3">
-                    <button type="submit">Registrar</button>
+                    <button type="submit" class="btn btn-success">Registrar</button>
                   </div>
                 </div>
             

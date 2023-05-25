@@ -121,70 +121,73 @@
                         <% } %>
                 </form>
                 
-
-
-
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-success" onclick="verPatronesAsignados()">
-    Ver patrones asignados
-  </button>
-  
-  <form action="desasignarPatrones" method="post">
-    <!-- Modal -->
-    <div class="modal fade" id="verPatronesAsignadosModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Patrones asignados</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div>
-                        <h4>Patrones Asignados</h4>
-                        <div id="div-patrones-asignados"></div> 
+                <div class="row mt-2">
+                    <div class="col-3"></div>
+                    <div class="col">
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-success mt-2" onclick="verPatronesAsignados()">
+                            Ver patrones asignados
+                        </button>
                     </div>
+                    <div class="col">
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-warning mt-2" onclick="verPatronesNoAsignados()">
+                            Ver patrones no asignados
+                        </button>
+                    </div>
+                    <div class="col-3"></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btnACancelar">Cancelar</button>
-                    <button class="btn btn-primary" id="btnADesasignar" type="submit">Desasignar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
-
-
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-warning" onclick="verPatronesNoAsignados()">
-    Ver patrones no asignados
-  </button>
-  
-<form action="asignarPatrones" method="post" id="asignarPatrones">
-    <!-- Modal -->
-    <div class="modal fade" id="verPatronesNoAsignadosModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Patrones no asignados</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
                 
-                <div>
-                    <h4>Patrones no Asignados</h4>
-                    <div id="div-patrones-no-asignados"></div> 
-                        <input type="hidden" id="claveEje" name ="claveEje">
-                        <input type="hidden" id="nomEje" name="nomEje" >
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btnNCancelar">Cancelar</button>
-                <button class="btn btn-primary" id="btnNAsignar">Asignar</button>
-            </div>
-        </div>
-        </div>
-    </div>
-</form>
+                <form action="desasignarPatrones" method="post">
+                    <!-- Modal -->
+                    <div class="modal fade" id="verPatronesAsignadosModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Patrones asignados</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div>
+                                        <h4>Patrones Asignados</h4>
+                                        <div id="div-patrones-asignados"></div> 
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btnACancelar">Cancelar</button>
+                                    <button class="btn btn-primary" id="btnADesasignar" type="submit">Desasignar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form action="asignarPatrones" method="post" id="asignarPatrones">
+                    <!-- Modal -->
+                    <div class="modal fade" id="verPatronesNoAsignadosModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Patrones no asignados</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                
+                                <div>
+                                    <h4>Patrones no Asignados</h4>
+                                    <div id="div-patrones-no-asignados"></div> 
+                                        <input type="hidden" id="claveEje" name ="claveEje">
+                                        <input type="hidden" id="nomEje" name="nomEje" >
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btnNCancelar">Cancelar</button>
+                                <button class="btn btn-primary" id="btnNAsignar">Asignar</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </form>
             </div>
           </div>  
       </div>
