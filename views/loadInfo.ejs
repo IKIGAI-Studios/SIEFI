@@ -24,6 +24,7 @@
                     <div class="row"><span class="nombre-usuario" id=""><%= session.user ? session.user.apellidos : "Apellidos" %></span></div>
                     <div class="row"><p class="tipo-usuario"><%= session.user ? session.user.tipo_usuario : "Administrador" %></p></div>
                 </div>
+                <a href="/logout" class="logout text-danger">CERRAR SESIÓN</a>
             </div>
         </div>
         <div class="col-lg-8">
@@ -58,8 +59,6 @@
                     <li><a href="/registerEjecutor" class="sidebar-item">REGISTRAR</a></li>
                 </ul>
               </li>
-              <br><br>
-              <li><a href="#" class="logout mt-3">CERRAR SESIÓN</a></li>
             </ul>
         </div>
         <div class="col-10 space-around">

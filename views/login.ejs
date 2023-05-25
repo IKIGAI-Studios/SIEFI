@@ -16,7 +16,7 @@
         <div class="row">
           <div class="col-lg-2"></div>
           <div class="col-lg-4">
-            <img src="/imgs/placeholder.png" alt="placeholder" style="width: 80%; height: auto;">
+            <img src="/imgs/image_login.jpg" alt="placeholder" style="width: 80%; height: auto;">
           </div>
 
           <!--LOG IN-->
@@ -49,7 +49,7 @@
               </div>
 
               <% if (session.loginError) { %>
-                <p class="light-label"><%= session.loginError %></p>
+                <h4 class="text-danger text-center"><b><%= session.loginError %></b></h4>
               <% } %>
             </form>
           </div>

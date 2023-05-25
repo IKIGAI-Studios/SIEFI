@@ -24,6 +24,7 @@
                       <div class="row"><span class="nombre-usuario" id=""><%= session.user ? session.user.apellidos : "Apellidos" %></span></div>
                       <div class="row"><p class="tipo-usuario"><%= session.user ? session.user.tipo_usuario : "Administrador" %></p></div>
                   </div>
+                  <a href="/logout" class="logout text-danger">CERRAR SESIÓN</a>
               </div>
           </div>
           <div class="col-lg-8">
@@ -47,7 +48,7 @@
             <li class="active mt-3">
               <h5>ESTADÍSTICAS</h5>
               <ul class="">
-                  <li><a href="#" class="sidebar-item">INDIVIDUALES</a></li>
+                  <li><a href="/estadisticasIndividuales" class="sidebar-item">INDIVIDUALES</a></li>
                   <li><a href="#" class="sidebar-item">GLOBALES</a></li>
               </ul>
             </li>
@@ -58,8 +59,6 @@
                   <li><a href="/registerEjecutor" class="sidebar-item">REGISTRAR</a></li>
               </ul>
             </li>
-            <br><br>
-            <li><a href="#" class="logout mt-3">CERRAR SESIÓN</a></li>
           </ul>
       </div>
           <div class="col-10 space-around">
