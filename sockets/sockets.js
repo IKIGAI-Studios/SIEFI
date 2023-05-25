@@ -479,6 +479,54 @@ function socket(io) {
       }
     });
 
+    // Obtener fechas de registro en la tabla Rale RCV
+    socket.on('cliente:consultarRegistrosRaleRCV', async () => {
+      try {
+        const fechasRegistro = await RaleRcv.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
+        });
+
+        const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
+
+        socket.emit('servidor:consultarRegistrosRaleRCV', fechasDistintas);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al consultar los registros del rale RCV.');
+      }
+    });
+
+    // Filtrar los registros Rale RCV por fecha. 
+    socket.on('cliente:filtrarRaleRCV', async (fechaRaleRCV) => {
+      try {
+        const raleRCVFiltrado = await RaleRcv.findAll({
+          where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaRaleRCV)
+        });
+        socket.emit('servidor:filtrarRaleRCV', raleRCVFiltrado);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al filtrar los registros de Rale RCV por fecha.');
+      }
+    });
+
+    // Consultar Patrones por ejecutor
+    socket.on('cliente:ejecutorSeleccionado', async (nombreEjecutor) => {
+      const patrones = await Afil.findAll({
+        where: {ejecutor: nombreEjecutor}
+      });
+    
+      const patronesSeleccionados = patrones.map(patron => {
+        return {
+          patron: patron.patron,
+          actividad: patron.actividad,
+          localidad: patron.localidad
+        };
+      });
+    
+      socket.emit('servidor:estIndividuales', patronesSeleccionados);
+    });
+
     // Maneja el evento de desconexión del cliente
     socket.on("disconnect", () => {
       // Programar eventos (innecesarios por ahora)
