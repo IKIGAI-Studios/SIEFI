@@ -14,7 +14,6 @@ function socket(io) {
     });
 
     socket.on("client:load-afil", ({ file }) => {
-      console.log(file)
       const result = processAfil(file);
       socket.emit("server:result-afil", result);
     });
