@@ -26,7 +26,6 @@ function itemSeleccionado(ejecutores) {
     if (ejecutor.type == 'admin') {
         document.getElementById("admin").selected = true;
     }
-
     if (ejecutor.status == '0') {
         document.getElementById("deshabilitado").checked = true;
     }
@@ -64,6 +63,7 @@ function verPatronesAsignados(){
     $('#div-patrones-asignados').empty();
     if (clave_eje != 'false'){
         socket.emit('cliente:consultarPatronesAsignados', clave_eje);
+        
         $('#verPatronesAsignadosModal').modal('show');
     
         $(`<h3 class="text-primary">Obteniendo patrones asignados</h3>`).appendTo('#div-patrones-asignados');
@@ -146,7 +146,7 @@ function verPatronesNoAsignados(){
         $('#verPatronesNoAsignadosModal').modal('show');
     
         $(`<h3 class="text-primary">Obteniendo patrones no asignados</h3>`).appendTo('#div-patrones-no-asignados');
-        $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-patrones-asignados');
+        $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-patrones-no-asignados');
 
         $('#btnNAsignar').prop('disabled', true);
         $('#btnNCancelar').prop('disabled', true);

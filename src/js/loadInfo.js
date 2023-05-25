@@ -955,6 +955,87 @@ socket.on('servidor:consultarRegistrosCoin', (data) => {
     $('#div-registros-coin').append(selectCoin);
 });
 
+
+socket.on('servidor:consultarRegistrosRaleRCV', (data) => {
+    $('#div-registros-rale-rcv').empty();
+    $('#btnCerrarRaleRCV').prop('disabled', false);
+  
+    // Crear la etiqueta select
+    const selectRaleRCV = $('<select>').attr({'id' : 'selectRaleRCV', 'name' : 'selectRaleRCV'});
+
+    // Crear la opción "Seleccionar" con valor falso y seleccionarla por defecto
+    const defaultOption = $('<option>').text('Seleccionar').val(false).prop('selected', true);
+    selectRaleRCV.append(defaultOption);
+
+    // Recorrer los datos y crear las opciones adicionales
+    data.forEach((item) => {
+        const option = $('<option>').text(item).val(item);
+        selectRaleRCV.append(option);
+    });
+
+    // Agregar un evento de cambio al select
+    selectRaleRCV.on('change', function() {
+        const fechaRaleRCV = $(this).val(); // Obtener el valor de la opción seleccionada
+        socket.emit('cliente:filtrarRaleRCV', fechaRaleRCV); // Enviar el valor al servidor a través del socket
+
+        $('#btnCerrarRaleRCV').prop('disabled', true);
+    });
+  
+    // Agregar el select al elemento con el ID 'div-registros-rale-rcv'
+    $('#div-registros-rale-rcv').append(selectRaleRCV);
+});
+
+socket.on('servidor:filtrarRaleRCV', (data) => {
+    //$('#div-registros-rale-rcv').empty();
+    $('#btnCerrarRaleRCV').prop('disabled', false);
+    $('#btnEliminarRaleRCV').prop('disabled', false);
+    $('#selectRaleRCV').hide();
+
+    // Crear tabla
+    const table = $('<table class="table">').attr('id', 'rale-rcv-filtrado-table');
+
+    // Crear el encabezado de la tabla
+    const thead = $('<thead>');
+    const headerRow = $('<tr>');
+
+    // Obtener los nombres de las propiedades del primer objeto
+    const headers = Object.keys(data[0]);
+
+    // Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+    headers.forEach((header) => {
+        const headerCell = $('<th scope="col">').text(header);
+        headerCell.appendTo(headerRow);
+    });
+
+    headerRow.appendTo(thead);
+    thead.appendTo(table);
+
+    // Crear el cuerpo de la tabla
+    const tbody = $('<tbody>');
+
+    // Recorrer los objetos y agregar filas a la tabla
+    data.forEach((obj) => {
+        const dataRow = $('<tr>');
+
+        // Recorrer las propiedades de cada objeto y agregar celdas a la fila
+        Object.values(obj).forEach((value) => {
+            const dataCell = $('<td>').text(value);
+            dataCell.appendTo(dataRow);
+        });
+
+        dataRow.appendTo(tbody);
+    });
+
+    tbody.appendTo(table);
+
+    // Mostrar la tabla con el numero de registros que tiene
+    const tableContainer = $('<div>').attr('id', 'tb-show-rale-rcv-filtrado');
+    $(`<b >Se encontraron ${data.length} registros de Rale Rcv<b>`).appendTo(tableContainer);
+    table.appendTo(tableContainer);
+    tableContainer.appendTo('#div-registros-rale-rcv'); 
+});
+
+
 socket.on('connect', () => {
     // console.log('Conexión establecida con el servidor');
 });
@@ -962,7 +1043,6 @@ socket.on('connect', () => {
 socket.on('disconnect', () => {
     // console.log('Conexión perdida con el servidor');
 });  
-
 
 function showResult( rslt ) {
     if (rslt.status) {
@@ -1011,4 +1091,16 @@ function verRegistrosRaleCOP(){
 
     $('#btnCerrarRaleCOP').prop('disabled', true); 
     $('#btnEliminarRaleCop').prop('disabled', true); 
+}
+
+function verRegistrosRaleRCV(){
+    $('#div-registros-rale-rcv').empty();
+    
+    socket.emit('cliente:consultarRegistrosRaleRCV');
+    $('#verRaleRCVModal').modal('show');
+
+    $(`<h3 class="text-primary">Obteniendo registros de Rale RCV</h3>`).appendTo('#div-registros-rale-rcv');
+
+    $('#btnCerrarRaleRCV').prop('disabled', true); 
+    $('#btnEliminarRaleRCV').prop('disabled', true); 
 }

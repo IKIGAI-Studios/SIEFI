@@ -5,6 +5,7 @@ import Afil63 from '../models/afilModel.js';
 import {Op} from 'sequelize';
 import sequelize from '../database.js';
 import RaleCop from '../models/raleCOPModel.js';
+import RaleRcv from '../models/raleRCVModel.js';
 
 const routes = express.Router();
 
@@ -379,5 +380,40 @@ routes.post('/elimarRaleCOPFiltrado', async(req, res) =>{
         res.redirect('/loadInfo');
     }
 });
+
+routes.post('/elimarRaleRCVFiltrado', async(req, res) =>{
+    try {
+        const fechaRaleRCV = req.body.selectRaleRCV;
+        console.log('Fecha: ',fechaRaleRCV);
+
+        const eliminarRaleRCVF = await RaleRcv.destroy({
+            where: sequelize.where(
+                sequelize.fn('DATE', sequelize.col('createdAt')),
+                fechaRaleRCV
+              )
+        });
+
+        res.render('loadInfo', { session: req.session});
+        req.session.loadInfo = 'Registros eliminados exitosamente';
+
+    } catch(error) {
+        console.log('Error al eliminar el Rale RCV',error);
+        res.redirect('/loadInfo');
+    }
+});
+
+routes.get('/estadisticasIndividuales', async (req, res) => {
+    try{
+        const ejecutores = await Ejecutor.findAll({
+            where : { type : 'ejecutor', status: '1' }
+        });
+        res.render('estindividuales', { session: req.session, ejecutores });
+        req.session.actualizarEjecutor = '';
+    } catch(error){
+        console.log(error);
+    }
+});
+
+
   
 export default routes;
