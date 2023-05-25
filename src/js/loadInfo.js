@@ -1012,3 +1012,15 @@ function verRegistrosRaleCOP(){
     $('#btnCerrarRaleCOP').prop('disabled', true); 
     $('#btnEliminarRaleCop').prop('disabled', true); 
 }
+
+function verRegistrosRaleRCV(){
+    $('#div-registros-rale-rcv').empty();
+    
+    socket.emit('cliente:consultarRegistrosRaleRCV');
+    $('#verRaleRCVModal').modal('show');
+
+    $(`<h3 class="text-primary">Obteniendo registros de Rale RCV</h3>`).appendTo('#div-registros-rale-rcv');
+
+    $('#btnCerrarRaleRCV').prop('disabled', true); 
+    $('#btnEliminarRaleRCV').prop('disabled', true); 
+}
