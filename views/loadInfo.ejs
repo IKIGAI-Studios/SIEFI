@@ -176,24 +176,26 @@
     </form>
 
     <!-- TODO MODAL ELIMINAR RALE RCV -->
-
-    <div class="modal fade" id="modalRaleRCV" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Registros de Rale RCV</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <h4>Registros Rale RCV</h4>
-            <div id="registros-rale-rcv"></div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+    <form action="eliminarRaleRCVFiltrado" method="post">
+      <div class="modal fade" id="verRaleRCVModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Registros de Rale RCV</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h4>Registros Rale RCV</h4>
+              <div id="div-registros-rale-rcv"></div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-danger" id="btnEliminarRaleRCV" type="submit">Eliminar</button>
+              <button type="button" class="btn btn-secondary" id="btnCerrarRaleRCV" data-bs-dismiss="modal">Cerrar</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </form>
 
     <!-- ! MODAL ELIMINAR RALE COP -->
     <form action="eliminarRaleCOPFiltrado" method="post">
@@ -215,7 +217,7 @@
           </div>
         </div>
       </div>
-    </form>    
+    </form>       
 
 </body>
 <%- include('templates/footer-pleca')%>
