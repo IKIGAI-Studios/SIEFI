@@ -40,9 +40,26 @@ routes.get('/registerEjecutor', (req, res) => {
     req.session.registerEjecutor = '';
 });
 
+routes.get('/confronta', (req, res) => {
+    // No existe la sesión
+    // if (req.session.user === undefined) {
+    //     res.redirect('/login');
+    //     return;
+    // }
+
+    // // No es administrador
+    // if (req.session.user.tipo != 'admin') {
+    //     res.redirect('/login');
+    //     return;
+    // }
+
+    res.render('confronta', { session: req.session });
+});
+
 routes.get('/loadInfo', (req, res) => {
     res.render('loadInfo', { session: req.session });
 });
+
 
 routes.post('/login', async (req, res) => {
     try {

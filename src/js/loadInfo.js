@@ -196,13 +196,13 @@ $('#btn_insertar').on('click', async function(e) {
     switch (insrt) {
         case "coin":
             while (i < objCoin.length) {
-                const batch = objCoin.slice(i, i + 100);
+                const batch = objCoin.slice(i, i + 1000);
                 // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
                 await socket.emit('client:insert-coin', { coin:batch, lote:i }, (res) => {
                     if (i == 0) $('#div-table').empty();
                     showResult(res);
                 });
-                i += 100;
+                i += 1000;
             }
             break;
         case "afil":
