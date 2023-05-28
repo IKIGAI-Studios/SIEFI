@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas individuales</title>
+    <link rel="shortcut icon" href="/imgs/imss-logo.png">
+    <title>Confronta</title>
 
     <%- include('templates/header')%>
 
@@ -29,7 +30,7 @@
             <div class="col-lg-8">
                 <div class="d-flex justify-content-center">
                     <div class="col-2"><img src="/icons/hint.png" alt="hint"></div>
-                    <div class="col-10"><p class="texto-hint mt-2">ESTADÍSTICAS INDIVIDUALES</p></div>
+                    <div class="col-10"><p class="texto-hint mt-2">CONFRONTA DE ARCHIVOS</p></div>
                 </div>
             </div>
         </div>
@@ -63,29 +64,46 @@
           </div>
           <div class="col-10 space-around">
             <div id="perfil" class="contenido activo text-center">
-
-                <form action="actualizarEjecutor" method="post">
-                    <div class="container">
-                        <label for="nombreEjecutor">Ejecutor</label>
-                        <div class="container mt-2">
-                            <input class="form-check-input mt-0" type="radio" id="ordenarIMP" name="opcion">
-                            <label for="option1">Ordenar por IMP</label>
-                            <input class="form-check-input mt-0" type="radio" id="ordenarOportunidad" name="opcion">
-                            <label for="option2">Ordenar por oportunidad</label>
-                        </div>
-                        <div id="div-tabla-estadisticas-individuales"></div>
+                <div class="container">
+                    <label for="typeFile">Tipo de Archivo a Confrontar</label>
+                    <select name="typeFile" id="typeFile" class="form-control input-group-text">
+                        <option>Selecciona un ejecutor</option>
+                        <option value="Rale">Rales RCV y COP</option>
+                        <option value="Coin">Coin</option>
+                    </select>
+                    <div class="row">
+                        <div id="div-selects" class="col"></div>
+                        <div id="div-selects" class="col"></div>
                     </div>
-                </form>
+                </div>
             </div>
           </div>  
       </div>
     </div>
 
+    <!-- ! MODAL VALIDATE -->
+    <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="confrontarModal" tabindex="-1" aria-labelledby="validateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h1 class="modal-title fs-5" id="validateModalLabel"><h5 class="texto-green" id="modal_title">PLACEHOLDER</h5></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="div-table" class="text-center"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btn_cancelar">Cancelar</button>
+                    <button type="submit" class="btn btn-success" id="btn_insertar">Insertar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 <script src="socket.io/socket.io.min.js"></script>
-<script src="/js/estIndividuales.js"></script>
+<script src="/js/confronta.js"></script>
 
 </html>
 

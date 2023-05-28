@@ -102,16 +102,7 @@ function socket(io) {
             .then(() => {
               callback({
                 status: true,
-                msg: `
-                Lote [${lote}-${lote + 999}] insertado correctamente
-                ${
-                  registrosNoInsertados.length > 0
-                    ? `Los siguientes registros patronales no están registrados en la tabla afil: ${registrosNoInsertados.join(
-                        ", "
-                      )}`
-                    : "Todos los registros patronales fueron insertador correctamente"
-                }
-              `,
+                msg: `Lote [${lote}-${lote + 999}] insertado correctamente`,
               });
             })
             .catch((e) => {
@@ -236,16 +227,7 @@ function socket(io) {
             .then(() => {
               callback({
                 status: true,
-                msg: `
-                Lote [${lote}-${lote + 999}] insertado correctamente
-                ${
-                  registrosNoInsertados.length > 0
-                    ? `Los siguientes registros patronales no están registrados en la tabla afil: ${registrosNoInsertados.join(
-                        ", "
-                      )}`
-                    : "Todos los registros patronales fueron insertador correctamente"
-                }
-              `,
+                msg: `Lote [${lote}-${lote + 999}] insertado correctamente`,
               });
             })
             .catch((e) => {
@@ -332,16 +314,7 @@ function socket(io) {
             .then(() => {
               callback({
                 status: true,
-                msg: `
-                Lote [${lote}-${lote + 999}] insertado correctamente
-                ${
-                  registrosNoInsertados.length > 0
-                    ? `Los siguientes registros patronales no están registrados en la tabla afil: ${registrosNoInsertados.join(
-                        ", "
-                      )}`
-                    : "Todos los registros patronales fueron insertador correctamente"
-                }
-              `,
+                msg: `Lote [${lote}-${lote + 999}] insertado correctamente`,
               });
             })
             .catch((e) => {

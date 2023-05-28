@@ -40,7 +40,7 @@ routes.get('/registerEjecutor', (req, res) => {
     req.session.registerEjecutor = '';
 });
 
-routes.get('/confronta', (req, res) => {
+routes.get('/confronta', async (req, res) => {
     // No existe la sesión
     // if (req.session.user === undefined) {
     //     res.redirect('/login');
@@ -53,13 +53,52 @@ routes.get('/confronta', (req, res) => {
     //     return;
     // }
 
-    res.render('confronta', { session: req.session });
+    try {
+        const ejecutores = await Ejecutor.findAll({
+            where : { type : 'ejecutor', status: '1' }
+        });
+        res.render('confronta', { session: req.session, ejecutores });
+    } catch (e) {
+        res.json(e)
+    }
 });
 
 routes.get('/loadInfo', (req, res) => {
     res.render('loadInfo', { session: req.session });
 });
 
+routes.get('/actualizarEjecutor', async (req, res) => {
+    try{
+        const ejecutores = await Ejecutor.findAll();
+        const afil = await Afil63.findAll();
+        res.render('actualizarEjecutor', { session: req.session, ejecutores, afil });
+        req.session.actualizarEjecutor = '';
+    } catch(error){
+        console.log(error);
+    }
+});
+
+routes.get('/registrarAfil', async (req, res) => {
+    try{
+        const usuEjecutores = await Ejecutor.findAll({where: {type : 'ejecutor', status:'1'}});
+        res.render('registrarAfil', { session: req.session, usuEjecutores });
+        req.session.registrarAfil = '';
+    } catch(error){
+        console.log(error);
+    }
+});
+
+routes.get('/estadisticasIndividuales', async (req, res) => {
+    try{
+        const ejecutores = await Ejecutor.findAll({
+            where : { type : 'ejecutor', status: '1' }
+        });
+        res.render('estindividuales', { session: req.session, ejecutores });
+        req.session.actualizarEjecutor = '';
+    } catch(error){
+        console.log(error);
+    }
+});
 
 routes.post('/login', async (req, res) => {
     try {
@@ -96,15 +135,24 @@ routes.post('/login', async (req, res) => {
             return;
         }
 
+        let nombre, apellidos, arrNombre = user.nombre.split(" ");
+        if (arrNombre[3]) {
+            nombre = arrNombre[0] + " " + [1];
+            apellidos = arrNombre[2] + " " + [3];
+        } else {
+            nombre = arrNombre[0];
+            apellidos = arrNombre[1] + " " + arrNombre[2];
+        }
+        
         // Crear la sesión del Usuario
-        req.session.user = { nombre: user.nombre, clave_eje: user.clave_eje, tipo: user.type };
+        req.session.user = { nombre , apellidos, clave_eje: user.clave_eje, tipo_usuario: user.type };
 
         // Redireccionar al tipo de usuario
         if (user.type == "ejecutor") {
             console.log(req.session.user)
             res.json('Ejecutor')
         } else {
-            res.redirect('/registerEjecutor');
+            res.redirect('/loadInfo');
         }
     } catch (error) {
         // Regresar un mensaje de error
@@ -157,17 +205,6 @@ routes.post('/registerEjecutor', async (req, res) => {
     }
 });
 
-routes.get('/actualizarEjecutor', async (req, res) => {
-    try{
-        const ejecutores = await Ejecutor.findAll();
-        const afil = await Afil63.findAll();
-        res.render('actualizarEjecutor', { session: req.session, ejecutores, afil });
-        req.session.actualizarEjecutor = '';
-    } catch(error){
-        console.log(error);
-    }
-});
-
     
 routes.post('/actualizarEjecutor', async (req, res) =>{
     try{
@@ -205,16 +242,6 @@ routes.post('/loadCoin', async (req, res) => {
         // Regresar un mensaje de error
         // req.session.loginError = `Error al hacer la consulta | Error: ${error}`;
         res.json(error);
-    }
-});
-
-routes.get('/registrarAfil', async (req, res) => {
-    try{
-        const usuEjecutores = await Ejecutor.findAll({where: {type : 'ejecutor', status:'1'}});
-        res.render('registrarAfil', { session: req.session, usuEjecutores });
-        req.session.registrarAfil = '';
-    } catch(error){
-        console.log(error);
     }
 });
 
@@ -416,18 +443,6 @@ routes.post('/elimarRaleRCVFiltrado', async(req, res) =>{
     } catch(error) {
         console.log('Error al eliminar el Rale RCV',error);
         res.redirect('/loadInfo');
-    }
-});
-
-routes.get('/estadisticasIndividuales', async (req, res) => {
-    try{
-        const ejecutores = await Ejecutor.findAll({
-            where : { type : 'ejecutor', status: '1' }
-        });
-        res.render('estindividuales', { session: req.session, ejecutores });
-        req.session.actualizarEjecutor = '';
-    } catch(error){
-        console.log(error);
     }
 });
 

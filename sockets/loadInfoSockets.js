@@ -490,7 +490,22 @@ export function socket(io) {
         socket.emit('servidor:error', 'Error al filtrar los registros de Rale RCV por fecha.');
       }
     });
-    
+
+    // Filtrar los registros Rales por fecha. 
+    socket.on('cliente:filtrarRales', async ({ rcv, cop }) => {
+      try {
+        const raleRCVFiltrado = await RaleRcv.findAll({
+          where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), rcv)
+        });
+        const raleCOPFiltrado = await RaleCop.findAll({
+            where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), cop)
+        });
+        socket.emit('servidor:filtrarRales', { raleRCVFiltrado, raleCOPFiltrado });
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+      }
+    });
 
     // Obtener fechas de registro en la tabla Rale RCV
     socket.on('cliente:consultarRegistrosRaleRCV', async () => {
