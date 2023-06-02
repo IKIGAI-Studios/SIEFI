@@ -1,6 +1,6 @@
 const socket = io('http://localhost:3000');
 
-let frstRaleRCV, frstRaleCOP, scndRaleRCV, scndRaleCOP, frstData, patrones;
+let frstRaleRCV, frstRaleCOP, scndRaleRCV, scndRaleCOP, Coin, frstData, scndData, patr, eje;
 
 $('#typeFile').on('change', function() {
     switch ($(this).val()) {
@@ -53,10 +53,22 @@ $('#typeFile').on('change', function() {
                     id: 'dateRCVscnd',
                     class: 'form-control input-group-text',
                     disabled: true
+                }),
+                $('<label>', {
+                    for: 'dateCOINscnd',
+                    text: 'Segunda fecha a confrontar de Rale RCV',
+                    class: 'mt-3'
+                }), 
+                $('<select>', {
+                    name: 'dateCOINscnd',
+                    id: 'dateCOINscnd',
+                    class: 'form-control input-group-text',
+                    disabled: true
                 })
             );
             socket.emit('cliente:consultarRegistrosRaleCOP');
             socket.emit('cliente:consultarRegistrosRaleRCV');
+            socket.emit('cliente:consultarRegistrosCoin');
             break;
         case "Coin": 
             $('#div-selects').empty();
@@ -70,8 +82,6 @@ $('#typeFile').on('change', function() {
 socket.on('servidor:consultarRegistrosRaleCOP', (data) => {
     $('#dateCOPfrst').empty();
     $('#dateCOPscnd').empty();
-    $('#dateCOPfrst').prop('disabled', true);
-    $('#dateCOPscnd').prop('disabled', true);
     $('#dateCOPfrst').append(
         $('<option>', {
             text: "Selecciona una fecha para Rale COP",
@@ -110,14 +120,13 @@ socket.on('servidor:consultarRegistrosRaleCOP', (data) => {
 socket.on('servidor:consultarRegistrosRaleRCV', (data) => {
     $('#dateRCVfrst').empty();
     $('#dateRCVscnd').empty();
-    $('#dateRCVfrst').prop('disabled', true);
-    $('#dateRCVscnd').prop('disabled', true);
     $('#dateRCVfrst').append(
         $('<option>', {
             text: "Selecciona una fecha para Rale RCV",
             value: false 
         }));
-        $('#dateRCVscnd').append($('<option>', {
+    $('#dateRCVscnd').append(
+        $('<option>', {
             text: "Selecciona una fecha para Rale RCV",
             value: false 
         })
@@ -142,6 +151,25 @@ socket.on('servidor:consultarRegistrosRaleRCV', (data) => {
     }
 });
 
+socket.on('servidor:consultarRegistrosCoin', (data) => {
+    $('#dateCOINscnd').empty();
+    $('#dateCOINscnd').append(
+        $('<option>', {
+            text: "Selecciona una fecha para COIN",
+            value: false 
+        })
+    );
+    data.map((date) => {
+        $('#dateCOINscnd').append(
+            $('<option>', {
+                value: date, 
+                text: date
+            })
+        );
+    });
+    $('#dateCOINscnd').prop('disabled', false);
+});
+
 // Hacemos un on change al div con el id dateCOP porque se crea dinamicamente 
 // entonces no se puede crear un evento a un elemento que no existe
 $('#div-frst-selects').on('change', '#dateCOPfrst', function() {
@@ -156,7 +184,6 @@ $('#div-frst-selects').on('change', '#dateCOPfrst', function() {
                 type: "frst"
             });
         }
-            
 });
 
 $('#div-frst-selects').on('change', '#dateRCVfrst', function() {
@@ -201,6 +228,10 @@ $('#div-scnd-selects').on('change', '#dateRCVscnd', function() {
         }
 });
 
+$('#div-scnd-selects').on('change', '#dateCOINscnd', function() {
+    if ($(this).val() != "false") socket.emit('cliente:filtrarCoin', $(this).val() );
+});
+
 socket.on('servidor:filtrarRales', ({ raleRCVFiltrado, raleCOPFiltrado, type }) => {
     if (type == "frst") {
         frstRaleRCV = raleRCVFiltrado;
@@ -209,50 +240,78 @@ socket.on('servidor:filtrarRales', ({ raleRCVFiltrado, raleCOPFiltrado, type }) 
         scndRaleRCV = raleRCVFiltrado;
         scndRaleCOP = raleCOPFiltrado;
     }
-    if ( frstRaleRCV && frstRaleCOP && scndRaleRCV && scndRaleCOP ) {
-        socket.emit('cliente:consultarConfrontaAfil');
+    if ( frstRaleRCV && frstRaleCOP && scndRaleRCV && scndRaleCOP && Coin ) {
+        socket.emit('cliente:confrontarData');
     }
 });
 
-socket.on('servidor:consultarConfrontaAfil', ( patrones ) => {
-    confrontData({ frstRaleRCV, frstRaleCOP, scndRaleRCV, scndRaleCOP, patrones });
-    console.log("Socket consultar contronta afil")
+socket.on('servidor:filtrarCoin', (coinFiltrado) => {
+    Coin = coinFiltrado;
+    if ( frstRaleRCV && frstRaleCOP && scndRaleRCV && scndRaleCOP && Coin ) {
+        socket.emit('cliente:confrontarData');
+    }
+});
+
+socket.on('servidor:confrontarData', ({ patrones, ejecutores }) => {
+    confrontData({ patrones, ejecutores });
 })
 
-function confrontData ({ frstRaleRCV, frstRaleCOP, scndRaleRCV, scndRaleCOP, patrones }) {
-    console.log("Confront Data")
+function confrontData ({ patrones, ejecutores }) {
     let frstRcv = frstRaleRCV.map((rale) => Object.assign(rale, { type: "rcv" }));
     let scndRcv = scndRaleRCV.map((rale) => Object.assign(rale, { type: "rcv" }));
     let frstCop = frstRaleCOP.map((rale) => Object.assign(rale, { type: "cop" }));
     let scndCop = scndRaleCOP.map((rale) => Object.assign(rale, { type: "cop" }));
+    Coin = Coin.map((coin) => Object.assign(coin, { type: "coin" }));
 
     frstData = frstRcv.concat(frstCop);
-    let scndData = scndRcv.concat(scndCop);
+    scndData = scndRcv.concat(scndCop);
 
-    // patrones = this.patrones;
+    patr = patrones;
+    eje = ejecutores;
 
-    // frstData[0].dias_rest = Math.floor((new Date() - new Date(frstData[0].fec_insid)) / 86400000); 
-    
-    // frstData[0].oportunidad = frstData[0].inc == 2 ? 
-    // "En tiempo en la 2"
-    // : frstData[0].dias_rest > 40 ? 
-    //     "Fuera de tiempo"
-    //     : "En tiempo 31" 
-
-    // frstData[0].quemados = frstData[0].inc != 2 ? 
-    // frstData[0].dias_rest > 40 ? 
-    //     "Fuera de tiempo"
-    //     :  frstData[0].dias_rest > 15 ? 
-    //         "Quemandose"
-    //         : "En tiempo 31"
-    // : ""
-
-    
-
-    // frstData.map((data) => {
-        
-    //     Object.assign(data, {  })
-    // });
+    // Calcular dias restantes
+    frstData[0].dias_rest = Math.floor((new Date() - new Date(frstData[0].fec_insid)) / 86400000)
+    // Calcular oportunidad
+    frstData[0].oportunidad = frstData[0].inc == 2 ? 
+        "En tiempo en la 2"
+        : frstData[0].dias_rest > 40 ? 
+            "Fuera de tiempo"
+            : "En tiempo 31" 
+    // Calcular quemados
+    frstData[0].quemados = frstData[0].inc != 2 ? 
+        frstData[0].dias_rest > 40 ? 
+            "Fuera de tiempo"
+            :  frstData[0].dias_rest > 15 ? 
+                "Quemandose"
+                : "En tiempo 31"
+        : ""
+    // Calcular clave ejecutor
+    frstData[0].clave_eje = patr.find(pat => pat.reg_pat == frstData[0].reg_pat).clave_eje
+    frstData[0].ejecutor ??= "No existe la clave de ejecutor"
+    // Calcular ejecutor 
+    frstData[0].ejecutor = eje.find(ejecutor => ejecutor.clave_eje == frstData[0].clave_eje).nombre
+    frstData[0].ejecutor ??= "No existe el ejecutor"
+    // Calcular programable con el coin
+    frstData[0].programable = Coin.find(coin => coin.reg_pat == frstData[0].reg_pat && coin.nom_cred == frstData[0].nom_cred)
+    frstData[0].programable ??= "EN TIEMPO 02"
+    // Calcular patron
+    frstData[0].patron = patr.find(pat => pat.reg_pat == frstData[0].reg_pat).patron
+    frstData[0].patron ??= "No existe el patron"
+    // Calcular actividad
+    frstData[0].actividad = patr.find(pat => pat.reg_pat == frstData[0].reg_pat).actividad
+    frstData[0].actividad ??= "No existe el patron"
+    // Calcular domicilio
+    frstData[0].domicilio = patr.find(pat => pat.reg_pat == frstData[0].reg_pat).domicilio
+    frstData[0].domicilio ??= "No existe el patron"
+    // Calcular localidad
+    frstData[0].localidad = patr.find(pat => pat.reg_pat == frstData[0].reg_pat).localidad
+    frstData[0].localidad ??= "No existe el patron"
+    // Calcular buscar pago
+    frstData[0].buscar_pago = scndData.find(data => data.reg_pat == frstData[0].reg_pat && data.nom_cred == frstData[0].nom_cred).importe
+    frstData[0].buscar_pago ??= "No hay pago"
+    // Calcular buscar td
+    frstData[0].buscar_td = frstData[0].buscar_pago != "No hay pago" ? frstData[0].buscar_pago : frstData[0].td
+    // 
 }
 
 function showTable (data) {

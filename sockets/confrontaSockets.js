@@ -1,6 +1,7 @@
 import RaleCop from "../models/raleCOPModel.js";
 import RaleRcv from "../models/raleRCVModel.js";
 import Afil63 from "../models/afilModel.js";
+import Ejecutor from "../models/ejecutorModel.js";
 import sequelize from "../database.js";
 
 export function socket(io) {
@@ -22,16 +23,11 @@ export function socket(io) {
         });
 
         // Obtener fechas de registro en la tabla Afil
-        socket.on('cliente:consultarConfrontaAfil', async () => {
+        socket.on('cliente:confrontarData', async () => {
             try {
-                const patrones = await Afil63.findAll()
-                .then(() => {
-                    socket.emit('servidor:consultarConfrontaAfil', patrones);
-                    console.log("Socket consultar contronta afil")
-                }) 
-                .catch((e) => {
-                    console.error(error);
-                });
+                const patrones = await Afil63.findAll();
+                const ejecutores = await Ejecutor.findAll();
+                socket.emit('servidor:confrontarData', { patrones, ejecutores });
             } catch (error) {
                 // Manejar el error
                 console.error(error);
