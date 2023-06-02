@@ -1,29 +1,56 @@
 const socket = io('http://localhost:3000');
 
+let frstRaleRCV, frstRaleCOP, scndRaleRCV, scndRaleCOP, frstData, patrones;
+
 $('#typeFile').on('change', function() {
     switch ($(this).val()) {
         case "Rale": 
-            $('#div-selects').empty();
-            $('#div-selects').append(
+            $('#div-frst-selects').empty();
+            $('#div-scnd-selects').empty();
+            $('#div-frst-selects').append(
                 $('<label>', {
-                    for: 'dateCOP',
-                    text: 'Fechas a confrontar de Rale COP',
+                    for: 'dateCOPfrst',
+                    text: 'Primer fecha a confrontar de Rale COP',
                     class: 'mt-3'
                 }), 
                 $('<select>', {
-                    name: 'dateCOP',
-                    id: 'dateCOP',
+                    name: 'dateCOPfrst',
+                    id: 'dateCOPfrst',
                     class: 'form-control input-group-text',
                     disabled: true
                 }),
                 $('<label>', {
-                    for: 'dateRCV',
-                    text: 'Fechas a confrontar de Rale RCV',
+                    for: 'dateRCVfrst',
+                    text: 'Primer fecha a confrontar de Rale RCV',
                     class: 'mt-3'
                 }), 
                 $('<select>', {
-                    name: 'dateRCV',
-                    id: 'dateRCV',
+                    name: 'dateRCVfrst',
+                    id: 'dateRCVfrst',
+                    class: 'form-control input-group-text',
+                    disabled: true
+                })
+            );
+            $('#div-scnd-selects').append(
+                $('<label>', {
+                    for: 'dateCOPscnd',
+                    text: 'Segunda fecha a confrontar de Rale COP',
+                    class: 'mt-3'
+                }), 
+                $('<select>', {
+                    name: 'dateCOPscnd',
+                    id: 'dateCOPscnd',
+                    class: 'form-control input-group-text',
+                    disabled: true
+                }),
+                $('<label>', {
+                    for: 'dateRCVscnd',
+                    text: 'Segunda fecha a confrontar de Rale RCV',
+                    class: 'mt-3'
+                }), 
+                $('<select>', {
+                    name: 'dateRCVscnd',
+                    id: 'dateRCVscnd',
                     class: 'form-control input-group-text',
                     disabled: true
                 })
@@ -40,80 +67,195 @@ $('#typeFile').on('change', function() {
     }
 });
 
+socket.on('servidor:consultarRegistrosRaleCOP', (data) => {
+    $('#dateCOPfrst').empty();
+    $('#dateCOPscnd').empty();
+    $('#dateCOPfrst').prop('disabled', true);
+    $('#dateCOPscnd').prop('disabled', true);
+    $('#dateCOPfrst').append(
+        $('<option>', {
+            text: "Selecciona una fecha para Rale COP",
+            value: false
+        }
+    ));
+    $('#dateCOPscnd').append(
+        $('<option>', {
+            text: "Selecciona una fecha para Rale COP",
+            value: false
+        }
+    ));
+    if (data.length <= 1) bsAlert('Es necesario tener al menos 2 archivos para la confronta', "danger");
+    else {
+        data.map((date) => {
+            // No se asigna el option a variables porque solo puede hacer 
+            // append a un solo elemento y si se hace a un segundo se elimina del primero
+            $('#dateCOPfrst').append(
+                $('<option>', {
+                    value: date, 
+                    text: date
+                })
+            );
+            $('#dateCOPscnd').append(
+                $('<option>', {
+                    value: date, 
+                    text: date
+                })
+            );
+        });
+        $('#dateCOPfrst').prop('disabled', false);
+        $('#dateCOPscnd').prop('disabled', false);
+    }
+});
+
+socket.on('servidor:consultarRegistrosRaleRCV', (data) => {
+    $('#dateRCVfrst').empty();
+    $('#dateRCVscnd').empty();
+    $('#dateRCVfrst').prop('disabled', true);
+    $('#dateRCVscnd').prop('disabled', true);
+    $('#dateRCVfrst').append(
+        $('<option>', {
+            text: "Selecciona una fecha para Rale RCV",
+            value: false 
+        }));
+        $('#dateRCVscnd').append($('<option>', {
+            text: "Selecciona una fecha para Rale RCV",
+            value: false 
+        })
+    );
+    if (data.length > 1) {
+        data.map((date) => {
+            $('#dateRCVfrst').append(
+                $('<option>', {
+                    value: date, 
+                    text: date
+                })
+            );
+            $('#dateRCVscnd').append(
+                $('<option>', {
+                    value: date, 
+                    text: date
+                })
+            );
+        });
+        $('#dateRCVfrst').prop('disabled', false);
+        $('#dateRCVscnd').prop('disabled', false);
+    }
+});
+
 // Hacemos un on change al div con el id dateCOP porque se crea dinamicamente 
 // entonces no se puede crear un evento a un elemento que no existe
-$('#div-selects').on('change', '#dateCOP', function() {
+$('#div-frst-selects').on('change', '#dateCOPfrst', function() {
+    $('#dateCOPscnd option').prop('disabled', false);
+    $(`#dateCOPscnd option[value="${$(this).val()}"]`).prop('disabled', $(this).val() != 'false');
     if ($(this).val() != "false") 
-        if ($('#dateRCV').val() != "false") 
+        if ($('#dateRCVfrst').val() != "false") {
+            if ($('#dateRCVfrst').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
             socket.emit('cliente:filtrarRales', { 
-                rcv: $('#dateRCV').val(), 
-                cop: $('#dateCOP').val() 
+                rcv: $('#dateRCVfrst').val(), 
+                cop: $('#dateCOPfrst').val(),
+                type: "frst"
             });
+        }
+            
 });
 
-$('#div-selects').on('change', '#dateRCV', function() {
+$('#div-frst-selects').on('change', '#dateRCVfrst', function() {
+    $('#dateRCVscnd option').prop('disabled', false);
+    $(`#dateRCVscnd option[value="${$(this).val()}"]`).prop('disabled', $(this).val() != 'false');
     if ($(this).val() != "false") 
-        if ($('#dateCOP').val() != "false") 
+        if ($('#dateCOPfrst').val() != "false") {
+            if ($('#dateCOPfrst').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
             socket.emit('cliente:filtrarRales', { 
-                rcv: $('#dateRCV').val(), 
-                cop: $('#dateCOP').val() 
+                rcv: $('#dateRCVfrst').val(), 
+                cop: $('#dateCOPfrst').val(),
+                type: "frst"
             });
+        }
 });
 
-socket.on('servidor:consultarRegistrosRaleCOP', (data) => {
-    $('#dateCOP').empty();
-    $('#dateCOP').append($('<option>', {
-        text: "Selecciona una fecha para Rale COP",
-        value: false
-    }));
-    data.map((date) => {
-        let option = $('<option>', {
-            value: date, 
-            text: date
-        });
-
-        $('#dateCOP').append(option);
-    });
-    $('#dateCOP').prop('disabled', false);
+$('#div-scnd-selects').on('change', '#dateCOPscnd', function() {
+    $('#dateCOPfrst option').prop('disabled', false);
+    $(`#dateCOPfrst option[value="${$(this).val()}"]`).prop('disabled', $(this).val() != 'false');
+    if ($(this).val() != "false") 
+        if ($('#dateRCVscnd').val() != "false") {
+            if ($('#dateRCVscnd').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
+            socket.emit('cliente:filtrarRales', { 
+                rcv: $('#dateRCVscnd').val(), 
+                cop: $('#dateCOPscnd').val(),
+                type: "scnd"
+            });
+        }
 });
 
-socket.on('servidor:consultarRegistrosRaleRCV', (data) => {
-    $('#dateRCV').empty();
-    $('#dateRCV').append($('<option>', {
-        text: "Selecciona una fecha para Rale RCV",
-        value: false 
-    }));
-    data.map((date) => {
-        let option = $('<option>', {
-            value: date, 
-            text: date
-        });
-
-        $('#dateRCV').append(option);
-    });
-    $('#dateRCV').prop('disabled', false);
+$('#div-scnd-selects').on('change', '#dateRCVscnd', function() {
+    $('#dateRCVfrst option').prop('disabled', false);
+    $(`#dateRCVfrst option[value="${$(this).val()}"]`).prop('disabled', $(this).val() != 'false');
+    if ($(this).val() != "false") 
+        if ($('#dateCOPscnd').val() != "false") {
+            if ($('#dateCOPscnd').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
+            socket.emit('cliente:filtrarRales', { 
+                rcv: $('#dateRCVscnd').val(), 
+                cop: $('#dateCOPscnd').val(),
+                type: "scnd"
+            });
+        }
 });
 
-socket.on('servidor:consultarRegistrosRaleRCV', (data) => {
-    $('#dateRCV').empty();
-    $('#dateRCV').append($('<option>', {
-        text: "Selecciona una fecha para Rale RCV",
-        value: false 
-    }));
-    data.map((date) => {
-        let option = $('<option>', {
-            value: date, 
-            text: date
-        });
-
-        $('#dateRCV').append(option);
-    });
-    $('#dateRCV').prop('disabled', false);
+socket.on('servidor:filtrarRales', ({ raleRCVFiltrado, raleCOPFiltrado, type }) => {
+    if (type == "frst") {
+        frstRaleRCV = raleRCVFiltrado;
+        frstRaleCOP = raleCOPFiltrado;
+    } else if (type == "scnd") {
+        scndRaleRCV = raleRCVFiltrado;
+        scndRaleCOP = raleCOPFiltrado;
+    }
+    if ( frstRaleRCV && frstRaleCOP && scndRaleRCV && scndRaleCOP ) {
+        socket.emit('cliente:consultarConfrontaAfil');
+    }
 });
 
-socket.on('servidor:filtrarRales', ({ raleRCVFiltrado, raleCOPFiltrado }) => {
-    let data = confrontData({ raleRCVFiltrado, raleCOPFiltrado }); 
+socket.on('servidor:consultarConfrontaAfil', ( patrones ) => {
+    confrontData({ frstRaleRCV, frstRaleCOP, scndRaleRCV, scndRaleCOP, patrones });
+    console.log("Socket consultar contronta afil")
+})
 
+function confrontData ({ frstRaleRCV, frstRaleCOP, scndRaleRCV, scndRaleCOP, patrones }) {
+    console.log("Confront Data")
+    let frstRcv = frstRaleRCV.map((rale) => Object.assign(rale, { type: "rcv" }));
+    let scndRcv = scndRaleRCV.map((rale) => Object.assign(rale, { type: "rcv" }));
+    let frstCop = frstRaleCOP.map((rale) => Object.assign(rale, { type: "cop" }));
+    let scndCop = scndRaleCOP.map((rale) => Object.assign(rale, { type: "cop" }));
+
+    frstData = frstRcv.concat(frstCop);
+    let scndData = scndRcv.concat(scndCop);
+
+    // patrones = this.patrones;
+
+    // frstData[0].dias_rest = Math.floor((new Date() - new Date(frstData[0].fec_insid)) / 86400000); 
+    
+    // frstData[0].oportunidad = frstData[0].inc == 2 ? 
+    // "En tiempo en la 2"
+    // : frstData[0].dias_rest > 40 ? 
+    //     "Fuera de tiempo"
+    //     : "En tiempo 31" 
+
+    // frstData[0].quemados = frstData[0].inc != 2 ? 
+    // frstData[0].dias_rest > 40 ? 
+    //     "Fuera de tiempo"
+    //     :  frstData[0].dias_rest > 15 ? 
+    //         "Quemandose"
+    //         : "En tiempo 31"
+    // : ""
+
+    
+
+    // frstData.map((data) => {
+        
+    //     Object.assign(data, {  })
+    // });
+}
+
+function showTable (data) {
     // Crear tabla
     const table = $('<table class="table">').attr('id', 'rales-table');
 
@@ -159,13 +301,4 @@ socket.on('servidor:filtrarRales', ({ raleRCVFiltrado, raleCOPFiltrado }) => {
     $(`<b >Se encontraron ${data.length} registros<b>`).appendTo(tableContainer);
     table.appendTo(tableContainer);
     tableContainer.appendTo('#div-table');
-});
-
-function confrontData ({ raleRCVFiltrado, raleCOPFiltrado }) {
-    let rcv = raleRCVFiltrado.map((rale) => Object.assign(rale, { type: "rcv" }));
-    let cop = raleCOPFiltrado.map((rale) => Object.assign(rale, { type: "cop" }));
-
-    let data = rcv.concat(cop);
-    console.log(data)
-    return data;
 }

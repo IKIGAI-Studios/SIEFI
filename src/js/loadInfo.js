@@ -220,7 +220,6 @@ $('#btn_insertar').on('click', async function(e) {
             }
             break;
         case "raleRCV":
-            $('#div-table').empty();
             while (i < objRaleRCV.length) {
                 const batch = objRaleRCV.slice(i, i + 1000);
                 // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
@@ -460,24 +459,24 @@ socket.on('server:result-rale-cop', ( data ) => {
         alert(`La columna M no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'OV. PATRONA' in obj) ) {
-        alert(`La columna OV. PATRONA no se encontró en el archivo`);
+    if ( !data.some(obj => 'OV. PATRONAL' in obj) ) {
+        alert(`La columna OV. PATRONAL no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'L SE' in obj) ) {
-        alert(`La columna L SE no se encontró en el archivo`);
+    if ( !data.some(obj => 'SECT' in obj) ) {
+        alert(`La columna SECT no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'CT NUM.CRED.' in obj) ) {
-        alert(`La columna CT NUM.CRED. no se encontró en el archivo`);
+    if ( !data.some(obj => 'NUM.CRED.' in obj) ) {
+        alert(`La columna NUM.CRED. no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'C' in obj) ) {
-        alert(`La columna C no se encontró en el archivo`);
+    if ( !data.some(obj => 'CE' in obj) ) {
+        alert(`La columna CE no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'E  PERIODO' in obj) ) {
-        alert(`La columna E PERIODO no se encontró en el archivo`);
+    if ( !data.some(obj => 'PERIODO' in obj) ) {
+        alert(`La columna PERIODO no se encontró en el archivo`);
         err = true;
     }
     if ( !data.some(obj => 'TD' in obj) ) {
@@ -488,20 +487,20 @@ socket.on('server:result-rale-cop', ( data ) => {
         alert(`La columna FECHA ALTA no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'FEC. NOTIF' in obj) ) {
-        alert(`La columna FEC. NOTIF no se encontró en el archivo`);
+    if ( !data.some(obj => 'FEC. NOTIF.' in obj) ) {
+        alert(`La columna FEC. NOTIF. no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => '. INC' in obj) ) {
-        alert(`La columna . INC no se encontró en el archivo`);
+    if ( !data.some(obj => 'INC.' in obj) ) {
+        alert(`La columna INC. no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => '. FEC. INCID' in obj) ) {
-        alert(`La columna . FEC. INCID no se encontró en el archivo`);
+    if ( !data.some(obj => 'FEC. INCID.' in obj) ) {
+        alert(`La columna FEC. INCID. no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => '. DIAS' in obj) ) {
-        alert(`La columna . DIAS no se encontró en el archivo`);
+    if ( !data.some(obj => 'DIAS' in obj) ) {
+        alert(`La columna DIAS. no se encontró en el archivo`);
         err = true;
     }
     if ( !data.some(obj => 'I M P O R T E' in obj)) {
@@ -596,24 +595,24 @@ socket.on('server:result-rale-rcv', ( data ) => {
         alert(`La columna M no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'OV. PATRONA' in obj) ) {
-        alert(`La columna OV. PATRONA no se encontró en el archivo`);
+    if ( !data.some(obj => 'OV. PATRONAL' in obj) ) {
+        alert(`La columna OV. PATRONAL no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'L SE' in obj) ) {
-        alert(`La columna L SE no se encontró en el archivo`);
+    if ( !data.some(obj => 'SECT' in obj) ) {
+        alert(`La columna SECT no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'CT NUM.CRED.' in obj) ) {
-        alert(`La columna CT NUM.CRED. no se encontró en el archivo`);
+    if ( !data.some(obj => 'NUM.CRED.' in obj) ) {
+        alert(`La columna NUM.CRED. no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'C' in obj) ) {
-        alert(`La columna C no se encontró en el archivo`);
+    if ( !data.some(obj => 'CE' in obj) ) {
+        alert(`La columna CE no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'E  PERIODO' in obj) ) {
-        alert(`La columna E PERIODO no se encontró en el archivo`);
+    if ( !data.some(obj => 'PERIODO' in obj) ) {
+        alert(`La columna PERIODO no se encontró en el archivo`);
         err = true;
     }
     if ( !data.some(obj => 'TD' in obj) ) {
@@ -624,20 +623,20 @@ socket.on('server:result-rale-rcv', ( data ) => {
         alert(`La columna FECHA ALTA no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => 'FEC. NOTIF' in obj) ) {
-        alert(`La columna FEC. NOTIF no se encontró en el archivo`);
+    if ( !data.some(obj => 'FEC. NOTIF.' in obj) ) {
+        alert(`La columna FEC. NOTIF. no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => '. INC' in obj) ) {
-        alert(`La columna . INC no se encontró en el archivo`);
+    if ( !data.some(obj => 'INC.' in obj) ) {
+        alert(`La columna INC. no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => '. FEC. INCID' in obj) ) {
-        alert(`La columna . FEC. INCID no se encontró en el archivo`);
+    if ( !data.some(obj => 'FEC. INCID.' in obj) ) {
+        alert(`La columna FEC. INCID. no se encontró en el archivo`);
         err = true;
     }
-    if ( !data.some(obj => '. DIAS' in obj) ) {
-        alert(`La columna . DIAS no se encontró en el archivo`);
+    if ( !data.some(obj => 'DIAS' in obj) ) {
+        alert(`La columna DIAS no se encontró en el archivo`);
         err = true;
     }
     if ( !data.some(obj => 'I M P O R T E' in obj)) {

@@ -11,6 +11,7 @@ import main_routes from './routes/main_routes.js';
 import { socket as loadInfoSockets } from './sockets/loadInfoSockets.js';
 import { socket as estIndividualesSockets } from './sockets/estindividualesSockets.js';
 import { socket as actEjecutorSockets } from './sockets/actEjecutorSockets.js';
+import { socket as confrontaSockets } from './sockets/confrontaSockets.js';
 import http from 'http';
 import { Server } from 'socket.io'
 
@@ -37,6 +38,7 @@ const io = new Server(httpServer);
 loadInfoSockets(io); // Configura los sockets de load Info en el servidor
 estIndividualesSockets(io); // Configura los sockets de estadisticas individuales en el servidor
 actEjecutorSockets(io); // Configura los sockets de actualizar ejecutor en el servidor
+confrontaSockets(io); // Configura los sockets de confronta ejecutor en el servidor
 
 
 httpServer.listen(port, () => {
