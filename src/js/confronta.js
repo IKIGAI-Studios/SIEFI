@@ -1,6 +1,6 @@
 const socket = io('http://localhost:3000');
 
-let frstRaleRCV, frstRaleCOP, scndRaleRCV, scndRaleCOP, Coin, frstData, scndData, patr, eje;
+let frstRaleRCV, frstRaleCOP, scndRaleRCV, scndRaleCOP, Coin, frstData, scndData, patr, eje, confronta;
 
 $('#typeFile').on('change', function() {
     switch ($(this).val()) {
@@ -269,49 +269,81 @@ function confrontData ({ patrones, ejecutores }) {
     patr = patrones;
     eje = ejecutores;
 
-    // Calcular dias restantes
-    frstData[0].dias_rest = Math.floor((new Date() - new Date(frstData[0].fec_insid)) / 86400000)
-    // Calcular oportunidad
-    frstData[0].oportunidad = frstData[0].inc == 2 ? 
-        "En tiempo en la 2"
-        : frstData[0].dias_rest > 40 ? 
-            "Fuera de tiempo"
-            : "En tiempo 31" 
-    // Calcular quemados
-    frstData[0].quemados = frstData[0].inc != 2 ? 
-        frstData[0].dias_rest > 40 ? 
-            "Fuera de tiempo"
-            :  frstData[0].dias_rest > 15 ? 
-                "Quemandose"
-                : "En tiempo 31"
-        : ""
-    // Calcular clave ejecutor
-    frstData[0].clave_eje = patr.find(pat => pat.reg_pat == frstData[0].reg_pat).clave_eje
-    frstData[0].ejecutor ??= "No existe la clave de ejecutor"
-    // Calcular ejecutor 
-    frstData[0].ejecutor = eje.find(ejecutor => ejecutor.clave_eje == frstData[0].clave_eje).nombre
-    frstData[0].ejecutor ??= "No existe el ejecutor"
-    // Calcular programable con el coin
-    frstData[0].programable = Coin.find(coin => coin.reg_pat == frstData[0].reg_pat && coin.nom_cred == frstData[0].nom_cred)
-    frstData[0].programable ??= "EN TIEMPO 02"
-    // Calcular patron
-    frstData[0].patron = patr.find(pat => pat.reg_pat == frstData[0].reg_pat).patron
-    frstData[0].patron ??= "No existe el patron"
-    // Calcular actividad
-    frstData[0].actividad = patr.find(pat => pat.reg_pat == frstData[0].reg_pat).actividad
-    frstData[0].actividad ??= "No existe el patron"
-    // Calcular domicilio
-    frstData[0].domicilio = patr.find(pat => pat.reg_pat == frstData[0].reg_pat).domicilio
-    frstData[0].domicilio ??= "No existe el patron"
-    // Calcular localidad
-    frstData[0].localidad = patr.find(pat => pat.reg_pat == frstData[0].reg_pat).localidad
-    frstData[0].localidad ??= "No existe el patron"
-    // Calcular buscar pago
-    frstData[0].buscar_pago = scndData.find(data => data.reg_pat == frstData[0].reg_pat && data.nom_cred == frstData[0].nom_cred).importe
-    frstData[0].buscar_pago ??= "No hay pago"
-    // Calcular buscar td
-    frstData[0].buscar_td = frstData[0].buscar_pago != "No hay pago" ? frstData[0].buscar_pago : frstData[0].td
-    // 
+    confronta = frstData.map((data) => {
+        // Calcular dias restantes
+        data.dias_rest = Math.floor((new Date() - new Date(data.fec_insid)) / 86400000)
+        // Calcular oportunidad
+        data.oportunidad = data.inc == 2 ? 
+            "En tiempo en la 2"
+            : data.dias_rest > 40 ? 
+                "Fuera de tiempo"
+                : "En tiempo 31" 
+        // Calcular quemados
+        data.quemados = data.inc != 2 ? 
+            data.dias_rest > 40 ? 
+                "Fuera de tiempo"
+                :  data.dias_rest > 15 ? 
+                    "Quemandose"
+                    : "En tiempo 31"
+            : ""
+        // Calcular clave ejecutor
+        data.clave_eje = patr.find(pat => pat.reg_pat == data.reg_pat).clave_eje
+        data.clave_eje ??= "No existe la clave de ejecutor"
+        // Calcular ejecutor 
+        data.ejecutor = eje.find(ejecutor => ejecutor.clave_eje == data.clave_eje).nombre
+        data.ejecutor ??= "No existe el ejecutor"
+        // Calcular programable con el coin
+        data.programable = Coin.find(coin => coin.reg_pat == data.reg_pat && coin.nom_cred == data.nom_cred)
+        data.programable ??= "EN TIEMPO 02"
+        // Calcular patron
+        data.patron = patr.find(pat => pat.reg_pat == data.reg_pat).patron
+        data.patron ??= "No existe el patron"
+        // Calcular actividad
+        data.actividad = patr.find(pat => pat.reg_pat == data.reg_pat).actividad
+        data.actividad ??= "No existe el patron"
+        // Calcular domicilio
+        data.domicilio = patr.find(pat => pat.reg_pat == data.reg_pat).domicilio
+        data.domicilio ??= "No existe el patron"
+        // Calcular localidad
+        data.localidad = patr.find(pat => pat.reg_pat == data.reg_pat).localidad
+        data.localidad ??= "No existe el patron"
+        // Calcular buscar pago
+        data.buscar_pago = scndData.find(data => data.reg_pat == data.reg_pat && data.nom_cred == data.nom_cred).importe
+        data.buscar_pago ??= "No hay pago"
+        // Calcular buscar td
+        data.buscar_td = data.buscar_pago != "No hay pago" ? data.buscar_pago : data.td
+        // Calcular cambio inc
+        data.buscar_cambio_inc = scndData.find(data => data.reg_pat == data.reg_pat && data.nom_cred == data.nom_cred).inc
+        data.buscar_pago ??= "No hay cambio"
+        // Calcular buscar 2 y 31
+        data.buscar_2_y_31 = data.buscar_cambio_inc != 2 ?
+            data.buscar_cambio_inc == 23 ?
+                23
+                : data.buscar_cambio_inc != 31 ?
+                    data.buscar_cambio_inc
+                    : "No hay 2 o 31"
+            : "No hay 2 o 31"
+        // Calcular re cuotas
+        data.re_cuotas = data.buscar_td.toString()[0] == "2" ? "RE" : "No hay cuotas"
+        // Calcular re rcv
+        data.re_rcv = data.buscar_td.toString()[0] == "6" ? "RB" : "No hay rcv"
+        // Calcular re multas
+        data.re_multas = data.buscar_td.toString()[0] == "8" ? "RE 10%" : "No hay multas"
+        // Calcular re aud
+        data.re_aud = data.buscar_td.toString()[0] == "5" ? "RE AUD" : "No hay Aud"
+        // Calcular res
+        data.res = [
+            data.buscar_cambio_inc, 
+            data.buscar_2_y_31, 
+            data.re_cuotas, 
+            data.re_rcv, 
+            data.re_multas, 
+            data.buscar_td, 
+            data.re_aud
+        ].join('-')
+        return data;
+    })
+    console.log(confronta)
 }
 
 function showTable (data) {
