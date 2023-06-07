@@ -6,6 +6,7 @@ window.onload = function () {
     socket.emit('cliente:consultarRegistrosRaleCOP');
     socket.emit('cliente:consultarRegistrosRaleRCV');
     socket.emit('cliente:consultarRegistrosCoin');
+    socket.emit('cliente:consultarConfrontas');
 }
 
 // $('#typeFile').on('change', function() {
@@ -176,6 +177,59 @@ socket.on('servidor:consultarRegistrosCoin', (data) => {
     $('#dateCOINscnd').prop('disabled', false);
 });
 
+socket.on('servidor:consultarConfrontas', ({ confronta }) => {
+    $('#show_confrontas tbody').empty();
+    confronta.map((reg, i) => {
+        let row = $('<tr>');
+        row.append(`<td>${ i + 1 }</td>`);
+        row.append(`<td>${ reg.createdAt }</td>`);
+        row.append(`<td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteConfronta('${ reg.createdAt }')">
+                            Eliminar
+                        </button>
+                    </td>`);
+        $('#show_confrontas tbody').append(row);
+    })
+});
+
+socket.on('servidor:filtrarRales', ({ raleRCVFiltrado, raleCOPFiltrado, type }) => {
+    if (type == "frst") {
+        frstRaleRCV = raleRCVFiltrado;
+        frstRaleCOP = raleCOPFiltrado;
+    } else if (type == "scnd") {
+        scndRaleRCV = raleRCVFiltrado;
+        scndRaleCOP = raleCOPFiltrado;
+    }
+    if ( frstRaleRCV && frstRaleCOP && scndRaleRCV && scndRaleCOP && Coin ) {
+        if ($("#switch_show_modal").prop('checked')) {
+            $('#div-table').empty();
+            $('#confrontarModal').modal('show');
+            $('#modal_title').text('Confronta');
+            $(`<h3 class="text-primary">Generando la confronta</h3>`).appendTo('#div-table');
+            $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
+        }
+        socket.emit('cliente:confrontarData');
+    }
+});
+
+socket.on('servidor:filtrarCoin', (coinFiltrado) => {
+    Coin = coinFiltrado;
+    if ( frstRaleRCV && frstRaleCOP && scndRaleRCV && scndRaleCOP && Coin ) {
+        if ($("#switch_show_modal").prop('checked')) {
+            $('#div-table').empty();
+            $('#confrontarModal').modal('show');
+            $('#modal_title').text('Confronta');
+            $(`<h3 class="text-primary">Generando la confronta</h3>`).appendTo('#div-table');
+            $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
+        }
+        socket.emit('cliente:confrontarData');
+    }
+});
+
+socket.on('servidor:confrontarData', ({ patrones, ejecutores }) => {
+    confrontData({ patrones, ejecutores });
+});
+
 // Hacemos un on change al div con el id dateCOP porque se crea dinamicamente 
 // entonces no se puede crear un evento a un elemento que no existe
 $('#div-frst-selects').on('change', '#dateCOPfrst', function() {
@@ -249,45 +303,32 @@ $('#switch_show_modal').on('change', function () {
 
 $('#confrontarModal').on('hidden.bs.modal', function() {
     $("#switch_show_modal").prop('checked', false);
+    socket.emit('cliente:consultarConfrontas');
 });
 
-socket.on('servidor:filtrarRales', ({ raleRCVFiltrado, raleCOPFiltrado, type }) => {
-    if (type == "frst") {
-        frstRaleRCV = raleRCVFiltrado;
-        frstRaleCOP = raleCOPFiltrado;
-    } else if (type == "scnd") {
-        scndRaleRCV = raleRCVFiltrado;
-        scndRaleCOP = raleCOPFiltrado;
-    }
-    if ( frstRaleRCV && frstRaleCOP && scndRaleRCV && scndRaleCOP && Coin ) {
-        if ($("#switch_show_modal").prop('checked')) {
-            $('#div-table').empty();
-            $('#confrontarModal').modal('show');
-            $('#modal_title').text('Confronta');
-            $(`<h3 class="text-primary">Generando la confronta</h3>`).appendTo('#div-table');
-            $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
-        }
-        socket.emit('cliente:confrontarData');
+$('#saveConfronta').on('click', async function () { 
+    let i = 0, lenght = confronta.length;
+    $('#div-table').empty();
+    $('#confrontarModal').modal('show');
+    $('#modal_title').text('Guardando en la BD');
+
+    while (i < lenght) {
+        const batch = confronta.slice(i, i + 1000);
+
+        await socket.emit('cliente:saveConfronta', { confronta:batch, lote:i, lenght }, (res) => {
+            if (i == 0) $('#div-table').empty();
+            showResult(res);
+        });
+        i += 1000;
     }
 });
 
-socket.on('servidor:filtrarCoin', (coinFiltrado) => {
-    Coin = coinFiltrado;
-    if ( frstRaleRCV && frstRaleCOP && scndRaleRCV && scndRaleCOP && Coin ) {
-        if ($("#switch_show_modal").prop('checked')) {
-            $('#div-table').empty();
-            $('#confrontarModal').modal('show');
-            $('#modal_title').text('Confronta');
-            $(`<h3 class="text-primary">Generando la confronta</h3>`).appendTo('#div-table');
-            $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
-        }
-        socket.emit('cliente:confrontarData');
-    }
-});
-
-socket.on('servidor:confrontarData', ({ patrones, ejecutores }) => {
-    confrontData({ patrones, ejecutores });
-});
+function deleteConfronta( date ) {
+    socket.emit('cliente:deleteConfronta', date, (res) => {
+        if (res.status) socket.emit('cliente:consultarConfrontas')
+        else bsAlert('No se pudo eliminar la fecha' + date, 'danger')
+    });
+}
 
 function confrontData ({ patrones, ejecutores }) {
     let frstRcv = frstRaleRCV.map((rale) => Object.assign(rale, { type: "rcv" }));
@@ -299,82 +340,98 @@ function confrontData ({ patrones, ejecutores }) {
     frstData = frstRcv.concat(frstCop);
     scndData = scndRcv.concat(scndCop);
 
-    confronta = frstData.map((data) => {
+    confronta = frstData.map((frstdata) => {
         // Calcular dias restantes
-        data.dias_rest = Math.floor((new Date() - new Date(data.fec_insid)) / 86400000)
+        frstdata.dias_rest = Math.floor((new Date() - new Date(frstdata.fec_insid)) / 86400000)
         // Calcular oportunidad
-        data.oportunidad = data.inc == 2 ? 
+        frstdata.oportunidad = frstdata.inc == 2 ? 
             "En tiempo en la 2"
-            : data.dias_rest > 40 ? 
+            : frstdata.dias_rest > 40 ? 
                 "Fuera de tiempo"
                 : "En tiempo 31" 
         // Calcular quemados
-        data.quemados = data.inc != 2 ? 
-            data.dias_rest > 40 ? 
+        frstdata.quemados = frstdata.inc != 2 ? 
+            frstdata.dias_rest > 40 ? 
                 "Fuera de tiempo"
-                :  data.dias_rest > 15 ? 
+                :  frstdata.dias_rest > 15 ? 
                     "Quemandose"
                     : "En tiempo 31"
             : ""
+        frstData.createdAt = null;
+        frstData.updatedAt = null;
         // Calcular clave ejecutor
-        data.clave_eje = patrones.find(pat => pat.reg_pat == data.reg_pat).clave_eje
-        data.clave_eje ??= "No existe la clave de ejecutor"
+        frstdata.clave_eje = patrones.find(pat => pat.reg_pat == frstdata.reg_pat).clave_eje
+        frstdata.clave_eje ??= "No existe la clave de ejecutor"
         // Calcular ejecutor 
-        data.ejecutor = ejecutores.find(ejecutor => ejecutor.clave_eje == data.clave_eje).nombre
-        data.ejecutor ??= "No existe el ejecutor"
+        frstdata.ejecutor = ejecutores.find(ejecutor => ejecutor.clave_eje == frstdata.clave_eje).nombre
+        frstdata.ejecutor ??= "No existe el ejecutor"
         // Calcular programable con el coin
-        data.programable = Coin.find(coin => coin.reg_pat == data.reg_pat && coin.nom_cred == data.nom_cred)
-        data.programable ??= "EN TIEMPO 02"
+        frstdata.programable = Coin.find(coin => coin.reg_pat == frstdata.reg_pat && coin.nom_cred == frstdata.nom_cred)
+        frstdata.programable ??= "EN TIEMPO 02"
         // Calcular patron
-        data.patron = patrones.find(pat => pat.reg_pat == data.reg_pat).patron
-        data.patron ??= "No existe el patron"
+        frstdata.patron = patrones.find(pat => pat.reg_pat == frstdata.reg_pat).patron
+        frstdata.patron ??= "No existe el patron"
         // Calcular actividad
-        data.actividad = patrones.find(pat => pat.reg_pat == data.reg_pat).actividad
-        data.actividad ??= "No existe el patron"
+        frstdata.actividad = patrones.find(pat => pat.reg_pat == frstdata.reg_pat).actividad
+        frstdata.actividad ??= "No existe el patron"
         // Calcular domicilio
-        data.domicilio = patrones.find(pat => pat.reg_pat == data.reg_pat).domicilio
-        data.domicilio ??= "No existe el patron"
+        frstdata.domicilio = patrones.find(pat => pat.reg_pat == frstdata.reg_pat).domicilio
+        frstdata.domicilio ??= "No existe el patron"
         // Calcular localidad
-        data.localidad = patrones.find(pat => pat.reg_pat == data.reg_pat).localidad
-        data.localidad ??= "No existe el patron"
+        frstdata.localidad = patrones.find(pat => pat.reg_pat == frstdata.reg_pat).localidad
+        frstdata.localidad ??= "No existe el patron"
         // Calcular buscar pago
-        data.buscar_pago = scndData.find(data => data.reg_pat == data.reg_pat && data.nom_cred == data.nom_cred).importe
-        data.buscar_pago ??= "No hay pago"
+        frstdata.buscar_pago = scndData.find(data => data.reg_pat == frstdata.reg_pat && data.nom_cred == frstdata.nom_cred)
+        frstdata.buscar_pago = frstdata.buscar_pago ? frstdata.buscar_pago.importe : "No hay pago"
         // Calcular buscar td
-        data.buscar_td = data.buscar_pago != "No hay pago" ? data.buscar_pago : data.td
+        frstdata.buscar_td = frstdata.buscar_pago != "No hay pago" ? frstdata.buscar_pago : frstdata.td
         // Calcular cambio inc
-        data.buscar_cambio_inc = scndData.find(data => data.reg_pat == data.reg_pat && data.nom_cred == data.nom_cred).inc
-        data.buscar_pago ??= "No hay cambio"
+        frstdata.buscar_cambio_inc = scndData.find(data => data.reg_pat == frstdata.reg_pat && data.nom_cred == frstdata.nom_cred)
+        frstdata.buscar_cambio_inc = frstdata.buscar_cambio_inc ? frstdata.buscar_cambio_inc.inc : "No hay cambio"
         // Calcular buscar 2 y 31
-        data.buscar_2_y_31 = data.buscar_cambio_inc != 2 ?
-            data.buscar_cambio_inc == 23 ?
+        frstdata.buscar_2_y_31 = frstdata.buscar_cambio_inc != 2 ?
+            frstdata.buscar_cambio_inc == 23 ?
                 23
-                : data.buscar_cambio_inc != 31 ?
-                    data.buscar_cambio_inc
+                : frstdata.buscar_cambio_inc != 31 ?
+                    frstdata.buscar_cambio_inc
                     : "No hay 2 o 31"
             : "No hay 2 o 31"
         // Calcular re cuotas
-        data.re_cuotas = data.buscar_td.toString()[0] == "2" ? "RE" : "No hay cuotas"
+        frstdata.re_cuotas = frstdata.buscar_td.toString()[0] == "2" ? "RE" : "No hay cuotas"
         // Calcular re rcv
-        data.re_rcv = data.buscar_td.toString()[0] == "6" ? "RB" : "No hay rcv"
+        frstdata.re_rcv = frstdata.buscar_td.toString()[0] == "6" ? "RB" : "No hay rcv"
         // Calcular re multas
-        data.re_multas = data.buscar_td.toString()[0] == "8" ? "RE 10%" : "No hay multas"
+        frstdata.re_multas = frstdata.buscar_td.toString()[0] == "8" ? "RE 10%" : "No hay multas"
         // Calcular re aud
-        data.re_aud = data.buscar_td.toString()[0] == "5" ? "RE AUD" : "No hay Aud"
+        frstdata.re_aud = frstdata.buscar_td.toString()[0] == "5" ? "RE AUD" : "No hay Aud"
         // Calcular res
-        data.resultado_concatenado = [
-            data.buscar_cambio_inc, 
-            data.buscar_2_y_31, 
-            data.re_cuotas, 
-            data.re_rcv, 
-            data.re_multas, 
-            data.buscar_td, 
-            data.re_aud
+        frstdata.resultado_concatenado = [
+            frstdata.buscar_cambio_inc, 
+            frstdata.buscar_2_y_31, 
+            frstdata.re_cuotas, 
+            frstdata.re_rcv, 
+            frstdata.re_multas, 
+            frstdata.buscar_td, 
+            frstdata.re_aud
         ].join('-')
-        return data;
+        return frstdata;
     })
     showConfronta();
     bsAlert('Se ha generado la confronta correctamente', 'success');
+    $('#saveConfronta').prop('disabled', false);
+}
+
+function showResult( rslt ) {
+    if (rslt.status) {
+        $(`<h3 class="text-success">${rslt.msg}</h3>`).appendTo('#div-table');
+        $('<img src="imgs/folder_listo.png" class="mt-3">').appendTo('#div-table');
+    } else {
+        $(`<h3 class="text-danger">${rslt.msg}</h3>`).appendTo('#div-table');
+        $('<img src="imgs/X.png" class="mt-3">').appendTo('#div-table');
+    }
+
+    $('#btn_cancelar').prop('disabled', false).text('Salir');
+    $('#btn_insertar').prop('disabled', true);
 }
 
 function showConfronta () {

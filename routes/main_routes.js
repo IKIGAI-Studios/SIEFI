@@ -365,7 +365,6 @@ routes.post('/asignarPatrones' , async (req, res) =>{
 routes.post('/elimarAfilFiltrado', async(req, res) =>{
     try {
         const fechaAfil = req.body.selectAfil;
-        console.log('Fecha: ',fechaAfil);
 
         const eliminarAfilF = await Afil63.destroy({
             where: sequelize.where(

@@ -267,7 +267,6 @@ export function socket(io) {
 
     socket.on("client:insert-rale-rcv", async ({ rale, lote }, callback) => {
       try {
-        console.log(lote)
         let raleValidado = [];
         let registrosNoInsertados = []; // Arreglo para almacenar los reg_pat no insertados
 
@@ -293,8 +292,6 @@ export function socket(io) {
           };
           raleValidado.push(regValid);
         });
-
-        console.log(raleValidado)
 
         // Obtener todos los afil registrados y regresar solo el reg pat como afil
         const existingRegPats = await Afil.findAll({
