@@ -2,82 +2,88 @@ const socket = io('http://localhost:3000');
 
 let frstRaleRCV, frstRaleCOP, scndRaleRCV, scndRaleCOP, Coin, frstData, scndData, patr, eje, confronta;
 
-$('#typeFile').on('change', function() {
-    switch ($(this).val()) {
-        case "Rale": 
-            $('#div-frst-selects').empty();
-            $('#div-scnd-selects').empty();
-            $('#div-frst-selects').append(
-                $('<label>', {
-                    for: 'dateCOPfrst',
-                    text: 'Primer fecha a confrontar de Rale COP',
-                    class: 'mt-3'
-                }), 
-                $('<select>', {
-                    name: 'dateCOPfrst',
-                    id: 'dateCOPfrst',
-                    class: 'form-control input-group-text',
-                    disabled: true
-                }),
-                $('<label>', {
-                    for: 'dateRCVfrst',
-                    text: 'Primer fecha a confrontar de Rale RCV',
-                    class: 'mt-3'
-                }), 
-                $('<select>', {
-                    name: 'dateRCVfrst',
-                    id: 'dateRCVfrst',
-                    class: 'form-control input-group-text',
-                    disabled: true
-                })
-            );
-            $('#div-scnd-selects').append(
-                $('<label>', {
-                    for: 'dateCOPscnd',
-                    text: 'Segunda fecha a confrontar de Rale COP',
-                    class: 'mt-3'
-                }), 
-                $('<select>', {
-                    name: 'dateCOPscnd',
-                    id: 'dateCOPscnd',
-                    class: 'form-control input-group-text',
-                    disabled: true
-                }),
-                $('<label>', {
-                    for: 'dateRCVscnd',
-                    text: 'Segunda fecha a confrontar de Rale RCV',
-                    class: 'mt-3'
-                }), 
-                $('<select>', {
-                    name: 'dateRCVscnd',
-                    id: 'dateRCVscnd',
-                    class: 'form-control input-group-text',
-                    disabled: true
-                }),
-                $('<label>', {
-                    for: 'dateCOINscnd',
-                    text: 'Segunda fecha a confrontar de Rale RCV',
-                    class: 'mt-3'
-                }), 
-                $('<select>', {
-                    name: 'dateCOINscnd',
-                    id: 'dateCOINscnd',
-                    class: 'form-control input-group-text',
-                    disabled: true
-                })
-            );
-            socket.emit('cliente:consultarRegistrosRaleCOP');
-            socket.emit('cliente:consultarRegistrosRaleRCV');
-            socket.emit('cliente:consultarRegistrosCoin');
-            break;
-        case "Coin": 
-            $('#div-selects').empty();
-            break;
-        default: 
-            $('#div-selects').empty();
-            break;
-    }
-});
+window.onload = function () {
+    socket.emit('cliente:consultarRegistrosRaleCOP');
+    socket.emit('cliente:consultarRegistrosRaleRCV');
+    socket.emit('cliente:consultarRegistrosCoin');
+}
+
+// $('#typeFile').on('change', function() {
+//     switch ($(this).val()) {
+//         case "Rale": 
+//             $('#div-frst-selects').empty();
+//             $('#div-scnd-selects').empty();
+//             $('#div-frst-selects').append(
+//                 $('<label>', {
+//                     for: 'dateCOPfrst',
+//                     text: 'Primer fecha a confrontar de Rale COP',
+//                     class: 'mt-3'
+//                 }), 
+//                 $('<select>', {
+//                     name: 'dateCOPfrst',
+//                     id: 'dateCOPfrst',
+//                     class: 'form-control input-group-text',
+//                     disabled: true
+//                 }),
+//                 $('<label>', {
+//                     for: 'dateRCVfrst',
+//                     text: 'Primer fecha a confrontar de Rale RCV',
+//                     class: 'mt-3'
+//                 }), 
+//                 $('<select>', {
+//                     name: 'dateRCVfrst',
+//                     id: 'dateRCVfrst',
+//                     class: 'form-control input-group-text',
+//                     disabled: true
+//                 })
+//             );
+//             $('#div-scnd-selects').append(
+//                 $('<label>', {
+//                     for: 'dateCOPscnd',
+//                     text: 'Segunda fecha a confrontar de Rale COP',
+//                     class: 'mt-3'
+//                 }), 
+//                 $('<select>', {
+//                     name: 'dateCOPscnd',
+//                     id: 'dateCOPscnd',
+//                     class: 'form-control input-group-text',
+//                     disabled: true
+//                 }),
+//                 $('<label>', {
+//                     for: 'dateRCVscnd',
+//                     text: 'Segunda fecha a confrontar de Rale RCV',
+//                     class: 'mt-3'
+//                 }), 
+//                 $('<select>', {
+//                     name: 'dateRCVscnd',
+//                     id: 'dateRCVscnd',
+//                     class: 'form-control input-group-text',
+//                     disabled: true
+//                 }),
+//                 $('<label>', {
+//                     for: 'dateCOINscnd',
+//                     text: 'Segunda fecha a confrontar de Rale RCV',
+//                     class: 'mt-3'
+//                 }), 
+//                 $('<select>', {
+//                     name: 'dateCOINscnd',
+//                     id: 'dateCOINscnd',
+//                     class: 'form-control input-group-text',
+//                     disabled: true
+//                 })
+//             );
+//             socket.emit('cliente:consultarRegistrosRaleCOP');
+//             socket.emit('cliente:consultarRegistrosRaleRCV');
+//             socket.emit('cliente:consultarRegistrosCoin');
+//             break;
+//         case "Coin": 
+//             $('#div-selects').empty();
+//             break;
+//         default: 
+//             $('#div-selects').empty();
+//             break;
+//     }
+// });
 
 socket.on('servidor:consultarRegistrosRaleCOP', (data) => {
     $('#dateCOPfrst').empty();
@@ -232,6 +238,19 @@ $('#div-scnd-selects').on('change', '#dateCOINscnd', function() {
     if ($(this).val() != "false") socket.emit('cliente:filtrarCoin', $(this).val() );
 });
 
+$('#switch_show_modal').on('change', function () {
+    if ($(this).prop('checked')) {
+        if (confronta !== undefined) {
+            $('#confrontarModal').modal('show');
+            showConfronta();
+        } else bsAlert('Mostrar el resultado en una ventana puede consumir bastantes recursos', 'warning');
+    }
+});
+
+$('#confrontarModal').on('hidden.bs.modal', function() {
+    $("#switch_show_modal").prop('checked', false);
+});
+
 socket.on('servidor:filtrarRales', ({ raleRCVFiltrado, raleCOPFiltrado, type }) => {
     if (type == "frst") {
         frstRaleRCV = raleRCVFiltrado;
@@ -241,6 +260,13 @@ socket.on('servidor:filtrarRales', ({ raleRCVFiltrado, raleCOPFiltrado, type }) 
         scndRaleCOP = raleCOPFiltrado;
     }
     if ( frstRaleRCV && frstRaleCOP && scndRaleRCV && scndRaleCOP && Coin ) {
+        if ($("#switch_show_modal").prop('checked')) {
+            $('#div-table').empty();
+            $('#confrontarModal').modal('show');
+            $('#modal_title').text('Confronta');
+            $(`<h3 class="text-primary">Generando la confronta</h3>`).appendTo('#div-table');
+            $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
+        }
         socket.emit('cliente:confrontarData');
     }
 });
@@ -248,13 +274,20 @@ socket.on('servidor:filtrarRales', ({ raleRCVFiltrado, raleCOPFiltrado, type }) 
 socket.on('servidor:filtrarCoin', (coinFiltrado) => {
     Coin = coinFiltrado;
     if ( frstRaleRCV && frstRaleCOP && scndRaleRCV && scndRaleCOP && Coin ) {
+        if ($("#switch_show_modal").prop('checked')) {
+            $('#div-table').empty();
+            $('#confrontarModal').modal('show');
+            $('#modal_title').text('Confronta');
+            $(`<h3 class="text-primary">Generando la confronta</h3>`).appendTo('#div-table');
+            $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-table');
+        }
         socket.emit('cliente:confrontarData');
     }
 });
 
 socket.on('servidor:confrontarData', ({ patrones, ejecutores }) => {
     confrontData({ patrones, ejecutores });
-})
+});
 
 function confrontData ({ patrones, ejecutores }) {
     let frstRcv = frstRaleRCV.map((rale) => Object.assign(rale, { type: "rcv" }));
@@ -265,9 +298,6 @@ function confrontData ({ patrones, ejecutores }) {
 
     frstData = frstRcv.concat(frstCop);
     scndData = scndRcv.concat(scndCop);
-
-    patr = patrones;
-    eje = ejecutores;
 
     confronta = frstData.map((data) => {
         // Calcular dias restantes
@@ -287,25 +317,25 @@ function confrontData ({ patrones, ejecutores }) {
                     : "En tiempo 31"
             : ""
         // Calcular clave ejecutor
-        data.clave_eje = patr.find(pat => pat.reg_pat == data.reg_pat).clave_eje
+        data.clave_eje = patrones.find(pat => pat.reg_pat == data.reg_pat).clave_eje
         data.clave_eje ??= "No existe la clave de ejecutor"
         // Calcular ejecutor 
-        data.ejecutor = eje.find(ejecutor => ejecutor.clave_eje == data.clave_eje).nombre
+        data.ejecutor = ejecutores.find(ejecutor => ejecutor.clave_eje == data.clave_eje).nombre
         data.ejecutor ??= "No existe el ejecutor"
         // Calcular programable con el coin
         data.programable = Coin.find(coin => coin.reg_pat == data.reg_pat && coin.nom_cred == data.nom_cred)
         data.programable ??= "EN TIEMPO 02"
         // Calcular patron
-        data.patron = patr.find(pat => pat.reg_pat == data.reg_pat).patron
+        data.patron = patrones.find(pat => pat.reg_pat == data.reg_pat).patron
         data.patron ??= "No existe el patron"
         // Calcular actividad
-        data.actividad = patr.find(pat => pat.reg_pat == data.reg_pat).actividad
+        data.actividad = patrones.find(pat => pat.reg_pat == data.reg_pat).actividad
         data.actividad ??= "No existe el patron"
         // Calcular domicilio
-        data.domicilio = patr.find(pat => pat.reg_pat == data.reg_pat).domicilio
+        data.domicilio = patrones.find(pat => pat.reg_pat == data.reg_pat).domicilio
         data.domicilio ??= "No existe el patron"
         // Calcular localidad
-        data.localidad = patr.find(pat => pat.reg_pat == data.reg_pat).localidad
+        data.localidad = patrones.find(pat => pat.reg_pat == data.reg_pat).localidad
         data.localidad ??= "No existe el patron"
         // Calcular buscar pago
         data.buscar_pago = scndData.find(data => data.reg_pat == data.reg_pat && data.nom_cred == data.nom_cred).importe
@@ -332,7 +362,7 @@ function confrontData ({ patrones, ejecutores }) {
         // Calcular re aud
         data.re_aud = data.buscar_td.toString()[0] == "5" ? "RE AUD" : "No hay Aud"
         // Calcular res
-        data.res = [
+        data.resultado_concatenado = [
             data.buscar_cambio_inc, 
             data.buscar_2_y_31, 
             data.re_cuotas, 
@@ -343,12 +373,16 @@ function confrontData ({ patrones, ejecutores }) {
         ].join('-')
         return data;
     })
-    console.log(confronta)
+    showConfronta();
+    bsAlert('Se ha generado la confronta correctamente', 'success');
 }
 
-function showTable (data) {
+function showConfronta () {
+    if (!$("#switch_show_modal").prop('checked')) return;
+    let data = confronta;
+    $('#div-table').empty();
     // Crear tabla
-    const table = $('<table class="table">').attr('id', 'rales-table');
+    const table = $('<table class="table">').attr('id', 'confronta-table');
 
     // Obtener todas las propiedades de los objetos en el conjunto de datos
     const allProperties = Array.from(data.reduce((acc, obj) => {
@@ -376,6 +410,17 @@ function showTable (data) {
     data.forEach((obj) => {
         const dataRow = $('<tr>');
 
+        switch (obj.type) {
+            case "rcv":
+                dataRow.addClass('table-primary');
+                break;
+            case "cop":
+                dataRow.addClass('table-success');
+                break;
+            default:
+                break;
+        }
+
         // Recorrer todas las propiedades y agregar celdas a la fila
         allProperties.forEach((property) => {
             const value = obj[property] || ''; // Obtener el valor de la propiedad o usar una cadena vacía si no existe
@@ -388,7 +433,7 @@ function showTable (data) {
     tbody.appendTo(table);
 
     // Mostrar la tabla con el numero de registros que tiene
-    const tableContainer = $('<div>').attr('id', 'tb-show-rale-cop');
+    const tableContainer = $('<div>').attr('id', 'tb-show-confronta');
     $(`<b >Se encontraron ${data.length} registros<b>`).appendTo(tableContainer);
     table.appendTo(tableContainer);
     tableContainer.appendTo('#div-table');

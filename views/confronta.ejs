@@ -64,7 +64,9 @@
           </div>
           <div class="col-10 space-around">
             <div id="perfil" class="contenido activo text-center">
-                <div class="container">
+                <h2 class="texto-green text-center mt-2">Confronta</h2>
+
+                <!-- <div class="container">
                     <label for="typeFile">Tipo de Archivo a Confrontar</label>
                     <select name="typeFile" id="typeFile" class="form-control input-group-text">
                         <option>Selecciona un tipo de Archivo</option>
@@ -74,6 +76,19 @@
                     <div class="row">
                         <div id="div-frst-selects" class="col"></div>
                         <div id="div-scnd-selects" class="col"></div>
+                    </div>
+                </div> -->
+
+                <div class="row">
+                    <div id="div-frst-selects" class="col"><label for="dateCOPfrst" class="mt-3">Primer fecha a confrontar de Rale COP</label><select name="dateCOPfrst" id="dateCOPfrst" class="form-control input-group-text"><option value="false">Selecciona una fecha para Rale COP</option><option value="2023-04-30">2023-04-30</option><option value="2023-05-31" disabled="">2023-05-31</option></select><label for="dateRCVfrst" class="mt-3">Primer fecha a confrontar de Rale RCV</label><select name="dateRCVfrst" id="dateRCVfrst" class="form-control input-group-text"><option value="false">Selecciona una fecha para Rale RCV</option><option value="2023-04-30">2023-04-30</option><option value="2023-05-31" disabled="">2023-05-31</option></select></div>
+                    <div id="div-scnd-selects" class="col"><label for="dateCOPscnd" class="mt-3">Segunda fecha a confrontar de Rale COP</label><select name="dateCOPscnd" id="dateCOPscnd" class="form-control input-group-text"><option value="false">Selecciona una fecha para Rale COP</option><option value="2023-04-30" disabled="">2023-04-30</option><option value="2023-05-31">2023-05-31</option></select><label for="dateRCVscnd" class="mt-3">Segunda fecha a confrontar de Rale RCV</label><select name="dateRCVscnd" id="dateRCVscnd" class="form-control input-group-text"><option value="false">Selecciona una fecha para Rale RCV</option><option value="2023-04-30" disabled="">2023-04-30</option><option value="2023-05-31">2023-05-31</option></select><label for="dateCOINscnd" class="mt-3">Segunda fecha a confrontar de Rale RCV</label><select name="dateCOINscnd" id="dateCOINscnd" class="form-control input-group-text"><option value="false">Selecciona una fecha para COIN</option><option value="2023-05-31">2023-05-31</option></select></div>
+                </div>
+                
+                <div class="form-check form-switch mt-4 row">
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <input class="form-check-input ml-3" type="checkbox" role="switch" id="switch_show_modal" id="flexSwitchCheckDefault">
+                        <label class="form-check-label" for="flexSwitchCheckDefault">Mostrar modal con la confronta</label>
                     </div>
                 </div>
             </div>
