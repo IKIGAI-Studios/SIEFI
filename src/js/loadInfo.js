@@ -206,7 +206,15 @@ $('#btn_insertar').on('click', async function(e) {
             }
             break;
         case "afil":
-            socket.emit('client:insert-afil', objAfil);
+            while (i < objAfil.length) {
+                const batch = objAfil.slice(i, i + 1000);
+                // Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
+                await socket.emit('client:insert-afil', { afil:batch, lote:i, lenght:objAfil.length }, (res) => {
+                    if (i == 0) $('#div-table').empty();
+                    showResult(res);
+                });
+                i += 1000;
+            }
             break;
         case "raleCOP":
             while (i < objRaleCOP.length) {

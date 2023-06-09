@@ -71,8 +71,9 @@
                 <div class="container">
                   <h4 for="afil">Afil</h4>
                   <a href="/registrarAfil" class="form-control" id="afil">Registrar Afil</a>
-                  <input type="hidden" class="form-control" name="Afil" id="Afil_input" accept=".xlsx"/>
-                  <button type="button" style="display: none;" class="btn btn-secondary mt-1"  onclick="verRegistrosAfil()">
+                  <input type="file" class="form-control" name="Afil" id="Afil_input" accept=".xlsx"/>
+                  <p class="text-danger">Alerta! Asegurate de eliminar el archivo Afil anterior antes de cargar uno nuevo</p>
+                  <button type="button" class="btn btn-secondary mt-1"  onclick="verRegistrosAfil()">
                     Ver registros Afil
                   </button>
                 </div>

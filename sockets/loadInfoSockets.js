@@ -139,7 +139,7 @@ export function socket(io) {
     });
 
     // Registrar AFIL en la BD
-    socket.on("client:insert-afil", (afil) => {
+    socket.on("client:insert-afil", ({ afil, lote, lenght }, callback) => {
       let afilValidado = [];
       afil.forEach((reg, i) => {
         const regValid = {
@@ -158,16 +158,16 @@ export function socket(io) {
 
       Afil.bulkCreate(afilValidado)
         .then(() => {
-          socket.emit("server:insert-rslt", {
-            msg: "Archivo AFIL insertado correctamente en la Base de Datos",
-            success: true,
-          });
+            callback({
+                status: true,
+                msg: `Lote [${lote}-${lote + 999 > lenght ? lenght : lote + 999 }] insertado correctamente`,
+            });
         })
         .catch((e) => {
-          socket.emit("server:insert-rslt", {
-            msg: `Error: ${e}`,
-            success: false,
-          });
+            callback({
+                status: false,
+                msg: `Lote [${lote}-${lote + 999 > lenght ? lenght : lote + 999 }] no se pudo insertar. Error ${e}`,
+            });
         });
     });
 
