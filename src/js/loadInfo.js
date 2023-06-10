@@ -395,6 +395,7 @@ socket.on('server:result-coin', ( data ) => {
 });
 
 socket.on('server:result-afil', ( data ) => {
+    console.log(data)
     // Vaciar div del modal
     $('#div-table').empty();
 
@@ -508,7 +509,7 @@ socket.on('server:result-rale-cop', ( data ) => {
         err = true;
     }
     if ( !data.some(obj => 'DIAS' in obj) ) {
-        alert(`La columna DIAS. no se encontró en el archivo`);
+        alert(`La columna DIAS no se encontró en el archivo`);
         err = true;
     }
     if ( !data.some(obj => 'I M P O R T E' in obj)) {

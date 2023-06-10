@@ -3,7 +3,7 @@ import sequelize from "../database.js";
 
 const Afil63 = sequelize.define('Afil63', {
   reg_pat: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.STRING(12),
     primaryKey: true,
     allowNull: false
   },
