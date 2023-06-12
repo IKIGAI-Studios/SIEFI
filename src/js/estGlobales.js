@@ -8,7 +8,7 @@ window.onload = function () {
     socket.emit('cliente:consultarRegistrosCoin');
 }
 
-socket.on('servidor:estIndividuales', (data) => {
+socket.on('servidor:estGlobales', (data) => {
     dataStats = data;
     fillFilters();
     showTable();
@@ -101,22 +101,6 @@ socket.on('servidor:consultarRegistrosCoin', (data) => {
     $('#dateCOINscnd').prop('disabled', false);
 });
 
-$('#nombreEjecutor').on('change', function() {
-    $('#btn_fil_inc').prop('disabled', true)
-    $('#btn_fil_res').prop('disabled', true)
-    $('#btn_fil_con').prop('disabled', true)
-
-    $('#div-tabla-estadisticas-individuales').empty();
-
-    if ($('#nombreEjecutor').val() != 'false') 
-        socket.emit('cliente:ejecutorSeleccionadoEstInd', { 
-            ejecutor: $('#nombreEjecutor').val(),
-            copDate: $('#dateCOPfrst').val(),
-            rcvDate: $('#dateRCVfrst').val()
-        });
-    else bsAlert("Selecciona la clave de ejecutor", 'warning');
-});
-
 // Hacemos un on change al div con el id dateCOP porque se crea dinamicamente 
 // entonces no se puede crear un evento a un elemento que no existe
 $('#div-frst-selects').on('change', '#dateCOPfrst', function() {
@@ -129,7 +113,7 @@ $('#div-frst-selects').on('change', '#dateCOPfrst', function() {
     if ($(this).val() != "false") 
         if ($('#dateRCVfrst').val() != "false") {
             if ($('#dateRCVfrst').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
-            $('#nombreEjecutor').prop('disabled', false);
+            getRales();
         }
 });
 
@@ -143,7 +127,7 @@ $('#div-frst-selects').on('change', '#dateRCVfrst', function() {
     if ($(this).val() != "false") 
         if ($('#dateCOPfrst').val() != "false") {
             if ($('#dateCOPfrst').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
-            $('#nombreEjecutor').prop('disabled', false);
+            getRales();
         }
 });
 
@@ -156,6 +140,19 @@ $('#inp_DATES_fes').on('change', function () {
         $('#DATES_dilig').text(dias_lab * 5 < 0 ? 0 : dias_lab * 5)
     } 
 })
+
+function getRales () {
+    $('#btn_fil_inc').prop('disabled', true)
+    $('#btn_fil_res').prop('disabled', true)
+    $('#btn_fil_con').prop('disabled', true)
+
+    $('#div-tabla-estadisticas-globales').empty();
+
+    socket.emit('cliente:ejecutorSeleccionadoEstGlob', { 
+        copDate: $('#dateCOPfrst').val(),
+        rcvDate: $('#dateRCVfrst').val()
+    });
+}
 
 function fillFilters() {
     $('#inc_fil').empty();

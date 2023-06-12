@@ -100,6 +100,18 @@ routes.get('/estadisticasIndividuales', async (req, res) => {
     }
 });
 
+routes.get('/estadisticasGlobales', async (req, res) => {
+    try{
+        const ejecutores = await Ejecutor.findAll({
+            where : { type : 'ejecutor', status: '1' }
+        });
+        res.render('estGlobales', { session: req.session, ejecutores });
+        req.session.actualizarEjecutor = '';
+    } catch(error){
+        console.log(error);
+    }
+});
+
 routes.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;

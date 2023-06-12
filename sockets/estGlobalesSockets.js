@@ -6,10 +6,12 @@ import { Op, Sequelize } from 'sequelize';
 export function socket(io) {
   io.on("connection", (socket) => {
     // Consultar Patrones por ejecutor
-    socket.on('cliente:ejecutorSeleccionadoEstInd', async ({ ejecutor, copDate, rcvDate }) => {
+    socket.on('cliente:ejecutorSeleccionadoEstGlob', async ({ copDate, rcvDate }) => {
       const afil = await Afil.findAll({
         where: {
-            ejecutor: ejecutor
+            ejecutor: {
+                [Sequelize.Op.ne]: 'foraneo'
+            }
         }
       });
       let cop = await RaleCop.findAll({
@@ -55,7 +57,7 @@ export function socket(io) {
             return a.td - b.td;
       });
     
-      socket.emit('servidor:estIndividuales', data);
+      socket.emit('servidor:estGlobales', data);
     });
 
     // Maneja el evento de desconexión del cliente
