@@ -26,10 +26,10 @@ app.use(cors());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser())
 app.use(session({
-  secret: process.env.SECRET_KEY_SESSION,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { maxAge: 3600000 }, 
+    secret: process.env.SECRET_KEY_SESSION,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 3600000 }, 
 }));
 
 const port = 3000;
@@ -54,4 +54,5 @@ app.use("/icons", express.static(join(__dirname, 'src/icons')));
 app.use("/imgs", express.static(join(__dirname, 'src/imgs')));
 app.use("/fonts", express.static(join(__dirname, 'src/fonts')));
 app.use("/js", express.static(join(__dirname, 'src/js')));
+app.use("/libs", express.static(join(__dirname, 'src/libs')));
 app.set('view engine', 'ejs');

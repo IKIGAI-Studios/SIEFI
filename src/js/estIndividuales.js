@@ -1,6 +1,6 @@
 const socket = io('http://localhost:3000');
 
-let dataStats, inc, res, con, fecha;
+let dataStats, inc, res, con, fecha, dates = {}, cop_rcv = {}, cuotas = {}, rcv = {};
 
 window.onload = function () {
     socket.emit('cliente:consultarRegistrosRaleCOP');
@@ -151,9 +151,10 @@ $('#inp_DATES_fes').on('change', function () {
     if ($('#dateCOPfrst').val() == "false" || $('#dateRCVfrst').val() == "false") return;
     if ($(this).val() == "") bsAlert('Inserta un número en los dias festivos', 'warning')
     else {
-        let dias_lab = getWorkDays(fecha.getMonth(), fecha.getFullYear()).length - ($('#inp_DATES_fes').val() != "" ? $('#inp_DATES_fes').val() : 0 )
-        $('#DATES_laborales').text(dias_lab < 0 ? 0 : dias_lab)
-        $('#DATES_dilig').text(dias_lab * 5 < 0 ? 0 : dias_lab * 5)
+        dates.laborales = getWorkDays(fecha.getMonth(), fecha.getFullYear()).length - ($('#inp_DATES_fes').val() != "" ? $('#inp_DATES_fes').val() : 0 )
+        dates.dilig = dates.laborales * 5 < 0 ? 0 : dates.laborales * 5
+        $('#DATES_laborales').text(dates.laborales)
+        $('#DATES_dilig').text(dates.dilig)
     } 
 })
 
@@ -240,40 +241,114 @@ function fillFilters() {
 }
 
 function fillStats() {
-    $('#CUOTAS_asignado').text(dataStats.filter(obj => obj.type === "cuotas").length)
-    $('#CUOTAS_pendiente').text("preguntar como se saca")
-    $('#CUOTAS_coin').text("preguntar como se saca")
-    $('#CUOTAS_coin_dilig').text("preguntar como se saca")
-    $('#CUOTAS_pendiente_2').text("preguntar como se saca")
-    $('#CUOTAS_diligenciado').text("preguntar como se saca")
-    $('#CUOTAS_inc_09').text(dataStats.filter(obj => obj.inc === 9 && obj.type === "cuotas").length)
-    $('#CUOTAS_embargo').text("preguntar como se saca")
-    $('#CUOTAS_citatorios').text("preguntar como se saca")
+    cuotas.asig = dataStats.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31)).length;
+    cuotas.pen = dataStats.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31) && !obj.cobrado).length;
+    cuotas.coin = 0 // preguntar
+    cuotas.coin_dilig = 0 // preguntar  
+    cuotas.pend_2 = "preguntar como se saca"
+    cuotas.dil = dataStats.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31) && obj.cobrado).length;
+    cuotas.inc_09 = dataStats.filter(obj => obj.inc === 9 && obj.type === "cuotas").length;
+    cuotas.embargo = 0 // pregutnar
+    cuotas.citatorios = "preguntar como se saca"
+    $('#CUOTAS_asignado').text(cuotas.asig)
+    $('#CUOTAS_pendiente').text(cuotas.pen)
+    $('#CUOTAS_coin').text(cuotas.coin)
+    $('#CUOTAS_coin_dilig').text(cuotas.coin_dilig)
+    $('#CUOTAS_pendiente_2').text(cuotas.pend_2)
+    $('#CUOTAS_diligenciado').text(cuotas.dil)
+    $('#CUOTAS_inc_09').text(cuotas.inc_09)
+    $('#CUOTAS_embargo').text(cuotas.embargo)
+    $('#CUOTAS_citatorios').text(cuotas.citatorios)
 
-    $('#RCV_asignado').text(dataStats.filter(obj => obj.type === "rcv").length)
-    $('#RCV_pendiente').text("preguntar como se saca")
-    $('#RCV_coin').text("preguntar como se saca")
-    $('#RCV_coin_dilig').text("preguntar como se saca")
-    $('#RCV_pendiente_2').text("preguntar como se saca")
-    $('#RCV_diligenciado').text("preguntar como se saca")
-    $('#RCV_inc_09').text(dataStats.filter(obj => obj.inc === 9 && obj.type === "rcv").length)
-    $('#RCV_embargo').text("preguntar como se saca")
-    $('#RCV_citatorios').text("preguntar como se saca")
+    rcv.asignado = dataStats.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31)).length
+    rcv.pendiente = dataStats.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31) && !obj.cobrado).length
+    rcv.coin = 0 // preguntar
+    rcv.coin_dilig = 0 // preguntar
+    rcv.pend_2 = "preguntar como se saca"
+    rcv.dil = dataStats.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31) && obj.cobrado).length
+    rcv.inc_09 = dataStats.filter(obj => obj.inc === 9 && obj.type === "rcv").length
+    rcv.embargo = 0 // preguntar
+    rcv.citatorio = "preguntar como se saca"
 
-    $('#COP_RCV_entregados').text(dataStats.filter(obj => obj.type === "rcv" || obj.type === "cuotas" ).length)
-    $('#COP_RCV_req_pago').text("preguntar como se saca")
-    $('#COP_RCV_no_local').text("preguntar como se saca")
-    $('#COP_RCV_embargo').text("preguntar como se saca")
-    $('#COP_RCV_citatorios').text("preguntar como se saca")
-    $('#COP_RCV_notif').text("preguntar como se saca")
+    $('#RCV_asignado').text(rcv.asignado)
+    $('#RCV_pendiente').text(rcv.pendiente)
+    $('#RCV_coin').text(rcv.coin)
+    $('#RCV_coin_dilig').text(rcv.coin_dilig)
+    $('#RCV_pendiente_2').text(rcv.pend_2)
+    $('#RCV_diligenciado').text(rcv.dil)
+    $('#RCV_inc_09').text(rcv.inc_09)
+    $('#RCV_embargo').text(rcv.embargo)
+    $('#RCV_citatorios').text(rcv.citatorio)
+
+    cop_rcv.entregados = dataStats.filter(obj => (obj.type === "rcv" || obj.type === "cuotas") && (obj.inc == 2  || obj.inc == 31)).length
+    cop_rcv.req_pago = "preguntar como se saca"
+    cop_rcv.no_local = "preguntar como se saca"
+    cop_rcv.embargo = "preguntar como se saca"
+    cop_rcv.citatorios = "preguntar como se saca"
+    cop_rcv.notif = "preguntar como se saca"
+
+    $('#COP_RCV_entregados').text(cop_rcv.entregados)
+    $('#COP_RCV_req_pago').text(cop_rcv.req_pago)
+    $('#COP_RCV_no_local').text(cop_rcv.no_local)
+    $('#COP_RCV_embargo').text(cop_rcv.embargo)
+    $('#COP_RCV_citatorios').text(cop_rcv.citatorios)
+    $('#COP_RCV_notif').text(cop_rcv.notif)
 
     fecha = new Date($('#dateCOPfrst').val());
 
-    $('#DATES_fec_ini').text(new Date(fecha.getFullYear(), fecha.getMonth(), 1).toLocaleDateString(undefined,  { year: 'numeric', month: 'long', day: 'numeric' }))
-    $('#DATES_fec_fin').text(new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).toLocaleDateString(undefined,  { year: 'numeric', month: 'long', day: 'numeric' }))
-    let dias_lab = getWorkDays(fecha.getMonth(), fecha.getFullYear()).length - ($('#inp_DATES_fes').val() != "" ? $('#inp_DATES_fes').val() : 0 )
-    $('#DATES_laborales').text(dias_lab)
-    $('#DATES_dilig').text(dias_lab * 5)
+    dates.fec_ini = new Date(fecha.getFullYear(), fecha.getMonth(), 1).toLocaleDateString(undefined,  { year: 'numeric', month: 'long', day: 'numeric' })
+    dates.fec_fin = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).toLocaleDateString(undefined,  { year: 'numeric', month: 'long', day: 'numeric' })
+    dates.laborales = getWorkDays(fecha.getMonth(), fecha.getFullYear()).length - ($('#inp_DATES_fes').val() != "" ? $('#inp_DATES_fes').val() : 0 )
+    dates.dilig = dates.laborales * 5
+    dates.pat_dilig = cuotas.dil + cuotas.inc_09 + cuotas.embargo + rcv.dil + rcv.inc_09 + rcv.embargo;
+
+    $('#DATES_fec_ini').text(dates.fec_ini)
+    $('#DATES_fec_fin').text(dates.fec_fin)
+    $('#DATES_laborales').text(dates.laborales)
+    $('#DATES_dilig').text(dates.dilig)
+    $('#DATES_pat_dilig').text(dates.pat_dilig)
+
+    getGraphics()
+}
+
+async function getGraphics() {
+    new Chart($('#canv_coin'), {
+        type: 'doughnut',
+        data: {
+            labels: [
+                'No diligenciado',
+                'Diligenciado',
+            ],
+            datasets: [{
+                label: 'My First Dataset',
+                data: [cuotas.coin, cuotas.coin_dilig],
+                backgroundColor: [
+                    'rgb(220, 53, 69)',
+                    'rgb(25, 135, 84)',
+                ],
+                hoverOffset: 4
+            }]
+        }
+    });
+
+    new Chart($('#canv_prod'), {
+        type: 'doughnut',
+        data: {
+            labels: [
+                'No diligenciado',
+                'Diligenciado',
+            ],
+            datasets: [{
+                label: 'My First Dataset',
+                data: [dates.dilig, dates.pat_dilig],
+                backgroundColor: [
+                    'rgb(220, 53, 69)',
+                    'rgb(25, 135, 84)',
+                ],
+                hoverOffset: 4
+            }]
+        }
+    });
 }
 
 function getWorkDays(month, year) {

@@ -65,7 +65,7 @@
           <div class="col-10 space-around">
             <div id="perfil" class="contenido activo text-center">
 
-                <form action="actualizarEjecutor" method="post">
+                
                     <div class="container">
                         <h2 class="texto-green text-center mt-2">Estadisticas Individuales</h2>
                         <h4 class="texto-green text-center mt-2">Fechas</h4>
@@ -129,7 +129,10 @@
                             </div>
                         </div>
                         <div id="div-tabla-estadisticas-individuales" class="mt-4"></div>
-                        <div id="div-count-estadisticas-individuales" class="table-responsive small mt-4 row">
+                        <figcaption class="blockquote-footer mt-3">
+                                Estadistísticas únicamente de patrones con inc 2 y 31
+                        </figcaption>
+                        <div id="div-count-estadisticas-individuales" class="table-responsive small row">
                             <table class="table table-striped table-sm table-bordered border-dark col-sm m-2">
                                 <thead>
                                     <tr>
@@ -311,8 +314,18 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="row">
+                            <div class="col-sm m-3">
+                                <h4 class="texto-green text-center mt-2">Coin 31</h4>
+                                <canvas id="canv_coin"></canvas>
+                            </div>
+                            <div class="col-sm m-3">
+                                <h4 class="texto-green text-center mt-2">Productividad Individual</h4>
+                                <canvas id="canv_prod"></canvas>
+                            </div>
+                        </div>
                     </div>
-                </form>
+                
             </div>
           </div>  
       </div>
@@ -341,6 +354,7 @@
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 <script src="socket.io/socket.io.min.js"></script>
 <script src="/js/estIndividuales.js"></script>
+<script src="/libs/chart.js"></script>
 
 </html>
 

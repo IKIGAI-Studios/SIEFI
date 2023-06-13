@@ -64,6 +64,19 @@ const RaleRcv = sequelize.define('rale_rcv', {
   dcsc: {
     type: DataTypes.INTEGER,
     allowNull: false
+  },
+  cobrado: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: 0,
+  },
+  fol_sua: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  res_dil: {
+    type: DataTypes.STRING(100),
+    allowNull: true
   }
 }, {
   tableName: 'rale_rcv',
