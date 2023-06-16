@@ -453,6 +453,7 @@ socket.on('server:result-afil', ( data ) => {
 });
 
 socket.on('server:result-rale-cop', ( data ) => {
+    console.log(data)
     $('#modal_title').text('Rale COP');
 
     // Vaciar div del modal

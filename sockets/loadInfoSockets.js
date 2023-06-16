@@ -105,9 +105,7 @@ export function socket(io) {
                 Lote [${lote}-${lote + 999}] insertado correctamente
                 ${
                   registrosNoInsertados.length > 0
-                    ? `Los siguientes registros patronales no están registrados en la tabla afil: ${registrosNoInsertados.join(
-                        ", "
-                      )}`
+                    ? `Algunos registros no fueron insertados debido a que no estaban registrados en la tabla afil`
                     : "Todos los registros patronales fueron insertador correctamente"
                 }
               `,
@@ -184,17 +182,17 @@ export function socket(io) {
           const regValid = {
             reg_pat: reg["REG. PATRONAL"],
             mov: reg["M"],
-            patronal: reg["OV. PATRONA"],
-            sect: reg["L SE"],
-            nom_cred: reg["CT NUM.CRED."],
-            ce: reg["C"],
-            periodo: reg["E  PERIODO"],
+            patronal: reg["OV. PATRONAL"],
+            sect: reg["SECT"],
+            nom_cred: reg["NUM.CRED."],
+            ce: reg["CE"],
+            periodo: reg["PERIODO"],
             td: reg["TD"],
             fec_alta: reg["FECHA ALTA"],
-            fec_notif: reg["FEC. NOTIF"],
-            inc: reg[". INC"],
-            fec_insid: reg[". FEC. INCID"],
-            dias: reg[". DIAS"],
+            fec_notif: reg["FEC. NOTIF."],
+            inc: reg["INC."],
+            fec_insid: reg["FEC. INCID."],
+            dias: reg["DIAS"],
             importe: reg["I M P O R T E"],
             dcsc: reg["DC SC"],
           };
@@ -239,9 +237,7 @@ export function socket(io) {
                 Lote [${lote}-${lote + 999}] insertado correctamente
                 ${
                   registrosNoInsertados.length > 0
-                    ? `Los siguientes registros patronales no están registrados en la tabla afil: ${registrosNoInsertados.join(
-                        ", "
-                      )}`
+                    ? `Algunos registros no fueron insertados debido a que no estaban registrados en la tabla afil`
                     : "Todos los registros patronales fueron insertador correctamente"
                 }
               `,
@@ -280,17 +276,17 @@ export function socket(io) {
           const regValid = {
             reg_pat: reg["REG. PATRONAL"],
             mov: reg["M"],
-            patronal: reg["OV. PATRONA"],
-            sect: reg["L SE"],
-            nom_cred: reg["CT NUM.CRED."],
-            ce: reg["C"],
-            periodo: reg["E  PERIODO"],
+            patronal: reg["OV. PATRONAL"],
+            sect: reg["SECT"],
+            nom_cred: reg["NUM.CRED."],
+            ce: reg["CE"],
+            periodo: reg["PERIODO"],
             td: reg["TD"],
             fec_alta: reg["FECHA ALTA"],
-            fec_notif: reg["FEC. NOTIF"],
-            inc: reg[". INC"],
-            fec_insid: reg[". FEC. INCID"],
-            dias: reg[". DIAS"],
+            fec_notif: reg["FEC. NOTIF."],
+            inc: reg["INC."],
+            fec_insid: reg["FEC. INCID."],
+            dias: reg["DIAS"],
             importe: reg["I M P O R T E"],
             dcsc: reg["DC SC"],
           };
@@ -335,9 +331,7 @@ export function socket(io) {
                 Lote [${lote}-${lote + 999}] insertado correctamente
                 ${
                   registrosNoInsertados.length > 0
-                    ? `Los siguientes registros patronales no están registrados en la tabla afil: ${registrosNoInsertados.join(
-                        ", "
-                      )}`
+                    ? `Algunos registros no fueron insertados debido a que no estaban registrados en la tabla afil`
                     : "Todos los registros patronales fueron insertador correctamente"
                 }
               `,
@@ -361,133 +355,154 @@ export function socket(io) {
           });
         }
       } catch (e) {
-        console.error(e);
+        callback({
+            status: false,
+            msg: `No se pudo insertar el lote [${lote}-${
+              lote + 999
+            }]. Error: ${e}`,
+          });   
       }
     });
 
     // Obtener fechas de registro en la tabla Afil
     socket.on('cliente:consultarRegistrosAfil', async () => {
-        try {
-          const fechasRegistro = await Afil.findAll({
-            attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
-          });
-  
-          const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
-  
-          socket.emit('servidor:consultarRegistrosAfil', fechasDistintas);
-        } catch (error) {
-          // Manejar el error
-          console.error(error);
-          socket.emit('servidor:error', 'Error al consultar los registros de Afil.');
-        }
+      try {
+        const fechasRegistro = await Afil.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
+        });
+
+        const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
+
+        socket.emit('servidor:consultarRegistrosAfil', fechasDistintas);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al consultar los registros de Afil.');
+      }
     });
+
 
     // Filtrar los registros Afil por fecha. 
     socket.on('cliente:filtrarAfil', async (fechaAfil) => {
-        try {
-          const afilFiltrado = await Afil.findAll({
-            where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaAfil)
-          });
-          socket.emit('servidor:filtrarAfil', afilFiltrado);
-        } catch (error) {
-          // Manejar el error
-          console.error(error);
-          socket.emit('servidor:error', 'Error al filtrar los registros de Afil por fecha.');
-        }
+      try {
+        const afilFiltrado = await Afil.findAll({
+          where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaAfil)
+        });
+        socket.emit('servidor:filtrarAfil', afilFiltrado);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al filtrar los registros de Afil por fecha.');
+      }
     });
 
-    // Obtener fechas de registro en la tabla Rale COP
-    socket.on('cliente:consultarRegistrosRaleCOP', async () => {
-        try {
-          const fechasRegistro = await RaleCop.findAll({
-            attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
-          });
-  
-          const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
-  
-          socket.emit('servidor:consultarRegistrosRaleCOP', fechasDistintas);
-        } catch (error) {
-          // Manejar el error
-          console.error(error);
-          socket.emit('servidor:error', 'Error al consultar los registros de Rale COP.');
-        }
-    });
-
-    // Filtrar los registros Rale COP por fecha. 
-    socket.on('cliente:filtrarRaleCOP', async (fechaRaleCOP) => {
-        try {
-          const raleCOPFiltrado = await RaleCop.findAll({
-            where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaRaleCOP)
-          });
-          socket.emit('servidor:filtrarRaleCOP', raleCOPFiltrado);
-        } catch (error) {
-          // Manejar el error
-          console.error(error);
-          socket.emit('servidor:error', 'Error al filtrar los registros de Rale COP por fecha.');
-        }
-    });
-
-    // Obtener fechas de registro en la tabla Rale RCV
-    socket.on('cliente:consultarRegistrosRaleRCV', async () => {
-        try {
-          const fechasRegistro = await RaleRcv.findAll({
-            attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
-          });
-  
-          const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
-  
-          socket.emit('servidor:consultarRegistrosRaleRCV', fechasDistintas);
-        } catch (error) {
-          // Manejar el error
-          console.error(error);
-          socket.emit('servidor:error', 'Error al consultar los registros del rale RCV.');
-        }
-    });
-
-    // Filtrar los registros Rale RCV por fecha. 
-    socket.on('cliente:filtrarRaleRCV', async (fechaRaleRCV) => {
-        try {
-          const raleRCVFiltrado = await RaleRcv.findAll({
-            where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaRaleRCV)
-          });
-          socket.emit('servidor:filtrarRaleRCV', raleRCVFiltrado);
-        } catch (error) {
-          // Manejar el error
-          console.error(error);
-          socket.emit('servidor:error', 'Error al filtrar los registros de Rale RCV por fecha.');
-        }
-    });
 
     // Obtener fechas de registro en la tabla Coin
     socket.on('cliente:consultarRegistrosCoin', async () => {
-        try {
-          const fechasRegistro = await Coin.findAll({
-            attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
-          });
-  
-          const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
-  
-          socket.emit('servidor:consultarRegistrosCoin', fechasDistintas);
-        } catch (error) {
-          // Manejar el error
-          console.error(error);
-          socket.emit('servidor:error', 'Error al consultar los registros de Coin.');
-        }
+      try {
+        const fechasRegistro = await Coin.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
+        });
+
+        const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
+
+        socket.emit('servidor:consultarRegistrosCoin', fechasDistintas);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al consultar los registros de Coin.');
+      }
     });
 
     // Filtrar los registros Coin por fecha. 
     socket.on('cliente:filtrarCoin', async (fechaCoin) => {
-        try {
-          const coinFiltrado = await Coin.findAll({
-            where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaCoin)
-          });
-          socket.emit('servidor:filtrarCoin', coinFiltrado);
-        } catch (error) {
-          // Manejar el error
-          console.error(error);
-          socket.emit('servidor:error', 'Error al filtrar los registros de Coin por fecha.');
-        }
-      });
+      try {
+        const coinFiltrado = await Coin.findAll({
+          where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaCoin)
+        });
+        socket.emit('servidor:filtrarCoin', coinFiltrado);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al filtrar los registros de Coin por fecha.');
+      }
+    });
+  
+    // Obtener fechas de registro en la tabla Rale COP
+    socket.on('cliente:consultarRegistrosRaleCOP', async () => {
+      try {
+        const fechasRegistro = await RaleCop.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
+        });
+
+        const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
+
+        socket.emit('servidor:consultarRegistrosRaleCOP', fechasDistintas);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al consultar los registros de Rale COP.');
+      }
+    });
+
+    // Filtrar los registros Rale COP por fecha. 
+    socket.on('cliente:filtrarRaleCOP', async (fechaRaleCOP) => {
+      try {
+        const raleCOPFiltrado = await RaleCop.findAll({
+          where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaRaleCOP)
+        });
+        socket.emit('servidor:filtrarRaleCOP', raleCOPFiltrado);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al filtrar los registros de Rale COP por fecha.');
+      }
+    });
+  
+    // Obtener fechas de registro en la tabla Rale RCV
+    socket.on('cliente:consultarRegistrosRaleRCV', async () => {
+      try {
+        const fechasRegistro = await RaleRcv.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('createdAt')), 'createdAt']]
+        });
+
+        const fechasDistintas = fechasRegistro.map(registro => registro.dataValues.createdAt);
+
+        socket.emit('servidor:consultarRegistrosRaleRCV', fechasDistintas);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al consultar los registros del rale RCV.');
+      }
+    });
+
+    // Filtrar los registros Rale RCV por fecha. 
+    socket.on('cliente:filtrarRaleRCV', async (fechaRaleRCV) => {
+      try {
+        const raleRCVFiltrado = await RaleRcv.findAll({
+          where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaRaleRCV)
+        });
+        socket.emit('servidor:filtrarRaleRCV', raleRCVFiltrado);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al filtrar los registros de Rale RCV por fecha.');
+      }
+    });
+
+    // Filtrar los registros Rale RCV por fecha. 
+    socket.on('cliente:filtrarRaleRCV', async (fechaRaleRCV) => {
+      try {
+        const raleRCVFiltrado = await RaleRcv.findAll({
+          where: sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), fechaRaleRCV)
+        });
+        socket.emit('servidor:filtrarRaleRCV', raleRCVFiltrado);
+      } catch (error) {
+        // Manejar el error
+        console.error(error);
+        socket.emit('servidor:error', 'Error al filtrar los registros de Rale RCV por fecha.');
+      }
+    });
 
     //Obtener fechas de las tablas
     socket.on('cliente:consultarRegistros', async (valor) => {
@@ -559,8 +574,7 @@ export function socket(io) {
         socket.emit('servidor:error', 'Error al filtrar los registros de Coin por fecha.');
       }
     });
- 
-    
+
     // Maneja el evento de desconexión del cliente
     socket.on("disconnect", () => {
       // Programar eventos (innecesarios por ahora)
@@ -717,17 +731,17 @@ function processRale(file) {
   const headerIndex = {
     "REG. PATRONAL": null,
     "M": null,
-    "OV. PATRONA": null,
-    "L SE": null,
-    "CT NUM.CRED.": null,
-    "C": null,
-    "E  PERIODO": null,
+    "OV. PATRONAL": null,
+    "SECT": null,
+    "NUM.CRED.": null,
+    "CE": null,
+    "PERIODO": null,
     "TD": null,
     "FECHA ALTA": null,
-    "FEC. NOTIF": null,
-    ". INC": null,
-    ". FEC. INCID": null,
-    ". DIAS": null,
+    "FEC. NOTIF.": null,
+    "INC.": null,
+    "FEC. INCID.": null,
+    "DIAS": null,
     "I M P O R T E": null,
     "DC SC": null,
   };
@@ -752,76 +766,69 @@ function processRale(file) {
     for (const header in headerIndex) {
       const columnIndex = headerIndex[header];
       if (columnIndex !== null && columnIndex < row.length) {
-        let value = row[columnIndex];
-
-        // Validar que exista reg_pat
-        if (
-          header === "REG. PATRONAL" &&
-          (value === null || value === "" || value === "TOTAL DE")
-        )
-          continue;
-
-        // Validar tipo de documento
-        if ( header === 'TD' ) {
-          if ( 
-            value == 0 ||
-            value == 2 ||
-            value == 80 ||
-            value == 81 ||
-            value == 82 ||
-            value == 88 ||
-            value == 89
-            )
-            raleType = "COP"
-          else if ( value == 60 ) 
-            raleType = "RCV"
-        }
-
-        // Poner en nulos los posibles vacíos
-        if (
-          header === "DC SC" ||
-          header === "C" ||
-          header === "FEC. NOTIF" ||
-          header === ". FEC. INCID"
-        )
-          if (value === null || value === "" || value === "#0/##/####" || value === undefined)
-            value = null;
-
-        // Convertir a número entero los que son necesarios
-        if (
-          header === "M" ||
-          header === "L SE" ||
-          header === "TD" ||
-          header === ". INC" ||
-          header === ". DIAS"
-        )
-          value = value !== null ? parseInt(value) : 0;
-
-        // Convertir a número decimal los que son necesarios
-        if (header === "CT NUM.CRED." || header === "I M P O R T E")
-          value = value !== null ? parseFloat(value) : 0;
-
-        // Convertir a fecha los que sean necesarios
-        if (
-          header === "OV. PATRONA" ||
-          header === "FECHA ALTA" ||
-          header === "FEC. NOTIF" ||
-          header === ". FEC. INCID"
-        )
-          value = value !== null ? new Date(value) : null;
-
-        // Dar formato al PERIODO
-        if (header === "E  PERIODO") {
-          if (value !== null) {
-            let fec = value.split("/");
-            let fecstr = `${fec[1]}/${fec[0]}/01`;
-            value = new Date(Date.parse(fecstr));
-          }
-        }
-
+        let value = row[columnIndex];        
         obj[header] = value;
       }
     }
+    // Validar que exista reg_pat
+    if (
+        obj['REG. PATRONAL'] === null || 
+        obj['REG. PATRONAL'] === undefined || 
+        obj['REG. PATRONAL'] === "" || 
+        obj['REG. PATRONAL'] === "TOTAL DE" || 
+        obj['REG. PATRONAL'].includes(".") ||
+        obj['REG. PATRONAL'].includes(" ") ||
+        obj['REG. PATRONAL'] === "D" ||
+        obj['REG. PATRONAL'] === "COBR2303" ||
+        obj['REG. PATRONAL'] === "ACT.ECO" ||
+        obj['REG. PATRONAL'] === "IMPORTE:" ||
+        obj['REG. PATRONAL'] === "IMPORTE" ||
+        obj['REG. PATRONAL'] === "REG. PATRONAL" 
+      )
+        continue;
+
+    // Validar tipo de documento
+    if ( 
+        obj['TD'] == 0 ||
+        obj['TD'] == 2 ||
+        obj['TD'] == 80 ||
+        obj['TD'] == 81 ||
+        obj['TD'] == 82 ||
+        obj['TD'] == 88 ||
+        obj['TD'] == 89
+    ) raleType = "COP"
+    else if ( obj['TD'] == 60 ) raleType = "RCV"
+    
+    // Poner en nulos los posibles vacíos
+    if (obj['DC SC'] === null || obj['DC SC'] === "" || obj['DC SC'] === "#0/##/####" || obj['DC SC'] === undefined) obj['DC SC'] = null;
+    if (obj['CE'] === null || obj['CE'] === "" || obj['CE'] === "#0/##/####" || obj['CE'] === undefined) obj['CE'] = null;
+    if (obj['FEC. NOTIF.'] === null || obj['FEC. NOTIF.'] === "" || obj['FEC. NOTIF.'] === "#0/##/####" || obj['FEC. NOTIF.'] === "0/ /" || obj['FEC. NOTIF.'] === undefined) obj['FEC. NOTIF.'] = null;
+    if (obj['FEC. INCID.'] === null || obj['FEC. INCID.'] === "" || obj['FEC. INCID.'] === "#0/##/####" || obj['FEC. INCID.'] === undefined) obj['FEC. INCID.'] = null;
+    
+    // Convertir a numeros los posibles
+    obj['M'] = obj['M'] ? parseInt(obj['M']) : 0;
+    obj['SECT'] = obj['SECT'] ? parseInt(obj['SECT']) : 0;
+    obj['TD'] = obj['TD'] ? parseInt(obj['TD']) : 0;
+    obj['INC.'] = obj['INC.'] ? parseInt(obj['INC.']) : 0;
+    obj['DIAS'] = obj['DIAS'] ? parseInt(obj['DIAS']) : 0;
+
+    // Convertir a número decimal los que son necesarios
+    obj['NUM.CRED.'] = obj['NUM.CRED.'] ? parseFloat(obj['NUM.CRED.']) : 0;
+    obj['I M P O R T E'] = obj['I M P O R T E'] ? parseFloat(obj['I M P O R T E']) : 0;
+
+    // Convertir a fecha los que sean necesarios
+    obj['OV. PATRONAL'] = obj['OV. PATRONAL'] ? new Date(obj['OV. PATRONAL'].toString()) : null;
+    obj['FECHA ALTA'] = obj['FECHA ALTA'] ? new Date(obj['FECHA ALTA'].toString()) : null;
+    obj['FEC. NOTIF.'] = obj['FEC. NOTIF.'] ? new Date(obj['FEC. NOTIF.'].toString()) : null;
+    obj['FEC. INCID.'] = obj['FEC. INCID.'] ? new Date(obj['FEC. INCID.'].toString()) : null;
+
+    // Dar formato al PERIODO
+    if (obj['PERIODO']) {
+        let fec = obj['PERIODO'].split("/");
+        let fecstr = `${fec[1]}/${fec[0]}/01`;
+        obj['PERIODO'] = new Date(Date.parse(fecstr));
+    }
+
     result.push(obj);
   }
   let ret = { result, raleType }
