@@ -13,6 +13,7 @@ import { socket as estIndividualesSockets } from './sockets/estindividualesSocke
 import { socket as estGlobalesSockets } from './sockets/estGlobalesSockets.js';
 import { socket as actEjecutorSockets } from './sockets/actEjecutorSockets.js';
 import { socket as confrontaSockets } from './sockets/confrontaSockets.js';
+import { socket as reportesSocket } from './sockets/reportesSocket.js';
 import http from 'http';
 import { Server } from 'socket.io'
 
@@ -41,6 +42,7 @@ estIndividualesSockets(io); // Configura los sockets de estadisticas individuale
 actEjecutorSockets(io); // Configura los sockets de actualizar ejecutor en el servidor
 confrontaSockets(io); // Configura los sockets de confronta ejecutor en el servidor
 estGlobalesSockets(io); // Configura los sockets de estadisticas globales en el servidor
+reportesSocket(io); // Configura los sockets de reportes en el servidor
 
 
 httpServer.listen(port, () => {
