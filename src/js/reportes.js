@@ -339,7 +339,7 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
           value: ''
         }).addClass('form-control');
         const fechaPagoInput = $('<input>').attr({
-          type: 'text',
+          type: 'date',
           name: 'fechaPago',
           value: ''
         }).addClass('form-control');

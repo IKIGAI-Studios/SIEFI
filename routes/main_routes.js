@@ -7,7 +7,7 @@ import sequelize from '../database.js';
 import RaleCop from '../models/raleCOPModel.js';
 import RaleRcv from '../models/raleRCVModel.js';
 import path from 'path';
-import { generarInforme, generarGastos } from './funciones.js';
+import { generarInforme, generarGastos } from './funciones_main_routes.js';
 
 
 const routes = express.Router();
@@ -34,7 +34,7 @@ routes.get('/registerEjecutor', (req, res) => {
     // }
 
     // // No es administrador
-    // if (req.session.user.tipo != 'admin') {
+    // if (req.session.user.tipo_usuario != 'admin') {
     //     res.redirect('/login');
     //     return;
     // }
@@ -51,7 +51,7 @@ routes.get('/confronta', async (req, res) => {
     // }
 
     // // No es administrador
-    // if (req.session.user.tipo != 'admin') {
+    // if (req.session.user.tipo_usuario != 'admin') {
     //     res.redirect('/login');
     //     return;
     // }
@@ -461,6 +461,18 @@ routes.post('/elimarRaleRCVFiltrado', async(req, res) =>{
 //Rutas para reportes
 
 routes.get('/reportes', (req, res) => {
+    console.log(req.session.user, )
+    // No existe la sesión
+    if (req.session.user === undefined) {
+        res.redirect('/login');
+        return;
+    }
+
+    // No es administrador
+    if (req.session.user.tipo_usuario != 'ejecutor') {
+        res.redirect('/login');
+        return;
+    }
     res.render('reportes', { session: req.session });
 });
 
