@@ -6,6 +6,9 @@ import {Op} from 'sequelize';
 import sequelize from '../database.js';
 import RaleCop from '../models/raleCOPModel.js';
 import RaleRcv from '../models/raleRCVModel.js';
+import path from 'path';
+import { generarInforme, generarGastos } from './funciones.js';
+
 
 const routes = express.Router();
 
@@ -150,7 +153,7 @@ routes.post('/login', async (req, res) => {
         // Redireccionar al tipo de usuario
         if (user.type == "ejecutor") {
             console.log(req.session.user)
-            res.json('Ejecutor')
+            res.redirect('/reportes');
         } else {
             res.redirect('/loadInfo');
         }
@@ -365,7 +368,6 @@ routes.post('/asignarPatrones' , async (req, res) =>{
 routes.post('/elimarAfilFiltrado', async(req, res) =>{
     try {
         const fechaAfil = req.body.selectAfil;
-        console.log('Fecha: ',fechaAfil);
 
         const eliminarAfilF = await Afil63.destroy({
             where: sequelize.where(
@@ -386,7 +388,6 @@ routes.post('/elimarAfilFiltrado', async(req, res) =>{
 routes.post('/elimarCoinFiltrado', async(req, res) =>{
     try {
         const fechaCoin = req.body.selectCoin;
-        console.log('Fecha: ',fechaCoin);
 
         const eliminarCoinF = await Coin.destroy({
             where: sequelize.where(
@@ -407,7 +408,6 @@ routes.post('/elimarCoinFiltrado', async(req, res) =>{
 routes.post('/elimarRaleCOPFiltrado', async(req, res) =>{
     try {
         const fechaRaleCOP = req.body.selectRaleCOP;
-        console.log('Fecha: ',fechaRaleCOP);
 
         const eliminarRaleCOPF = await RaleCop.destroy({
             where: sequelize.where(
@@ -428,7 +428,6 @@ routes.post('/elimarRaleCOPFiltrado', async(req, res) =>{
 routes.post('/elimarRaleRCVFiltrado', async(req, res) =>{
     try {
         const fechaRaleRCV = req.body.selectRaleRCV;
-        console.log('Fecha: ',fechaRaleRCV);
 
         const eliminarRaleRCVF = await RaleRcv.destroy({
             where: sequelize.where(
@@ -447,5 +446,40 @@ routes.post('/elimarRaleRCVFiltrado', async(req, res) =>{
 });
 
 
+//Rutas para reportes
+
+routes.get('/reportes', (req, res) => {
+    res.render('reportes', { session: req.session });
+});
+
+
+routes.post('/generarCitatorio', (req, res) => {
+    console.log("Citatorio: ",req.body);
+});
+
+
+routes.post('/generarMandamiento', (req, res) => {
+    console.log("Mandamiento:", req.body);
+});
+
+
+
+routes.post('/generarInforme', async (req, res) => {
+    try {
+        await generarInforme(req,res);
+      } catch (error) {
+        console.error(error);
+      }    
+}); 
   
+
+routes.post('/generarGastos', async (req, res) => {
+    try {
+        await generarGastos(req,res);
+      } catch (error) {
+        console.error(error);
+      }       
+});
+
+
 export default routes;

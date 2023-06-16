@@ -48,7 +48,6 @@
               <li class="active mt-3">
                 <h5>ESTADÍSTICAS</h5>
                 <ul class="">
-                    <li><a href="/confronta" class="sidebar-item">CONFRONTA</a></li>
                     <li><a href="/estadisticasIndividuales" class="sidebar-item">INDIVIDUALES</a></li>
                     <li><a href="#" class="sidebar-item">GLOBALES</a></li>
                 </ul>
@@ -72,7 +71,7 @@
                   <h4 for="afil">Afil</h4>
                   <a href="/registrarAfil" class="form-control" id="afil">Registrar Afil</a>
                   <input type="hidden" class="form-control" name="Afil" id="Afil_input" accept=".xlsx"/>
-                  <button type="button" style="display: none;" class="btn btn-secondary mt-1"  onclick="verRegistrosAfil()">
+                  <button type="button" style="display: block;" class="btn btn-secondary mt-1" value="afil"  onclick="verRegistros(this.value)">
                     Ver registros Afil
                   </button>
                 </div>
@@ -81,7 +80,7 @@
                 <div class="container">
                   <h4 for="Coin">Coin</h4>
                   <input type="file" class="form-control" name="Coin" id="Coin_input" accept=".xlsx"/>
-                  <button type="button" class="btn btn-primary mt-1" onclick="verRegistrosCoin()">
+                  <button type="button" class="btn btn-primary mt-1" value="coin" onclick="verRegistros(this.value)">
                     Ver registros Coin
                   </button>
                 </div>
@@ -90,7 +89,7 @@
                 <div class="container">
                   <h4 for="Coin">Rale COP</h4>
                   <input type="file" class="form-control" name="RaleCOP" id="RaleCOP_input" accept=".xlsx"/>
-                  <button type="button" class="btn btn-success mt-1" onclick="verRegistrosRaleCOP()">
+                  <button type="button" class="btn btn-success mt-1" value="cop" onclick="verRegistros(this.value)">
                     Ver registros Rale Cop
                   </button>
                 </div>
@@ -99,7 +98,7 @@
                 <div class="container">
                   <h4 for="Coin">Rale RCV</h4>
                   <input type="file" class="form-control" name="RaleRCV" id="RaleRCV_input" accept=".xlsx"/>
-                  <button type="button" class="btn btn-light mt-1" data-bs-toggle="modal" data-bs-target="#modalRaleRCV" onclick="verRegistrosRaleRCV()">
+                  <button type="button" class="btn btn-light mt-1" value="rcv" onclick="verRegistros(this.value)">
                     Ver registros Rale RCV
                   </button>
                 </div>
@@ -129,100 +128,31 @@
       </div>
     </div>
 
-    <!-- ? MODAL ELIMINAR AFIL FILTRADO -->
-    <form action="elimarAfilFiltrado" method="post">
-      <div class="modal fade" id="verAfilModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- ? MODAL ELIMINAR REGISTROS FILTRADOS POR FECHA -->
+    <form action="" method="post" id="eliminarForm">
+      <div class="modal fade" id="verRegistrosModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
           <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">Registros Afil</h1>
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Registros</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <h4>Registros Afil</h4>
-              <div id="div-registros-afil"></div>
+              <div id="div-registros-filtrados"></div>
               
             </div>
             <div class="modal-footer">
-              <button class="btn btn-danger" id="btnEliminarAfil" type="submit">Eliminar</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnCerrarAfil">Cerrar</button>
+              <button class="btn btn-danger" id="btnEliminar" type="submit">Eliminar</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnCerrar">Cerrar</button>
             </div>
           </div>
         </div>
       </div>
     </form>
 
-    <!-- * MODAL ELIMINAR COIN FILTRADO -->
-
-    <form action="elimarCoinFiltrado" method="post" >
-      <div class="modal fade" id="verCoinModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">Registros Coin</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <h4>Registros Coin</h4>
-              <div id="div-registros-coin"></div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-danger" id="btnEliminarCoin" type="submit">Eliminar</button>
-              <button type="button" id="btnCerrarCoin"  class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
-
-    <!-- TODO MODAL ELIMINAR RALE RCV -->
-    <form action="eliminarRaleRCVFiltrado" method="post">
-      <div class="modal fade" id="verRaleRCVModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">Registros de Rale RCV</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <h4>Registros Rale RCV</h4>
-              <div id="div-registros-rale-rcv"></div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-danger" id="btnEliminarRaleRCV" type="submit">Eliminar</button>
-              <button type="button" class="btn btn-secondary" id="btnCerrarRaleRCV" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
-
-    <!-- ! MODAL ELIMINAR RALE COP -->
-    <form action="eliminarRaleCOPFiltrado" method="post">
-      <div class="modal fade" id="verRaleCOPModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">Registros de Rale COP</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <h4>Registros Rale COP</h4>
-              <div id="div-registros-rale-cop"></div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-danger" id="btnEliminarRaleCOP" type="submit">Eliminar</button>
-              <button type="button" class="btn btn-secondary" id="btnCerrarRaleCOP" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>       
-
-</body>
-<%- include('templates/footer-pleca')%>
-<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
-<script src="socket.io/socket.io.min.js"></script>
-<script src="/js/loadInfo.js"></script>
-</html>
-
+  </body>
+  <%- include('templates/footer-pleca')%>
+  <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+  <script src="socket.io/socket.io.min.js"></script>
+  <script src="/js/loadInfo.js"></script>
+  </html>
