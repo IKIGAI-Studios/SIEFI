@@ -8,12 +8,13 @@ socket.on('servidor:capturarDatos', (data, value, clave_eje) => {
   $('#div-ingresar-registro-patronal').empty();
   $('#generarReportesRPModal').modal('show');
   $('#btnCerrar').prop('disabled', true);
-  $('#btnGenerar').hide();
+  
 
   // Crear el input, el link y el select
   const input = $('<input type="text" id="patronInput" class="form-control form-control-sm w-50" placeholder="Registro Patronal">');
   const select = $('<select id="fechaSelect" class="form-control form-control-sm w-50">');
   const link = $('<a href="#" class="btn btn-primary disabled ml-3">Aceptar</a>');
+  
 
   // Obtener las fechas distintas del campo createdAt en el objeto data
   const fechasDistintas = Array.from(new Set(data.map(item => item)));
@@ -62,7 +63,6 @@ socket.on('servidor:capturarDatos', (data, value, clave_eje) => {
 
 //Socket para crear la tabla 
 socket.on('servidor:obtenerPatrones', (data, value, user) => {
-
   
   $('#div-generar-reportes').empty();
   $('#div-formularios-reportes').empty();
@@ -70,6 +70,10 @@ socket.on('servidor:obtenerPatrones', (data, value, user) => {
   $('#generarReportesRPModal').modal('hide');
   $('#btnCerrar').prop('disabled', false);
   $('#btnGenerarForms').prop('disabled', true);
+
+  // Deshabilitar el botón sólo si es mandamiento o citatorio de otra forma habilitarlo
+  if (value == 'mandamiento' || value == 'citatorio') $('#btnGenerar').prop('disabled', true);
+  else $('#btnGenerar').prop('disabled', false);
 
   //Mostrar el modal dependiendo del valor recibido
   if(value == 'citatorio' || value == 'mandamiento') {
@@ -90,6 +94,7 @@ socket.on('servidor:obtenerPatrones', (data, value, user) => {
     $('#div-generar-reportes').append(noRecordsMessage);
     $('#div-formularios-reportes').append(noRecordsMessage);
     return;
+
   } else{
 
     // Crear tabla
@@ -108,14 +113,10 @@ socket.on('servidor:obtenerPatrones', (data, value, user) => {
       headerCell.appendTo(headerRow);
     });
 
-    // Agregar columna adicional según el valor recibido
-    if (value === 'citatorio' || value === 'mandamiento') {
-      const iconHeader = $('<th>').attr('scope', 'col').text('Generar');
-      iconHeader.appendTo(headerRow);
-    } else if (value === 'informe' || value === 'gastos') {
+    // Agregar columna adicional para seleccionar los registros.
       const checkboxHeader = $('<th>').attr('scope', 'col').text('Seleccionar');
       checkboxHeader.prependTo(headerRow);
-    }
+    
 
     headerRow.appendTo(thead);
     thead.appendTo(table);
@@ -127,16 +128,35 @@ socket.on('servidor:obtenerPatrones', (data, value, user) => {
     data.forEach((obj) => {
       const dataRow = $('<tr>');
 
-    //Switch para cambiar el color dependiendo de la tabla donde fueron obtenidas
-    switch (obj.cobrado) {
-      case true:
-        dataRow.addClass('table-primary');
-        break;
-      case false:
-        dataRow.addClass('table-success');
-        break;
-        default:
-        break;
+
+    // Cambiar los colores de los registros, dependiendo del documento.  
+    if (value == 'informe' || value == 'gastos' ){
+
+      //Switch para cambiar el color dependiendo del status del registro
+      switch (obj.cobrado) {
+        case true:
+          dataRow.addClass('table-primary');
+          break;
+        case false:
+          dataRow.addClass('table-success');
+          break;
+          default:
+          break;
+      }
+    } else {
+
+      // Switch para cambiar el color de los registros dependiendo de la tabla donde fueron seleccionados.
+      switch (obj.type) {
+        case 'cop':
+          dataRow.addClass('table-primary');
+          break;
+        case 'rcv':
+          dataRow.addClass('table-success');
+          break;
+          default:
+          break;
+      }
+
     }
 
       // Recorrer las propiedades de cada objeto y agregar celdas a la fila
@@ -145,50 +165,16 @@ socket.on('servidor:obtenerPatrones', (data, value, user) => {
         dataCell.appendTo(dataRow);
       });
 
-      // Agregar columna adicional según el valor recibido
-      if (value === 'citatorio' || value === 'mandamiento') {
-        const buttonCell = $('<td>');
-        const button = $('<button>').html('<img src="imgs/folder_azul.png">').addClass('custom-button');
-
-        // Agregar evento de clic al botón
-        button.on('click', function() {
-          const form = $(this).closest('form');
-          const dataRow = $(this).closest('tr');
-          const formData = dataRow.find('td').map(function() {
-            return $(this).text();
-          }).get();
-
-          switch (value) {
-            case 'citatorio':
-              form.attr('action', '/generarCitatorio');
-              break;
-            case 'mandamiento':
-              form.attr('action', '/generarMandamiento');
-              break;
-          }
-
-          $('<input>').attr({
-            type: 'hidden',
-            name: 'registroData',
-            value: formData.join(',')
-          }).appendTo(form);
-
-          form.submit();
-        });
-
-        button.appendTo(buttonCell);
-        buttonCell.appendTo(dataRow);
-      }
-
-        else if (value === 'informe' || value === 'gastos') {
-          const checkboxCell = $('<td>');
-          const checkbox = $('<input type="checkbox" id="selectPatrones" class="select-registro" name="opcion">').attr('value', JSON.stringify(obj));
-          checkbox.appendTo(checkboxCell);
-          checkboxCell.prependTo(dataRow);
-          $('#btnGenerarForms').show();
-        }
+      // Agregar columna adicional para seleccionar los registros. 
+      const checkboxCell = $('<td>');
+      const checkbox = $('<input type="checkbox" id="selectPatrones" class="select-registro" name="opcion">').attr('value', JSON.stringify(obj));
+      checkbox.appendTo(checkboxCell);
+      checkboxCell.prependTo(dataRow);
+      $('#btnGenerarForms').show();
+        
 
       dataRow.appendTo(tbody);
+
     });
 
     tbody.appendTo(table);
@@ -209,19 +195,26 @@ socket.on('servidor:obtenerPatrones', (data, value, user) => {
 
   // Llamar a la función para establecer el estado inicial del botón
   actualizarEstadoBoton(value, user);
+
+  //Mandar a diferentes rutas 
+  const form = $("#reportesForm");
+
+  //Mandar a la ruta de acuerdo a su valor 
+  if (value == 'mandamiento') form.attr('action', '/generarMandamiento');
+  if (value == 'citatorio') form.attr('action', '/generarCitatorio');
     
   }
 });
 
 
-//Socket para crear el formulario del informe.
+//Socket para crear el formulario del informe y de gastos de ejecutor. 
+
 socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
 
   $('#div-generar-reportes').empty();
   $('#formsReportesModal').modal('hide');
 
   $('#generarReportesModal').modal('show');
-  $('#btnGenerar').show();
 
   // Comprobar si la variable data está vacía
   if (data.length === 0) {
@@ -263,12 +256,10 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
       const fechaPagoHeader = $('<th>').attr('scope', 'col').text('Fecha de pago');
       const cobradoHeader = $('<th>').attr('scope', 'col').text('Cobrado');
       const gastosEjecutor = $('<th>').attr('scope', 'col').text('G.E');
-      const tabulador = $('<th>').attr('scope', 'col').text('Tabulador');
       provioHeader.appendTo(headerRow);
       fechaPagoHeader.appendTo(headerRow);
       cobradoHeader.appendTo(headerRow);
       gastosEjecutor.appendTo(headerRow);
-      tabulador.appendTo(headerRow);
     }
     
 
@@ -316,45 +307,47 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
   
         dataRow.appendTo(tbody);
       }
-
+      
+      //Crear los campos rellenables en caso de que el valor sea gastos. 
       if (value == 'gastos'){
+
         const provioInput = $('<input>').attr({
           type: 'text',
           name: 'provio',
           value: ''
         }).addClass('form-control');
-        const cobradoInput = $('<input>').attr({
-          type: 'text',
-          name: 'cobrado',
-          value: ''
-        }).addClass('form-control');
-        const gastosInput = $('<input>').attr({
-          type: 'text',
-          name: 'gastos',
-          value: ''
-        }).addClass('form-control');
-        const tabuladorInput = $('<input>').attr({
-          type: 'text',
-          name: 'tabulador',
-          value: ''
-        }).addClass('form-control');
+
         const fechaPagoInput = $('<input>').attr({
           type: 'date',
           name: 'fechaPago',
           value: ''
         }).addClass('form-control');
 
+        const cobradoInput = $('<input>').attr({
+          type: 'text',
+          name: 'cobrado',
+          id: 'cobrado',
+          value: ''
+        }).addClass('form-control');
+
+        const gastosInput = $('<input>').attr({
+          type: 'text',
+          name: 'gastos',
+          id: 'gastos',
+          value: ''
+        }).addClass('form-control');
+     
+        
+
         const inputCell1 = $('<td>').append(provioInput);
-        const inputCell2 = $('<td>').append(cobradoInput);
-        const inputCell3 = $('<td>').append(gastosInput);
-        const inputCell4 = $('<td>').append(tabuladorInput);
-        const inputCell5 = $('<td>').append(fechaPagoInput);
+        const inputCell2 = $('<td>').append(fechaPagoInput);
+        const inputCell3 = $('<td>').append(cobradoInput);
+        const inputCell4 = $('<td>').append(gastosInput);
         inputCell1.appendTo(dataRow);
         inputCell2.appendTo(dataRow);
         inputCell3.appendTo(dataRow);
         inputCell4.appendTo(dataRow);
-        inputCell5.appendTo(dataRow);
-  
+
         dataRow.appendTo(tbody);
 
       }
@@ -371,7 +364,6 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
     const form = $("#reportesForm");
 
     //Mandar a la ruta de acuerdo a su valor 
-
     if (value == 'informe') form.attr('action', '/generarInforme');
     if (value == 'gastos') form.attr('action', '/generarGastos');
 
@@ -389,7 +381,6 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
 
       $(`<h3 class="text-primary">Obteniendo Patrones</h3>`).appendTo('#formsReportesModal');
       $('#btnCerrar').prop('disabled', true);
-      $('#btnGenerar').hide();
 
       socket.emit('cliente:obtenerPatronesEjecutor', value, user);
     }
@@ -401,7 +392,11 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
 
 // Función para actualizar el estado del botón y obtener los registros de la tabla. 
 function actualizarEstadoBoton(value, user) {
-  const btnGenerarForms = $('#btnGenerarForms');
+  var btnGenerarForms;
+
+  if(value == 'informe' || value == 'gastos') btnGenerarForms = $('#btnGenerarForms');
+  else btnGenerarForms = $('#btnGenerar');
+  
   const checkboxes = $('.select-registro');
 
   // Controlar la acción al presionar el botón
