@@ -1,6 +1,6 @@
 const socket = io('http://localhost:3000');
 
-let dataStats, inc, res, con, fecha, dates = {}, cop_rcv = {}, cuotas = {}, rcv = {};
+let dataStats, inc, res, con, fecha, dates = {}, cop_rcv = {}, cuotas = {}, rcv = {}, coinData = {}, oports = {}, imp = {};
 
 window.onload = function () {
     socket.emit('cliente:consultarRegistrosRaleCOP');
@@ -8,7 +8,7 @@ window.onload = function () {
     socket.emit('cliente:consultarRegistrosCoin');
 }
 
-socket.on('servidor:estGlobales', (data) => {
+socket.on('servidor:estGlobales', ({ data }) => {
     dataStats = data;
     fillFilters();
     showTable();
@@ -84,7 +84,14 @@ socket.on('servidor:consultarRegistrosRaleRCV', (data) => {
 
 socket.on('servidor:consultarRegistrosCoin', (data) => {
     $('#dateCOINscnd').empty();
+    $('#dateCOINfrst').empty();
     $('#dateCOINscnd').append(
+        $('<option>', {
+            text: "Selecciona una fecha para COIN",
+            value: false 
+        })
+    );
+    $('#dateCOINfrst').append(
         $('<option>', {
             text: "Selecciona una fecha para COIN",
             value: false 
@@ -97,8 +104,15 @@ socket.on('servidor:consultarRegistrosCoin', (data) => {
                 text: date
             })
         );
+        $('#dateCOINfrst').append(
+            $('<option>', {
+                value: date, 
+                text: date
+            })
+        );
     });
     $('#dateCOINscnd').prop('disabled', false);
+    $('#dateCOINfrst').prop('disabled', false);
 });
 
 // Hacemos un on change al div con el id dateCOP porque se crea dinamicamente 
@@ -111,8 +125,8 @@ $('#div-frst-selects').on('change', '#dateCOPfrst', function() {
     $('#dateCOPscnd option').prop('disabled', false);
     $(`#dateCOPscnd option[value="${$(this).val()}"]`).prop('disabled', $(this).val() != 'false');
     if ($(this).val() != "false") 
-        if ($('#dateRCVfrst').val() != "false") {
-            if ($('#dateRCVfrst').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
+        if ($('#dateRCVfrst').val() != "false" && $('#dateCOINfrst').val() != "false") {
+            if ($('#dateRCVfrst').val() != $(this).val() || $('#dateCOINfrst').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
             getRales();
         }
 });
@@ -125,8 +139,22 @@ $('#div-frst-selects').on('change', '#dateRCVfrst', function() {
     $('#dateRCVscnd option').prop('disabled', false);
     $(`#dateRCVscnd option[value="${$(this).val()}"]`).prop('disabled', $(this).val() != 'false');
     if ($(this).val() != "false") 
-        if ($('#dateCOPfrst').val() != "false") {
-            if ($('#dateCOPfrst').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
+        if ($('#dateCOPfrst').val() != "false" && $('#dateCOINfrst').val() != "false") {
+            if ($('#dateCOPfrst').val() != $(this).val() || $('#dateCOINfrst').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
+            getRales();
+        }
+});
+
+$('#div-frst-selects').on('change', '#dateCOINfrst', function() {
+    $('#btn_fil_inc').prop('disabled', true)
+    $('#btn_fil_res').prop('disabled', true)
+    $('#btn_fil_con').prop('disabled', true)
+
+    $('#dateCOINscnd option').prop('disabled', false);
+    $(`#dateCOINscnd option[value="${$(this).val()}"]`).prop('disabled', $(this).val() != 'false');
+    if ($(this).val() != "false") 
+        if ($('#dateCOPfrst').val() != "false" && $('#dateRCVfrst').val() != "false") {
+            if ($('#dateCOPfrst').val() != $(this).val() || $('#dateRCVfrst').val() != $(this).val()) bsAlert('Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes', 'warning')
             getRales();
         }
 });
@@ -150,7 +178,8 @@ function getRales () {
 
     socket.emit('cliente:ejecutorSeleccionadoEstGlob', { 
         copDate: $('#dateCOPfrst').val(),
-        rcvDate: $('#dateRCVfrst').val()
+        rcvDate: $('#dateRCVfrst').val(),
+        coinDate: $('#dateCOINfrst').val()
     });
 }
 
@@ -158,20 +187,28 @@ function fillFilters() {
     $('#inc_fil').empty();
     $('#btn_fil_inc').prop('disabled', false)
     $('#btn_fil_con').prop('disabled', false)
+    $('#btn_fil_res').prop('disabled', false)
     inc = Array.from(
-        dataStats.reduce(function (res, obj) {
+        dataStats.rales.reduce(function (res, obj) {
             res.add(obj.inc);
             return res;
         }, new Set())
     );
     con = Array.from(
-        dataStats.reduce(function (res, obj) {
+        dataStats.rales.reduce(function (res, obj) {
             res.add(obj.type);
             return res;
         }, new Set())
     );
+    res = Array.from(
+        dataStats.rales.reduce(function (res, obj) {
+            if (obj.res_dil) res.add(obj.res_dil);
+            return res;
+        }, new Set())
+    )
     inc.sort(function (a, b) { return a - b })
-    con.sort(function (a, b) { return a - b })
+    con.sort(function (a, b) { a.localeCompare(b) })
+    res.sort(function (a, b) { a.localeCompare(b) })
     inc.map((data) => {
         $('#inc_fil')
         .append(
@@ -234,54 +271,81 @@ function fillFilters() {
             )
         );
     });
+    res.map((data) => {
+        $('#res_fil')
+        .append(
+            $('<li>')
+            .append(
+                $('<a>')
+                .attr('href', '#')
+                .addClass('dropdown-item')
+                .append(
+                    $('<div>')
+                    .addClass('form-check')
+                    .append( 
+                        $('<input>')
+                        .addClass('form-check-input')
+                        .attr('checked', true)
+                        .attr('type', 'checkbox')
+                        .val('chk_res_' + data)
+                        .on('change', function () {
+                            updateFilters( "res", data, $(this).is(':checked'))
+                        })
+                    )
+                    .append(
+                        $('<label>')
+                        .addClass('form-check-label')
+                        .attr('for', 'flexCheckDefault')
+                        .text(data)
+                    )
+                )
+            )
+        );
+    });
 }
 
 function fillStats() {
-    cuotas.asig = dataStats.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31)).length;
-    cuotas.pen = dataStats.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31) && !obj.cobrado).length;
-    cuotas.coin = 0 // preguntar
-    cuotas.coin_dilig = 0 // preguntar  
-    cuotas.pend_2 = "preguntar como se saca"
-    cuotas.dil = dataStats.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31) && obj.cobrado).length;
-    cuotas.inc_09 = dataStats.filter(obj => obj.inc === 9 && obj.type === "cuotas").length;
-    cuotas.embargo = 0 // pregutnar
-    cuotas.citatorios = "preguntar como se saca"
+    cuotas.asig = dataStats.rales.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31)).length;
+    cuotas.pen = dataStats.rales.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31) && !obj.cobrado).length;
+    cuotas.coin = dataStats.coin.map(coin => dataStats.rales.filter(rale => (rale.inc == 2 || rale.inc == 31) && rale.type == "cuotas" && rale.reg_pat == coin.reg_pat && rale.nom_cred == coin.num_credito)).filter(objetos => objetos.length > 0).length
+    cuotas.coin_dilig = dataStats.coin.map(coin => dataStats.rales.filter(rale => (rale.inc == 2 || rale.inc == 31) && rale.type == "cuotas" && rale.reg_pat == coin.reg_pat && rale.nom_cred == coin.num_credito && rale.cobrado)).filter(objetos => objetos.length > 0).length
+    cuotas.dil = dataStats.rales.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31) && obj.cobrado).length;
+    cuotas.inc_09 = dataStats.rales.filter(obj => obj.inc === 9 && obj.type === "cuotas").length;
+    cuotas.embargo = dataStats.rales.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31) && (obj.res_dil == 33 || obj.res_dil == 43)).length;
+    cuotas.citatorios = dataStats.rales.filter(obj => obj.type === "cuotas" && (obj.inc == 2  || obj.inc == 31) && obj.res_dil == "citatorio").length;
     $('#CUOTAS_asignado').text(cuotas.asig)
     $('#CUOTAS_pendiente').text(cuotas.pen)
     $('#CUOTAS_coin').text(cuotas.coin)
     $('#CUOTAS_coin_dilig').text(cuotas.coin_dilig)
-    $('#CUOTAS_pendiente_2').text(cuotas.pend_2)
     $('#CUOTAS_diligenciado').text(cuotas.dil)
     $('#CUOTAS_inc_09').text(cuotas.inc_09)
     $('#CUOTAS_embargo').text(cuotas.embargo)
     $('#CUOTAS_citatorios').text(cuotas.citatorios)
 
-    rcv.asignado = dataStats.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31)).length
-    rcv.pendiente = dataStats.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31) && !obj.cobrado).length
-    rcv.coin = 0 // preguntar
-    rcv.coin_dilig = 0 // preguntar
-    rcv.pend_2 = "preguntar como se saca"
-    rcv.dil = dataStats.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31) && obj.cobrado).length
-    rcv.inc_09 = dataStats.filter(obj => obj.inc === 9 && obj.type === "rcv").length
-    rcv.embargo = 0 // preguntar
-    rcv.citatorio = "preguntar como se saca"
+    rcv.asignado = dataStats.rales.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31)).length
+    rcv.pendiente = dataStats.rales.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31) && !obj.cobrado).length
+    rcv.coin = dataStats.coin.map(coin => dataStats.rales.filter(rale => (rale.inc == 2 || rale.inc == 31) && rale.type == "rcv" && rale.reg_pat == coin.reg_pat && rale.nom_cred == coin.num_credito)).filter(objetos => objetos.length > 0).length
+    rcv.coin_dilig = dataStats.coin.map(coin => dataStats.rales.filter(rale => (rale.inc == 2 || rale.inc == 31) && rale.type == "rcv" && rale.reg_pat == coin.reg_pat && rale.nom_cred == coin.num_credito && rale.cobrado)).filter(objetos => objetos.length > 0).length
+    rcv.dil = dataStats.rales.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31) && obj.cobrado).length
+    rcv.inc_09 = dataStats.rales.filter(obj => obj.inc === 9 && obj.type === "rcv").length
+    rcv.embargo = dataStats.rales.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31) && (obj.res_dil == 33 || obj.res_dil == 43)).length;
+    rcv.citatorio = dataStats.rales.filter(obj => obj.type === "rcv" && (obj.inc == 2  || obj.inc == 31) && obj.res_dil == "citatoio").length;
 
     $('#RCV_asignado').text(rcv.asignado)
     $('#RCV_pendiente').text(rcv.pendiente)
     $('#RCV_coin').text(rcv.coin)
     $('#RCV_coin_dilig').text(rcv.coin_dilig)
-    $('#RCV_pendiente_2').text(rcv.pend_2)
     $('#RCV_diligenciado').text(rcv.dil)
     $('#RCV_inc_09').text(rcv.inc_09)
     $('#RCV_embargo').text(rcv.embargo)
     $('#RCV_citatorios').text(rcv.citatorio)
 
-    cop_rcv.entregados = dataStats.filter(obj => (obj.type === "rcv" || obj.type === "cuotas") && (obj.inc == 2  || obj.inc == 31)).length
-    cop_rcv.req_pago = "preguntar como se saca"
-    cop_rcv.no_local = "preguntar como se saca"
-    cop_rcv.embargo = "preguntar como se saca"
-    cop_rcv.citatorios = "preguntar como se saca"
-    cop_rcv.notif = "preguntar como se saca"
+    cop_rcv.entregados = cuotas.asig + rcv.asignado
+    cop_rcv.req_pago = cuotas.dil + rcv.dil
+    cop_rcv.no_local = cuotas.inc_09 + rcv.inc_09
+    cop_rcv.embargo = cuotas.embargo + rcv.embargo
+    cop_rcv.citatorios = cuotas.citatorios + rcv.citatorio
+    cop_rcv.notif = dataStats.rales.filter(obj => (obj.type === "rcv" || obj.type === "cop") && (obj.inc == 2  || obj.inc == 31) && obj.res_dil == "NOTIFICACIÓN").length;
 
     $('#COP_RCV_entregados').text(cop_rcv.entregados)
     $('#COP_RCV_req_pago').text(cop_rcv.req_pago)
@@ -297,12 +361,28 @@ function fillStats() {
     dates.laborales = getWorkDays(fecha.getMonth(), fecha.getFullYear()).length - ($('#inp_DATES_fes').val() != "" ? $('#inp_DATES_fes').val() : 0 )
     dates.dilig = dates.laborales * 5
     dates.pat_dilig = cuotas.dil + cuotas.inc_09 + cuotas.embargo + rcv.dil + rcv.inc_09 + rcv.embargo;
+    dates.productividad = ((dates.pat_dilig / dates.dilig) * 100).toFixed(2);
+    dates.ava_coin = ((cuotas.coin_dilig / cuotas.coin) * 100).toFixed(2);
+    oports.dos = dataStats.rales.filter(obj => (obj.inc == 2  || obj.inc == 31) && obj.oportunidad == "En tiempo 2").length; 
+    oports.tres_uno = dataStats.rales.filter(obj => (obj.inc == 2  || obj.inc == 31) && obj.oportunidad == "En tiempo 31").length; 
+    oports.fuera = dataStats.rales.filter(obj => (obj.inc == 2  || obj.inc == 31) && obj.oportunidad == "Fuera de tiempo").length; 
+    dates.opor_docs = (((oports.dos + oports.tres_uno) / (oports.dos + oports.tres_uno + oports.fuera)) * 100).toFixed(2)
+    imp.dos = dataStats.rales.filter(obj => (obj.inc == 2  || obj.inc == 31) && obj.oportunidad == "En tiempo 2").reduce((acumulador, obj) => acumulador + obj.importe, 0); 
+    imp.tres_uno = dataStats.rales.filter(obj => (obj.inc == 2  || obj.inc == 31) && obj.oportunidad == "En tiempo 31").reduce((acumulador, obj) => acumulador + obj.importe, 0); 
+    imp.fuera = dataStats.rales.filter(obj => (obj.inc == 2  || obj.inc == 31) && obj.oportunidad == "Fuera de tiempo").reduce((acumulador, obj) => acumulador + obj.importe, 0); 
+    dates.opor_imp = (((imp.dos + imp.tres_uno) / (imp.dos + imp.tres_uno + imp.fuera)) * 100).toFixed(2)
+    dates.oport = (parseInt(dates.opor_docs) + parseInt(dates.opor_imp)) / 2
 
     $('#DATES_fec_ini').text(dates.fec_ini)
     $('#DATES_fec_fin').text(dates.fec_fin)
     $('#DATES_laborales').text(dates.laborales)
     $('#DATES_dilig').text(dates.dilig)
     $('#DATES_pat_dilig').text(dates.pat_dilig)
+    $('#DATES_product').text(dates.productividad + "%")
+    $('#DATES_ava_coin').text(dates.ava_coin + "%")
+    $('#DATES_opor_docs').text(dates.opor_docs + "%")
+    $('#DATES_opor_imp').text(dates.opor_imp + "%")
+    $('#DATES_opor').text(dates.oport + "%")
 
     getGraphics()
 }
@@ -379,7 +459,16 @@ function updateFilters( group, n, act ) {
                     return fil !== n
                 })
             }
-            con.sort(function (a, b) { return a - b })
+            con.sort(function (a, b) { a.localeCompare(b) })
+            break;
+        case "res":
+            if (act) res.push(n)
+            else {
+                res = res.filter(function(fil) {
+                    return fil !== n
+                })
+            }
+            res.sort(function (a, b) { a.localeCompare(b) })
             break;
         default:
             break;
@@ -388,10 +477,10 @@ function updateFilters( group, n, act ) {
 }
 
 function showTable () {
-    $('#div-tabla-estadisticas-individuales').empty();
-    let data = dataStats;
+    $('#div-tabla-estadisticas-globales').empty();
+    let data = dataStats.rales;
     if (data.length < 1) {
-        bsAlert('El ejecutor no tiene ningun patron asignado', 'danger')
+        bsAlert('No hay fningun patron asignado', 'danger')
         return;
     }
 
@@ -440,12 +529,12 @@ function showTable () {
     // Crear un div con scroll para contener la tabla
     const tableScrollContainer = $('<div>').css({
         'overflow-y': 'scroll',
-        'max-height': '350px' 
+        'max-height': '400px' 
     });
     table.appendTo(tableScrollContainer);
 
     // Mostrar la tabla con el número de registros que tiene
     const tableContainer = $('<div>').attr('id', 'tb-show-estadisticas-individuales');
     tableScrollContainer.appendTo(tableContainer);
-    tableContainer.appendTo('#div-tabla-estadisticas-individuales');
+    tableContainer.appendTo('#div-tabla-estadisticas-globales');
 }

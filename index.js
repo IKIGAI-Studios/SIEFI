@@ -46,9 +46,9 @@ reportesSocket(io); // Configura los sockets de reportes en el servidor
 
 
 httpServer.listen(port, () => {
-    console.log(`Server in port ${port}`);
+    console.log(`Server in port http://localhost:${port}`);
 });
-
+    
 app.use('/', express.static(path.join(__dirname, '/public')));
 app.use('/', main_routes);
 app.use("/scss", express.static(join(__dirname, 'src/assets/scss')));

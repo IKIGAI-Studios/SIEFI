@@ -345,7 +345,7 @@ function confrontData ({ patrones, ejecutores }) {
         frstdata.dias_rest = Math.floor((new Date() - new Date(frstdata.fec_insid)) / 86400000)
         // Calcular oportunidad
         frstdata.oportunidad = frstdata.inc == 2 ? 
-            "En tiempo en la 2"
+            "En tiempo 2"
             : frstdata.dias_rest > 40 ? 
                 "Fuera de tiempo"
                 : "En tiempo 31" 

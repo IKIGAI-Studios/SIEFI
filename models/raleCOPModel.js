@@ -70,6 +70,11 @@ const RaleCop = sequelize.define('rale_cop', {
     allowNull: false,
     defaultValue: 0,
   },
+  citatorio: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: 0,
+  },
   fol_sua: {
     type: DataTypes.STRING(100),
     allowNull: true
