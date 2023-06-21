@@ -75,6 +75,14 @@ const RaleRcv = sequelize.define('rale_rcv', {
     allowNull: false,
     defaultValue: 0,
   },
+  cobrado_patron: {
+    type: DataTypes.DOUBLE,
+    allowNull: false
+  },
+  gastos_ejecutor: {
+    type: DataTypes.DOUBLE,
+    allowNull: false
+  },
   fol_sua: {
     type: DataTypes.STRING(100),
     allowNull: true
