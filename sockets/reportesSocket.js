@@ -53,7 +53,7 @@ socket.on('cliente:obtenerPatrones', async (patron, fecha, value, clave_eje) => 
 
   // Obtener de la tabla Rale COP los registros que coincidan con la consulta anterior.
   const raleC = await RaleCop.findAll({
-    attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'createdAt'],
+    attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'inc', 'createdAt'],
     where: { 
             reg_pat: reg_pat.map(rp => rp.reg_pat), 
             reg_pat: patron,
@@ -65,7 +65,7 @@ socket.on('cliente:obtenerPatrones', async (patron, fecha, value, clave_eje) => 
 
   // Obtener de la tabla Rale RCV los registros que coincidan con la consulta anterior.
   const raleR = await RaleRCV.findAll({
-    attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'createdAt'],
+    attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'inc', 'createdAt'],
     where: { 
             reg_pat: reg_pat.map(rp => rp.reg_pat), 
             reg_pat: patron,
@@ -98,13 +98,13 @@ socket.on('cliente:obtenerPatronesEjecutor', async (value, clave_eje) => {
 
   // Obtener de la tabla Rale COP los registros que coincidan con la consulta anterior.
   const raleC = await RaleCop.findAll({
-    attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'createdAt', 'cobrado'],
+    attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'inc', 'createdAt', 'cobrado'],
     where: { reg_pat: reg_pat.map(rp => rp.reg_pat)}
   });
 
   // Obtener de la tabla Rale RCV los registros que coincidan con la consulta anterior.
   const raleR = await RaleRCV.findAll({
-    attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'createdAt', 'cobrado'],
+    attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'createdAt', 'inc', 'cobrado'],
     where: { reg_pat: reg_pat.map(rp => rp.reg_pat)}
   });
 

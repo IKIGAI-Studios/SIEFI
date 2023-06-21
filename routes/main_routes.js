@@ -7,7 +7,7 @@ import sequelize from '../database.js';
 import RaleCop from '../models/raleCOPModel.js';
 import RaleRcv from '../models/raleRCVModel.js';
 import path from 'path';
-import { generarInforme, generarGastos } from './funciones_main_routes.js';
+import { generarInforme, generarGastos, generarMandamiento, generarCitatorio } from './funciones_main_routes.js';
 
 
 const routes = express.Router();
@@ -468,7 +468,7 @@ routes.get('/reportes', (req, res) => {
         return;
     }
 
-    // No es administrador
+    // No es ejecutor
     if (req.session.user.tipo_usuario != 'ejecutor') {
         res.redirect('/login');
         return;
@@ -477,13 +477,21 @@ routes.get('/reportes', (req, res) => {
 });
 
 
-routes.post('/generarCitatorio', (req, res) => {
-    console.log("Citatorio: ",req.body);
+routes.post('/generarCitatorio', async (req, res) => {
+    try {
+        await generarCitatorio(req,res);
+      } catch (error) {
+        console.error(error);
+      }   
 });
 
 
-routes.post('/generarMandamiento', (req, res) => {
-    console.log("Mandamiento:", req.body);
+routes.post('/generarMandamiento', async (req, res) => {
+    try {
+        await generarMandamiento(req,res);
+      } catch (error) {
+        console.error(error);
+      }
 });
 
 
