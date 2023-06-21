@@ -252,7 +252,7 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
     
     // Agregar encabezados adicionales para las nuevas columnas cuando sean gastos
     if(value == 'gastos'){
-      const provioHeader = $('<th>').attr('scope', 'col').text('Provio .I.');
+      const provioHeader = $('<th>').attr('scope', 'col').text('Prov/o .I.');
       const fechaPagoHeader = $('<th>').attr('scope', 'col').text('Fecha de pago');
       const cobradoHeader = $('<th>').attr('scope', 'col').text('Cobrado');
       const gastosEjecutor = $('<th>').attr('scope', 'col').text('G.E');
@@ -312,7 +312,7 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
       if (value == 'gastos'){
 
         const provioInput = $('<input>').attr({
-          type: 'text',
+          type: 'number',
           name: 'provio',
           value: ''
         }).addClass('form-control');
@@ -324,14 +324,14 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
         }).addClass('form-control');
 
         const cobradoInput = $('<input>').attr({
-          type: 'text',
+          type: 'number',
           name: 'cobrado',
           id: 'cobrado',
           value: ''
         }).addClass('form-control');
 
         const gastosInput = $('<input>').attr({
-          type: 'text',
+          type: 'number',
           name: 'gastos',
           id: 'gastos',
           value: ''
