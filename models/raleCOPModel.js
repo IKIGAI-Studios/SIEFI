@@ -75,7 +75,6 @@ const RaleCop = sequelize.define('rale_cop', {
     allowNull: false,
     defaultValue: 0,
   },
-
   cobrado_patron: {
     type: DataTypes.DOUBLE,
     allowNull: false

@@ -6,6 +6,7 @@ import {Op} from 'sequelize';
 import sequelize from '../database.js';
 import RaleCop from '../models/raleCOPModel.js';
 import RaleRcv from '../models/raleRCVModel.js';
+import Coin from '../models/coinModel.js'
 import path from 'path';
 import { generarInforme, generarGastos, generarMandamiento, generarCitatorio } from './funciones_main_routes.js';
 
@@ -377,7 +378,7 @@ routes.post('/asignarPatrones' , async (req, res) =>{
     
 });
 
-routes.post('/elimarAfilFiltrado', async(req, res) =>{
+routes.post('/eliminarAfilFiltrado', async(req, res) =>{
     try {
         const fechaAfil = req.body.selectAfil;
 
@@ -397,7 +398,7 @@ routes.post('/elimarAfilFiltrado', async(req, res) =>{
     }
 });
 
-routes.post('/elimarCoinFiltrado', async(req, res) =>{
+routes.post('/eliminarCoinFiltrado', async(req, res) =>{
     try {
         const fechaCoin = req.body.selectCoin;
 
@@ -417,7 +418,7 @@ routes.post('/elimarCoinFiltrado', async(req, res) =>{
     }
 });
 
-routes.post('/elimarRaleCOPFiltrado', async(req, res) =>{
+routes.post('/eliminarRaleCOPFiltrado', async(req, res) =>{
     try {
         const fechaRaleCOP = req.body.selectRaleCOP;
 
@@ -437,7 +438,7 @@ routes.post('/elimarRaleCOPFiltrado', async(req, res) =>{
     }
 });
 
-routes.post('/elimarRaleRCVFiltrado', async(req, res) =>{
+routes.post('/eliminarRaleRCVFiltrado', async(req, res) =>{
     try {
         const fechaRaleRCV = req.body.selectRaleRCV;
 
