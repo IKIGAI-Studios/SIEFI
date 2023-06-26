@@ -409,9 +409,7 @@ routes.post('/eliminarCoinFiltrado', async(req, res) =>{
               )
         });
 
-        res.render('loadInfo', { session: req.session});
-        req.session.loadInfo = 'Registros eliminados exitosamente';
-
+        res.redirect('/loadInfo');
     } catch(error) {
         console.log('Error al eliminar el Coin',error);
         res.redirect('/loadInfo');
@@ -429,9 +427,7 @@ routes.post('/eliminarRaleCOPFiltrado', async(req, res) =>{
               )
         });
 
-        res.render('loadInfo', { session: req.session});
-        req.session.loadInfo = 'Registros eliminados exitosamente';
-
+        res.redirect('/loadInfo');
     } catch(error) {
         console.log('Error al eliminar el Rale COP',error);
         res.redirect('/loadInfo');
@@ -449,9 +445,7 @@ routes.post('/eliminarRaleRCVFiltrado', async(req, res) =>{
               )
         });
 
-        res.render('loadInfo', { session: req.session});
-        req.session.loadInfo = 'Registros eliminados exitosamente';
-
+        res.redirect('/loadInfo');
     } catch(error) {
         console.log('Error al eliminar el Rale RCV',error);
         res.redirect('/loadInfo');

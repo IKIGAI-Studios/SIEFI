@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../database.js" ;
+import sequelize from "../database.js";
 
 const Coin = sequelize.define('Coin', {
   id_coin: {
@@ -24,7 +24,7 @@ const Coin = sequelize.define('Coin', {
     allowNull: false
   },
   reg_pat: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.STRING(12),
     allowNull: false
   },
   escencial: {
@@ -93,10 +93,18 @@ const Coin = sequelize.define('Coin', {
   },
   inc_actual: {
     type: DataTypes.STRING(100),
-    allowNull: false
+    allowNull: true
   },
   resultado: {
     type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: false
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
     allowNull: false
   }
 }, {

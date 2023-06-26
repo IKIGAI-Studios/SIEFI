@@ -9,7 +9,7 @@ let objRaleRCV;
 let insrt;
 
 $('#validateModal').on('hidden.bs.modal', function() {
-    location.reload();
+    location.href = '/loadInfo';
 })
 
 $('#Coin_input').on('change', function(e) {
