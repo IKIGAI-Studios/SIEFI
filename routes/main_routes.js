@@ -165,7 +165,6 @@ routes.post('/login', async (req, res) => {
 
         // Redireccionar al tipo de usuario
         if (user.type == "ejecutor") {
-            console.log(req.session.user)
             res.redirect('/reportes');
         } else {
             res.redirect('/loadInfo');
@@ -304,7 +303,7 @@ routes.post('/desasignarPatrones', async (req, res) => {
                 { where: { reg_pat: registros_patA } }
               )
               .then(() =>{
-                  console.log('Actualizado correctamente');
+                  console.log('Usuario Actualizado correctamente');
               })
               .catch(() => {
                   console.log('Error al actualizar');
@@ -318,7 +317,7 @@ routes.post('/desasignarPatrones', async (req, res) => {
                     { where: { reg_pat: reg } }
                   )
                   .then(() =>{
-                      console.log('Actualizado correctamente');
+                      console.log('Usuario Actualizado correctamente');
                   })
                   .catch(() => {
                       console.log('Error al actualizar');

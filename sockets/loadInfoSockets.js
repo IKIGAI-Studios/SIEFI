@@ -94,6 +94,14 @@ export function socket(io) {
           (regValid) => regValid !== undefined
         );
 
+        let reg_pat_no_ins = []
+        for (var i = 0; i < registrosNoInsertados.length; i++) {
+            if (reg_pat_no_ins.indexOf(registrosNoInsertados[i]) === -1) {
+                // Si el elemento no existe en el nuevo array, agregarlo
+                reg_pat_no_ins.push(registrosNoInsertados[i]);
+            }
+        }
+
         if (recordsToInsert.length > 0) {
           // Insertar los registros válidos en la tabla RaleCop
           await Coin.bulkCreate(recordsToInsert, { logging: false })
@@ -103,8 +111,9 @@ export function socket(io) {
                 msg: `
                 Lote [${lote}-${lote + 999}] insertado correctamente
                 ${
-                  registrosNoInsertados.length > 0
-                    ? `| ${registrosNoInsertados.length} registros no fueron insertados debido a que no estaban registrados en la tabla afil: ` + registrosNoInsertados
+                    reg_pat_no_ins.length > 0
+                    ? `| ${reg_pat_no_ins.length} registros no fueron insertados debido a que no estaban registrados en la tabla afil: ` +
+                    reg_pat_no_ins
                     : "Todos los registros patronales fueron insertador correctamente"
                 }
               `,
@@ -230,6 +239,14 @@ export function socket(io) {
           (regValid) => regValid !== undefined
         );
 
+        let reg_pat_no_ins = []
+        for (var i = 0; i < registrosNoInsertados.length; i++) {
+            if (reg_pat_no_ins.indexOf(registrosNoInsertados[i]) === -1) {
+                // Si el elemento no existe en el nuevo array, agregarlo
+                reg_pat_no_ins.push(registrosNoInsertados[i]);
+            }
+        }
+
         if (recordsToInsert.length > 0) {
           // Insertar los registros válidos en la tabla RaleCop
           await RaleCop.bulkCreate(recordsToInsert, { logging: false })
@@ -239,8 +256,9 @@ export function socket(io) {
                 msg: `
                 Lote [${lote}-${lote + 999}] insertado correctamente
                 ${
-                  registrosNoInsertados.length > 0
-                    ? `| ${registrosNoInsertados.length} registros no fueron insertados debido a que no estaban registrados en la tabla afil: ` + registrosNoInsertados
+                    reg_pat_no_ins.length > 0
+                    ? `| ${reg_pat_no_ins.length} registros no fueron insertados debido a que no estaban registrados en la tabla afil: ` +
+                    reg_pat_no_ins
                     : "Todos los registros patronales fueron insertador correctamente"
                 }
               `,
@@ -324,6 +342,14 @@ export function socket(io) {
           (regValid) => regValid !== undefined
         );
 
+        let reg_pat_no_ins = []
+        for (var i = 0; i < registrosNoInsertados.length; i++) {
+            if (reg_pat_no_ins.indexOf(registrosNoInsertados[i]) === -1) {
+                // Si el elemento no existe en el nuevo array, agregarlo
+                reg_pat_no_ins.push(registrosNoInsertados[i]);
+            }
+        }
+
         if (recordsToInsert.length > 0) {
           // Insertar los registros válidos en la tabla RaleCop
           await RaleRcv.bulkCreate(recordsToInsert, { logging: false })
@@ -333,8 +359,9 @@ export function socket(io) {
                 msg: `
                 Lote [${lote}-${lote + 999}] insertado correctamente
                 ${
-                  registrosNoInsertados.length > 0
-                    ? `| ${registrosNoInsertados.length} registros no fueron insertados debido a que no estaban registrados en la tabla afil: ` + registrosNoInsertados
+                    reg_pat_no_ins.length > 0
+                    ? `| ${reg_pat_no_ins.length} registros no fueron insertados debido a que no estaban registrados en la tabla afil: ` +
+                        reg_pat_no_ins
                     : "Todos los registros patronales fueron insertador correctamente"
                 }
               `,
@@ -925,7 +952,7 @@ function processRale(file) {
     // Convertir a número decimal los que son necesarios
     obj["NUM.CRED."] = obj["NUM.CRED."] ? parseFloat(obj["NUM.CRED."]) : 0;
     obj["I M P O R T E"] = obj["I M P O R T E"]
-      ? parseFloat(obj["I M P O R T E"])
+      ? parseFloat(obj["I M P O R T E"].replace(/,/g, "").replace(".", "."))
       : 0;
 
     // Convertir a fecha los que sean necesarios
@@ -989,14 +1016,13 @@ async function processAfil(file) {
 
   let eje = await Ejecutor.findAll();
   eje = eje.map((obj) => obj.dataValues);
-  let dict = {} 
+  let dict = {};
   eje.map((item) => {
-        if (item.type === 'ejecutor' && item.status == 1) {
-            dict[item.nombre] = item.clave_eje;
-        }
+    if (item.type === "ejecutor" && item.status == 1) {
+      dict[item.nombre] = item.clave_eje;
+    }
   });
-  dict['FORANEO'] = "E-00000000";
-  console.log(dict);
+  dict["No asignado"] = "E-00000000";
 
   // Procesar los datos
   const result = [];
@@ -1041,7 +1067,7 @@ async function processAfil(file) {
         obj[header] = value;
       }
     }
-    obj.EJECUTOR = obj.EJECUTOR ?? "FORANEO";
+    obj.EJECUTOR = obj.EJECUTOR == 0 || obj.EJECUTOR == "" || obj.EJECUTOR === null ? "No asignado" : obj.EJECUTOR;
     obj.CLAVE = dict[obj.EJECUTOR];
     result.push(obj);
   }

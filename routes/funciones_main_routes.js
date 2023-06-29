@@ -297,7 +297,7 @@ export async function generarInforme (req, res){
     // Guardar el archivo modificado
     await workbook.xlsx.writeFile(outputFilePath);
     
-    console.log('Archivo modificado guardado:', outputFilePath);
+    console.log('Archivo modificado guardado:', outputFilePath);s
     
     // Descargar el archivo modificado
     const fileContent = fs.readFileSync(outputFilePath);
