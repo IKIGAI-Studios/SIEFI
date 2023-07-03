@@ -33,6 +33,8 @@ socket.on("servidor:estIndividuales", ({ data }) => {
 });
 
 socket.on("servidor:estIndividualesConfronta", ({ data }) => {
+    console.log(data)
+    confronta = data;
     var encontrado = false;
     for (var i = 0; i < dataStats.rales.length; i++) {
         encontrado = false;
@@ -56,9 +58,10 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
     (obj) =>
         obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31) && !obj.cobrado
     ).length;
-    cuotas.coin = dataStats.coin
+
+    cuotas.coin_dilig += dataStats.coin
     .map((coin) =>
-        data.rales.filter(
+        regFal.rales.filter(
         (rale) =>
             (rale.inc == 2 || rale.inc == 31) &&
             rale.type == "cuotas" &&
@@ -67,56 +70,24 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
         )
     )
     .filter((objetos) => objetos.length > 0).length;
-    cuotas.coin_dilig = dataStats.coin
-    .map((coin) =>
-        dataStats.rales.filter(
-        (rale) =>
-            (rale.inc == 2 || rale.inc == 31) &&
-            rale.type == "cuotas" &&
-            rale.reg_pat == coin.reg_pat &&
-            rale.nom_cred == coin.num_credito &&
-            rale.cobrado
-        )
-    )
-    .filter((objetos) => objetos.length > 0).length;
-    cuotas.dil = dataStats.rales.filter(
+
+    cuotas.dil = regFal.rales.filter(
     (obj) =>
-        obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31) && obj.cobrado
+        obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31)
     ).length;
-    cuotas.inc_09 = dataStats.rales.filter(
-    (obj) => obj.inc === 9 && obj.type === "cuotas"
-    ).length;
-    cuotas.embargo = dataStats.rales.filter(
-    (obj) =>
-        obj.type === "cuotas" &&
-        (obj.inc == 2 || obj.inc == 31) &&
-        (obj.res_dil == 33 || obj.res_dil == 43)
-    ).length;
-    cuotas.citatorios = dataStats.rales.filter(
-    (obj) =>
-        obj.type === "cuotas" &&
-        (obj.inc == 2 || obj.inc == 31) &&
-        obj.res_dil == "citatorio"
-    ).length;
-    $("#CUOTAS_asignado").text(cuotas.asig);
+
     $("#CUOTAS_pendiente").text(cuotas.pen);
-    $("#CUOTAS_coin").text(cuotas.coin);
     $("#CUOTAS_coin_dilig").text(cuotas.coin_dilig);
     $("#CUOTAS_diligenciado").text(cuotas.dil);
-    $("#CUOTAS_inc_09").text(cuotas.inc_09);
-    $("#CUOTAS_embargo").text(cuotas.embargo);
-    $("#CUOTAS_citatorios").text(cuotas.citatorios);
 
-    rcv.asignado = dataStats.rales.filter(
-    (obj) => obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31)
-    ).length;
-    rcv.pendiente = dataStats.rales.filter(
+    rcv.pendiente = data.rales.filter(
     (obj) =>
         obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31) && !obj.cobrado
     ).length;
-    rcv.coin = dataStats.coin
+
+    rcv.coin_dilig += dataStats.coin
     .map((coin) =>
-        dataStats.rales.filter(
+        regFal.rales.filter(
         (rale) =>
             (rale.inc == 2 || rale.inc == 31) &&
             rale.type == "rcv" &&
@@ -125,46 +96,15 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
         )
     )
     .filter((objetos) => objetos.length > 0).length;
-    rcv.coin_dilig = dataStats.coin
-    .map((coin) =>
-        dataStats.rales.filter(
-        (rale) =>
-            (rale.inc == 2 || rale.inc == 31) &&
-            rale.type == "rcv" &&
-            rale.reg_pat == coin.reg_pat &&
-            rale.nom_cred == coin.num_credito &&
-            rale.cobrado
-        )
-    )
-    .filter((objetos) => objetos.length > 0).length;
-    rcv.dil = dataStats.rales.filter(
+
+    cuotas.dil = regFal.rales.filter(
     (obj) =>
-        obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31) && obj.cobrado
-    ).length;
-    rcv.inc_09 = dataStats.rales.filter(
-    (obj) => obj.inc === 9 && obj.type === "rcv"
-    ).length;
-    rcv.embargo = dataStats.rales.filter(
-    (obj) =>
-        obj.type === "rcv" &&
-        (obj.inc == 2 || obj.inc == 31) &&
-        (obj.res_dil == 33 || obj.res_dil == 43)
-    ).length;
-    rcv.citatorio = dataStats.rales.filter(
-    (obj) =>
-        obj.type === "rcv" &&
-        (obj.inc == 2 || obj.inc == 31) &&
-        obj.res_dil == "citatoio"
+        obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31)
     ).length;
 
-    $("#RCV_asignado").text(rcv.asignado);
     $("#RCV_pendiente").text(rcv.pendiente);
-    $("#RCV_coin").text(rcv.coin);
     $("#RCV_coin_dilig").text(rcv.coin_dilig);
     $("#RCV_diligenciado").text(rcv.dil);
-    $("#RCV_inc_09").text(rcv.inc_09);
-    $("#RCV_embargo").text(rcv.embargo);
-    $("#RCV_citatorios").text(rcv.citatorio);
 
     cop_rcv.entregados = cuotas.asig + rcv.asignado;
     cop_rcv.req_pago = cuotas.dil + rcv.dil;
