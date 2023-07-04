@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon index"
+    "server": "nodemon index --ignore 'src/js/*.js'"
   },
   "repository": {
     "type": "git",

@@ -13,8 +13,8 @@ let dataStats,
   oports = {},
   imp = {},
   confronta = {},
-  regFal = {rales: []};
-  regExis = {rales: []}
+  regFal = { rales: [] };
+regExis = { rales: [] };
 
 window.onload = function () {
   socket.emit("cliente:consultarRegistrosRaleCOP");
@@ -25,7 +25,7 @@ window.onload = function () {
 socket.on("servidor:estIndividuales", ({ data }) => {
   dataStats = data;
   fillFilters();
-  showTable();
+  showTable("inicio");
   fillStats();
   $("#dateCOPscnd").prop("disabled", false);
   $("#dateRCVscnd").prop("disabled", false);
@@ -33,183 +33,177 @@ socket.on("servidor:estIndividuales", ({ data }) => {
 });
 
 socket.on("servidor:estIndividualesConfronta", ({ data }) => {
-    console.log(data)
-    confronta = data;
-    var encontrado = false;
-    for (var i = 0; i < dataStats.rales.length; i++) {
-        encontrado = false;
-        var reg_pat = dataStats.rales[i].reg_pat;
-        var nom_cred = dataStats.rales[i].nom_cred;
+  confronta = data;
+  var encontrado = false;
+  for (var i = 0; i < dataStats.rales.length; i++) {
+    encontrado = false;
+    var reg_pat = dataStats.rales[i].reg_pat;
+    var nom_cred = dataStats.rales[i].nom_cred;
 
-        // Verifica si el registro existe en el nuevo objeto 'rales'
-        for (var j = 0; j < data.rales.length; j++) {
-        if (data.rales[j].reg_pat === reg_pat && data.rales[j].nom_cred === nom_cred) {
-            regExis.rales.push(dataStats.rales[i]);
-            encontrado = true;
-            break;
-        }
-        }
-
-        // Agrega el registro al arreglo correspondiente
-        if (!encontrado) regFal.rales.push(dataStats.rales[i])
+    // Verifica si el registro existe en el nuevo objeto 'rales'
+    for (var j = 0; j < data.rales.length; j++) {
+      if (
+        data.rales[j].reg_pat === reg_pat &&
+        data.rales[j].nom_cred === nom_cred
+      ) {
+        regExis.rales.push(dataStats.rales[i]);
+        encontrado = true;
+        break;
+      }
     }
 
-    cuotas.pen = data.rales.filter(
-    (obj) =>
-        obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31) && !obj.cobrado
-    ).length;
+    // Agrega el registro al arreglo correspondiente
+    if (!encontrado) regFal.rales.push(dataStats.rales[i]);
+  }
 
-    cuotas.coin_dilig += dataStats.coin
+  cuotas.asig = data.rales.filter(
+    (obj) => obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31)
+  ).length;
+
+  cuotas.pen = data.rales.filter(
+    (obj) => obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31)
+  ).length;
+
+  cuotas.pen = data.rales.filter(
+    (obj) =>
+      obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31) && !obj.cobrado
+  ).length;
+
+  cuotas.coin_dilig += dataStats.coin
     .map((coin) =>
-        regFal.rales.filter(
+      regFal.rales.filter(
         (rale) =>
-            (rale.inc == 2 || rale.inc == 31) &&
-            rale.type == "cuotas" &&
-            rale.reg_pat == coin.reg_pat &&
-            rale.nom_cred == coin.num_credito
-        )
+          (rale.inc == 2 || rale.inc == 31) &&
+          rale.type == "cuotas" &&
+          rale.reg_pat == coin.reg_pat &&
+          rale.nom_cred == coin.num_credito
+      )
     )
     .filter((objetos) => objetos.length > 0).length;
 
-    cuotas.dil = regFal.rales.filter(
+  cuotas.dil = regFal.rales.filter(
+    (obj) => obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31)
+  ).length;
+
+  $("#CUOTAS_asignado").text(cuotas.asig);
+  $("#CUOTAS_pendiente").text(cuotas.pen);
+  $("#CUOTAS_coin_dilig").text(cuotas.coin_dilig);
+  $("#CUOTAS_diligenciado").text(cuotas.dil);
+
+  rcv.asignado = data.rales.filter(
+    (obj) => obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31)
+  ).length;
+
+  rcv.pendiente = data.rales.filter(
     (obj) =>
-        obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31)
-    ).length;
+      obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31) && !obj.cobrado
+  ).length;
 
-    $("#CUOTAS_pendiente").text(cuotas.pen);
-    $("#CUOTAS_coin_dilig").text(cuotas.coin_dilig);
-    $("#CUOTAS_diligenciado").text(cuotas.dil);
-
-    rcv.pendiente = data.rales.filter(
-    (obj) =>
-        obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31) && !obj.cobrado
-    ).length;
-
-    rcv.coin_dilig += dataStats.coin
+  rcv.coin_dilig += dataStats.coin
     .map((coin) =>
-        regFal.rales.filter(
+      regFal.rales.filter(
         (rale) =>
-            (rale.inc == 2 || rale.inc == 31) &&
-            rale.type == "rcv" &&
-            rale.reg_pat == coin.reg_pat &&
-            rale.nom_cred == coin.num_credito
-        )
+          (rale.inc == 2 || rale.inc == 31) &&
+          rale.type == "rcv" &&
+          rale.reg_pat == coin.reg_pat &&
+          rale.nom_cred == coin.num_credito
+      )
     )
     .filter((objetos) => objetos.length > 0).length;
 
-    cuotas.dil = regFal.rales.filter(
+  rcv.dil = regFal.rales.filter(
+    (obj) => obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31)
+  ).length;
+
+  $("#RCV_asignado").text(rcv.asignado);
+  $("#RCV_pendiente").text(rcv.pendiente);
+  $("#RCV_coin_dilig").text(rcv.coin_dilig);
+  $("#RCV_diligenciado").text(rcv.dil);
+
+  cop_rcv.entregados = cuotas.asig + rcv.asignado;
+  cop_rcv.req_pago = cuotas.dil + rcv.dil;
+  cop_rcv.no_local = cuotas.inc_09 + rcv.inc_09;
+  cop_rcv.embargo = cuotas.embargo + rcv.embargo;
+  cop_rcv.citatorios = cuotas.citatorios + rcv.citatorio;
+  cop_rcv.notif = data.rales.filter(
     (obj) =>
-        obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31)
-    ).length;
+      (obj.type === "rcv" || obj.type === "cop") &&
+      (obj.inc == 2 || obj.inc == 31) &&
+      obj.res_dil == "NOTIFICACIÓN"
+  ).length;
 
-    $("#RCV_pendiente").text(rcv.pendiente);
-    $("#RCV_coin_dilig").text(rcv.coin_dilig);
-    $("#RCV_diligenciado").text(rcv.dil);
+  $("#COP_RCV_entregados").text(cop_rcv.entregados);
+  $("#COP_RCV_req_pago").text(cop_rcv.req_pago);
+  $("#COP_RCV_no_local").text(cop_rcv.no_local);
+  $("#COP_RCV_embargo").text(cop_rcv.embargo);
+  $("#COP_RCV_citatorios").text(cop_rcv.citatorios);
+  $("#COP_RCV_notif").text(cop_rcv.notif);
 
-    cop_rcv.entregados = cuotas.asig + rcv.asignado;
-    cop_rcv.req_pago = cuotas.dil + rcv.dil;
-    cop_rcv.no_local = cuotas.inc_09 + rcv.inc_09;
-    cop_rcv.embargo = cuotas.embargo + rcv.embargo;
-    cop_rcv.citatorios = cuotas.citatorios + rcv.citatorio;
-    cop_rcv.notif = dataStats.rales.filter(
-    (obj) =>
-        (obj.type === "rcv" || obj.type === "cop") &&
-        (obj.inc == 2 || obj.inc == 31) &&
-        obj.res_dil == "NOTIFICACIÓN"
-    ).length;
+  fecha = new Date($("#dateCOPfrst").val());
 
-    $("#COP_RCV_entregados").text(cop_rcv.entregados);
-    $("#COP_RCV_req_pago").text(cop_rcv.req_pago);
-    $("#COP_RCV_no_local").text(cop_rcv.no_local);
-    $("#COP_RCV_embargo").text(cop_rcv.embargo);
-    $("#COP_RCV_citatorios").text(cop_rcv.citatorios);
-    $("#COP_RCV_notif").text(cop_rcv.notif);
-
-    fecha = new Date($("#dateCOPfrst").val());
-
-    dates.fec_ini = new Date(
-    fecha.getFullYear(),
-    fecha.getMonth(),
-    1
-    ).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    });
-    dates.fec_fin = new Date(
-    fecha.getFullYear(),
-    fecha.getMonth() + 1,
-    0
-    ).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    });
-    dates.laborales =
-    getWorkDays(fecha.getMonth(), fecha.getFullYear()).length -
-    ($("#inp_DATES_fes").val() != "" ? $("#inp_DATES_fes").val() : 0);
-    dates.dilig = dates.laborales * 5;
-    dates.pat_dilig =
+  dates.pat_dilig =
     cuotas.dil +
     cuotas.inc_09 +
     cuotas.embargo +
     rcv.dil +
     rcv.inc_09 +
     rcv.embargo;
-    dates.productividad = ((dates.pat_dilig / dates.dilig) * 100).toFixed(2);
-    dates.ava_coin = ((cuotas.coin_dilig / cuotas.coin) * 100).toFixed(2);
-    oports.dos = dataStats.rales.filter(
+  dates.productividad = ((dates.pat_dilig / dates.dilig) * 100).toFixed(2);
+  dates.ava_coin = ((cuotas.coin_dilig / cuotas.coin) * 100).toFixed(2);
+  oports.dos = data.rales.filter(
     (obj) => (obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "En tiempo 2"
-    ).length;
-    oports.tres_uno = dataStats.rales.filter(
+  ).length;
+  oports.tres_uno = data.rales.filter(
     (obj) =>
-        (obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "En tiempo 31"
-    ).length;
-    oports.fuera = dataStats.rales.filter(
+      (obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "En tiempo 31"
+  ).length;
+  oports.fuera = data.rales.filter(
     (obj) =>
-        (obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "Fuera de tiempo"
-    ).length;
-    dates.opor_docs = (
+      (obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "Fuera de tiempo"
+  ).length;
+  dates.opor_docs = (
     ((oports.dos + oports.tres_uno) /
-        (oports.dos + oports.tres_uno + oports.fuera)) *
+      (oports.dos + oports.tres_uno + oports.fuera)) *
     100
-    ).toFixed(2);
-    imp.dos = dataStats.rales
+  ).toFixed(2);
+  imp.dos = data.rales
     .filter(
-        (obj) =>
+      (obj) =>
         (obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "En tiempo 2"
     )
     .reduce((acumulador, obj) => acumulador + obj.importe, 0);
-    imp.tres_uno = dataStats.rales
+  imp.tres_uno = data.rales
     .filter(
-        (obj) =>
+      (obj) =>
         (obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "En tiempo 31"
     )
     .reduce((acumulador, obj) => acumulador + obj.importe, 0);
-    imp.fuera = dataStats.rales
+  imp.fuera = data.rales
     .filter(
-        (obj) =>
+      (obj) =>
         (obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "Fuera de tiempo"
     )
     .reduce((acumulador, obj) => acumulador + obj.importe, 0);
-    dates.opor_imp = (
+  dates.opor_imp = (
     ((imp.dos + imp.tres_uno) / (imp.dos + imp.tres_uno + imp.fuera)) *
     100
-    ).toFixed(2);
-    dates.oport = (parseInt(dates.opor_docs) + parseInt(dates.opor_imp)) / 2;
+  ).toFixed(2);
+  dates.oport = (parseInt(dates.opor_docs) + parseInt(dates.opor_imp)) / 2;
 
-    $("#DATES_fec_ini").text(dates.fec_ini);
-    $("#DATES_fec_fin").text(dates.fec_fin);
-    $("#DATES_laborales").text(dates.laborales);
-    $("#DATES_dilig").text(dates.dilig);
-    $("#DATES_pat_dilig").text(dates.pat_dilig);
-    $("#DATES_product").text(dates.productividad + "%");
-    $("#DATES_ava_coin").text(dates.ava_coin + "%");
-    $("#DATES_opor_docs").text(dates.opor_docs + "%");
-    $("#DATES_opor_imp").text(dates.opor_imp + "%");
-    $("#DATES_opor").text(dates.oport + "%");
+  $("#DATES_fec_ini").text(dates.fec_ini);
+  $("#DATES_fec_fin").text(dates.fec_fin);
+  $("#DATES_laborales").text(dates.laborales);
+  $("#DATES_dilig").text(dates.dilig);
+  $("#DATES_pat_dilig").text(dates.pat_dilig);
+  $("#DATES_product").text(dates.productividad + "%");
+  $("#DATES_ava_coin").text(dates.ava_coin + "%");
+  $("#DATES_opor_docs").text(dates.opor_docs + "%");
+  $("#DATES_opor_imp").text(dates.opor_imp + "%");
+  $("#DATES_opor").text(dates.oport + "%");
 
-    getGraphics();
+  showGraphics("canvas-coin-31", (cuotas.coin / cuotas.coin_dilig) * 10);
+  showGraphics("canvas-prod-ind", (dates.dilig / dates.pat_dilig) * 10);
+  showTable("confronta");
 });
 
 socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
@@ -418,12 +412,8 @@ $("#div-scnd-selects").on("change", "#dateCOPscnd", function () {
     $(this).val() != "false"
   );
   if ($(this).val() != "false")
-    if (
-      $("#dateRCVscnd").val() != "false" 
-    ) {
-      if (
-        $("#dateRCVscnd").val() != $(this).val() 
-      )
+    if ($("#dateRCVscnd").val() != "false") {
+      if ($("#dateRCVscnd").val() != $(this).val())
         bsAlert(
           "Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
           "warning"
@@ -439,12 +429,8 @@ $("#div-scnd-selects").on("change", "#dateRCVscnd", function () {
     $(this).val() != "false"
   );
   if ($(this).val() != "false")
-    if (
-      $("#dateCOPscnd").val() != "false" 
-    ) {
-      if (
-        $("#dateCOPscnd").val() != $(this).val() 
-      )
+    if ($("#dateCOPscnd").val() != "false") {
+      if ($("#dateCOPscnd").val() != $(this).val())
         bsAlert(
           "Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
           "warning"
@@ -469,15 +455,12 @@ $("#inp_DATES_fes").on("change", function () {
 });
 
 function getConfronta() {
-  console.log(
-    $("#dateRCVscnd").val(),
-    $("#dateCOPscnd").val()
-  );
+  console.log($("#dateRCVscnd").val(), $("#dateCOPscnd").val());
 
   socket.emit("cliente:confrontaEstInd", {
     ejecutor: $("#nombreEjecutor").val(),
     copDate: $("#dateCOPscnd").val(),
-    rcvDate: $("#dateRCVscnd").val()
+    rcvDate: $("#dateRCVscnd").val(),
   });
 }
 
@@ -823,7 +806,77 @@ function fillStats() {
   $("#DATES_opor_imp").text(dates.opor_imp + "%");
   $("#DATES_opor").text(dates.oport + "%");
 
-  getGraphics();
+  showGraphics("canvas-coin-31", (cuotas.coin / cuotas.coin_dilig) * 10);
+  showGraphics("canvas-prod-ind", (dates.dilig / dates.pat_dilig) * 10);
+}
+
+function showGraphics(id, perc) {
+  // Obtén el elemento canvas
+  var canvas = document.getElementById(id);
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Configuración del dona
+  var centerX = canvas.width / 2;
+  var centerY = canvas.height;
+  var outerRadius = 120;
+  var innerRadius = 80;
+
+  // Colores para las secciones
+  var colors = ["#FF0000", "#FFA500", "#FFFF00", "#00FF00", "#0000FF"];
+
+  // Dibujar seccion por seccion
+  colors.map((color, i) => {
+    let start = (180 + i * (180 / colors.length)) * (Math.PI / 180),
+      end = (180 + (i + 1) * (180 / colors.length)) * (Math.PI / 180);
+    // Dibuja la dona
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, outerRadius, start, end);
+    ctx.arc(centerX, centerY, innerRadius, end, start, true);
+    ctx.closePath();
+
+    // Establece el color de relleno y trazo
+    ctx.fillStyle = color;
+    ctx.strokeStyle = "#000000";
+
+    // Aplica el color de relleno y trazo
+    ctx.fill();
+    ctx.stroke();
+
+    // Agrega el número dentro de la sección
+    var sectionNumber = i + 1;
+    var sectionText = sectionNumber.toString();
+    var sectionAngle = (start + end) / 2; // Ángulo medio de la sección
+    var textX = centerX + Math.cos(sectionAngle) * (innerRadius + (outerRadius - innerRadius) / 2);
+    var textY = centerY + Math.sin(sectionAngle) * (innerRadius + (outerRadius - innerRadius) / 2);
+
+    ctx.fillStyle = "#000000"; // Color del texto
+    ctx.font = "20px Arial"; // Fuente y tamaño del texto
+    ctx.textAlign = "center"; // Alineación del texto
+    ctx.textBaseline = "middle"; // Baseline del texto
+    ctx.fillText(sectionText, textX, textY); // Dibuja el texto dentro de la sección
+  });
+
+  // Calcular el ángulo correspondiente al porcentaje
+  var radianes = (((360 - 180) * perc / 100) + 180) * (Math.PI / 180);
+
+  // Calcular las coordenadas de la punta de la flecha
+  var x = centerX + Math.cos(radianes) * 95;
+  var y = centerY + Math.sin(radianes) * 95;
+
+  // Dibujar la flecha
+  ctx.beginPath();
+  ctx.moveTo(centerX, centerY);
+  ctx.lineTo(x, y);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "black";
+  ctx.stroke();
+
+  // Dibujar el círculo en la punta de la flecha
+  ctx.beginPath();
+  ctx.arc(x, y, 5, 0, Math.PI * 2);
+  ctx.fillStyle = "black";
+  ctx.fill();
 }
 
 async function getGraphics() {
@@ -910,12 +963,12 @@ function updateFilters(group, n, act) {
     default:
       break;
   }
-  showTable();
+  showTable("inicio");
 }
 
-function showTable() {
+function showTable(type) {
+  let data = type == "inicio" ? dataStats.rales : confronta.rales;
   $("#div-tabla-estadisticas-individuales").empty();
-  let data = dataStats.rales;
   if (data.length < 1) {
     bsAlert("El ejecutor no tiene ningun patron asignado", "danger");
     return;

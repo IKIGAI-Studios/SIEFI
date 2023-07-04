@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="/imgs/imss-logo.png">
     <title>Estadísticas individuales</title>
+    <style>
+        .canvas {
+          width: 300px;
+          height: 300px;
+        }
+    </style>
 
     <%- include('templates/header')%>
 
@@ -306,15 +312,14 @@
                     <div class="row">
                         <div class="col-sm m-3">
                             <h4 class="texto-green text-center mt-2">Coin 31</h4>
-                            <canvas id="canv_coin"></canvas>
+                            <canvas id="canvas-coin-31"></canvas>
                         </div>
                         <div class="col-sm m-3">
                             <h4 class="texto-green text-center mt-2">Productividad Individual</h4>
-                            <canvas id="canv_prod"></canvas>
+                            <canvas id="canvas-prod-ind"></canvas>
                         </div>
                     </div>
                 </div>
-            
             </div>
           </div>  
       </div>
