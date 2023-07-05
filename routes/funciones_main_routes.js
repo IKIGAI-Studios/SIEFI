@@ -1075,7 +1075,6 @@ export async function generarCitatorio(req, res) {
         console.error('Error al crear el archivo PDF:', err);
         res.status(500).send('Error al crear el archivo PDF');
     });
-
 }
 
 

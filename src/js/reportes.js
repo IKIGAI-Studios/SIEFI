@@ -1,5 +1,11 @@
 const socket = io('http://localhost:3000');
 
+// Events
+
+$('#btnCerrar').on('click', function() {
+    location.href = '/reportes';
+})
+
 // Sockets
 
 //Socket para pedir la información inicial al usuario. 
@@ -334,7 +340,8 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
         const provioInput = $('<input>').attr({
           type: 'number',
           name: 'provio',
-          value: ''
+          value: '',
+          min: 0
         }).addClass('form-control');
 
         const fechaPagoInput = $('<input>').attr({
@@ -347,14 +354,16 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
           type: 'number',
           name: 'cobrado',
           id: 'cobrado',
-          value: ''
+          value: '',
+          min: 0
         }).addClass('form-control');
 
         const gastosInput = $('<input>').attr({
           type: 'number',
           name: 'gastos',
           id: 'gastos',
-          value: ''
+          value: '',
+          min: 0
         }).addClass('form-control');
      
         
