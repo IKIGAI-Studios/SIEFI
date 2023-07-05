@@ -953,7 +953,7 @@ export async function generarCitatorio(req, res) {
         return `${mes}-${año}`;
     }
 
-    const datosRegistro = [["CRÉDITO", "PÉRIODO", "IMPORTE"], ...datosRegistros];
+    const datosRegistro = [["CRÉDITO", "PERIODO", "IMPORTE"], ...datosRegistros];
     margenSuperior = 250;
     anchoColumna = 160;
 
