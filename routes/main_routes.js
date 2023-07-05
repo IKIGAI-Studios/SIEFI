@@ -508,4 +508,22 @@ routes.post('/generarGastos', async (req, res) => {
 });
 
 
+//Rutas para visualizar patrones 
+routes.get('/verPatrones', (req, res) => {
+    console.log(req.session.user, )
+    // No existe la sesión
+    if (req.session.user === undefined) {
+        res.redirect('/login');
+        return;
+    }
+
+    // No es ejecutor
+    if (req.session.user.tipo_usuario != 'ejecutor') {
+        res.redirect('/login');
+        return;
+    }
+    res.render('verpatrones', { session: req.session });
+});
+
+
 export default routes;

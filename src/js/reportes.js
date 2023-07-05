@@ -3,7 +3,8 @@ const socket = io('http://localhost:3000');
 // Sockets
 
 //Socket para pedir la información inicial al usuario. 
-socket.on('servidor:capturarDatos', (data, value, clave_eje) => {
+socket.on('servidor:capturarDatos', (data, registros, value, clave_eje) => {
+
   
   $('#div-ingresar-registro-patronal').empty();
   $('#generarReportesRPModal').modal('show');
@@ -11,7 +12,7 @@ socket.on('servidor:capturarDatos', (data, value, clave_eje) => {
   
 
   // Crear el input, el link y el select
-  const input = $('<input type="text" id="patronInput" class="form-control form-control-sm w-50" placeholder="Registro Patronal">');
+  const selectR  = $('<select id="registroSelect" class="form-control form-control-sm w-50">');
   const select = $('<select id="fechaSelect" class="form-control form-control-sm w-50">');
   const link = $('<a href="#" class="btn btn-primary disabled ml-3">Aceptar</a>');
   
@@ -19,9 +20,15 @@ socket.on('servidor:capturarDatos', (data, value, clave_eje) => {
   // Obtener las fechas distintas del campo createdAt en el objeto data
   const fechasDistintas = Array.from(new Set(data.map(item => item)));
 
+  //Obtener los registros patronales diferentes y no cobrados en el objeto registro 
+  const registrosDistintos = Array.from(new Set(registros.map(item => item))).sort();
+
   // Agregar el elemento de selección por defecto
-  const defaultOption = $('<option>').text('Seleccionar').val('0').prop('selected', true);
-  select.append(defaultOption);
+  const defaultOption = $('<option>').text('Seleccionar registro patronal').val('0').prop('selected', true);
+  selectR.append(defaultOption);
+  const defaultOption2 = $('<option>').text('Seleccionar fecha').val('0').prop('selected', true);
+  select.append(defaultOption2);
+
 
   // Agregar las opciones al select con las fechas distintas
   fechasDistintas.forEach(fecha => {
@@ -29,14 +36,20 @@ socket.on('servidor:capturarDatos', (data, value, clave_eje) => {
     select.append(option);
   });  
 
+    // Agregar las opciones al select con los registros distintos
+    registrosDistintos.forEach(registro => {
+      const option = $('<option>').text(registro).val(registro);
+      selectR.append(option);
+    });  
+
   // Agregar el input y el enlace al div de ingreso de registro patronal
-  $('#div-ingresar-registro-patronal').append(input);
+  $('#div-ingresar-registro-patronal').append(selectR);
   $('#div-ingresar-registro-patronal').append(select);
   $('#div-ingresar-registro-patronal').append(link);
 
-  // Manejar el evento input del input
-  input.on('input', function() {
-    if ($(this).val() !== '') {
+  // Manejar el change del select
+  selectR.on('change', function() {
+    if ($(this).val() !== '0') {
       link.removeClass('disabled');
     } else {
       link.addClass('disabled');
@@ -50,7 +63,7 @@ socket.on('servidor:capturarDatos', (data, value, clave_eje) => {
     const opcionSeleccionada = $('#fechaSelect').val();
     
     if (opcionSeleccionada !== '0'){
-      const patron = $('#patronInput').val();
+      const patron = $('#registroSelect').val();
       const fecha = $('#fechaSelect').val();
       $('#div-ingresar-registro-patronal').text("Cargando...");
       socket.emit('cliente:obtenerPatrones', patron, fecha, value, clave_eje);
@@ -134,10 +147,10 @@ socket.on('servidor:obtenerPatrones', (data, value, user) => {
 
       //Switch para cambiar el color dependiendo del status del registro
       switch (obj.cobrado) {
-        case true:
+        case 'Cobrado':
           dataRow.addClass('table-primary');
           break;
-        case false:
+        case 'No cobrado':
           dataRow.addClass('table-success');
           break;
           default:
@@ -165,13 +178,20 @@ socket.on('servidor:obtenerPatrones', (data, value, user) => {
         dataCell.appendTo(dataRow);
       });
 
-      // Agregar columna adicional para seleccionar los registros. 
+      // Agregar columna adicional para seleccionar los registros
       const checkboxCell = $('<td>');
       const checkbox = $('<input type="checkbox" id="selectPatrones" class="select-registro" name="opcion">').attr('value', JSON.stringify(obj));
       checkbox.appendTo(checkboxCell);
       checkboxCell.prependTo(dataRow);
       $('#btnGenerarForms').show();
-        
+
+
+      if (value == 'mandamiento' || value == 'citatorio' ){
+        // Verificar si la incidencia es 31, y si lo es, seleccionar el registro por defecto. 
+        if (obj.inc === 31) {
+          checkbox.prop('checked', true);
+        }
+      }
 
       dataRow.appendTo(tbody);
 
@@ -187,22 +207,22 @@ socket.on('servidor:obtenerPatrones', (data, value, user) => {
     if (value === 'informe' || value === 'gastos') tableContainer.appendTo('#div-formularios-reportes'); 
 
    
-  // Habilitar o deshabilitar el botón según las selecciones
-  const select = $('#selectPatrones');
-  select.on('change', function() {
+    // Habilitar o deshabilitar el botón según las selecciones
+    const select = $('#selectPatrones');
+    select.on('change', function() {
+      actualizarEstadoBoton(value, user);
+    });
+
+    // Llamar a la función para establecer el estado inicial del botón
     actualizarEstadoBoton(value, user);
-  });
 
-  // Llamar a la función para establecer el estado inicial del botón
-  actualizarEstadoBoton(value, user);
+    //Mandar a diferentes rutas 
+    const form = $("#reportesForm");
 
-  //Mandar a diferentes rutas 
-  const form = $("#reportesForm");
-
-  //Mandar a la ruta de acuerdo a su valor 
-  if (value == 'mandamiento') form.attr('action', '/generarMandamiento');
-  if (value == 'citatorio') form.attr('action', '/generarCitatorio');
-    
+    //Mandar a la ruta de acuerdo a su valor 
+    if (value == 'mandamiento') form.attr('action', '/generarMandamiento');
+    if (value == 'citatorio') form.attr('action', '/generarCitatorio');
+      
   }
 });
 
@@ -252,7 +272,7 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
     
     // Agregar encabezados adicionales para las nuevas columnas cuando sean gastos
     if(value == 'gastos'){
-      const provioHeader = $('<th>').attr('scope', 'col').text('Prov/o .I.');
+      const provioHeader = $('<th>').attr('scope', 'col').text('Rev. Prov./ O.I.');
       const fechaPagoHeader = $('<th>').attr('scope', 'col').text('Fecha de pago');
       const cobradoHeader = $('<th>').attr('scope', 'col').text('Cobrado');
       const gastosEjecutor = $('<th>').attr('scope', 'col').text('G.E');
@@ -387,16 +407,15 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
 
     if (value == 'citatorio' || value == 'mandamiento') socket.emit('cliente:capturarDatos',  value, user);
 }
- 
 
 
 // Función para actualizar el estado del botón y obtener los registros de la tabla. 
 function actualizarEstadoBoton(value, user) {
   var btnGenerarForms;
 
-  if(value == 'informe' || value == 'gastos') btnGenerarForms = $('#btnGenerarForms');
+  if (value == 'informe' || value == 'gastos') btnGenerarForms = $('#btnGenerarForms');
   else btnGenerarForms = $('#btnGenerar');
-  
+
   const checkboxes = $('.select-registro');
 
   // Controlar la acción al presionar el botón
@@ -417,7 +436,15 @@ function actualizarEstadoBoton(value, user) {
 
     btnGenerarForms.prop('disabled', registrosSeleccionados.length === 0);
   });
+
+  // Establecer el estado inicial del botón según las selecciones
+  const registrosSeleccionadosInicial = checkboxes.filter(':checked').map(function() {
+    return JSON.parse($(this).val());
+  }).get();
+
+  btnGenerarForms.prop('disabled', registrosSeleccionadosInicial.length === 0);
 }
+
 
 
   

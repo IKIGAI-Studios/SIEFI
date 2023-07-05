@@ -30,7 +30,7 @@
         <div class="col-lg-8">
             <div class="d-flex justify-content-center">
                 <div class="col-2"><img src="/icons/hint.png" alt="hint"></div>
-                <div class="col-10"><p class="texto-hint mt-2">Generar Citatorios y mandamientos</p></div>
+                <div class="col-10"><p class="texto-hint mt-2">Ver patrones asignados</p></div>
             </div>
         </div>
       </div>
@@ -41,13 +41,13 @@
               <li class="active">
                 <h5>PATRONES</h5>
                 <ul class="">
-                    <li><a href="/verPatrones" class="sidebar-item ">VER PATRONES</a></li>
+                    <li><a href="/verPatrones" class="sidebar-item activo">VER PATRONES</a></li>
                 </ul>
               </li>
               <li class="active mt-3">
                 <h5>REPORTES</h5>
                 <ul class="">
-                    <li><a href="/reportes" class="sidebar-item activo">GENERAR REPORTES</a></li>
+                    <li><a href="/reportes" class="sidebar-item">GENERAR REPORTES</a></li>
                 </ul>
               </li>
               <li class="active mt-3">
@@ -60,39 +60,14 @@
         </div>
         <div class="col-10 space-around">
           <div id="perfil" class="contenido activo text-center">
-            <h2 class="texto-green text-center mt-2">Archivos</h2>
+            <h2 class="texto-green text-center mt-2">Patrones asignados</h2>
 
             <div class="">
               <div class="mt-3">
                 <div class="container">
-                  <h4 for="citatorio">Citatorios</h4>
-                  <button type="button" class="btn btn-primary mt-1" value="citatorio" onclick="generarReportes(this.value, '<%= session.user.clave_eje %>' )"> 
-                    Generar citatorio
+                  <button type="button" class="btn btn-primary mt-1" onclick="generarReportes(this.value, '<%= session.user.clave_eje %>' )"> 
+                    Descargar listado de patrones
                   </button>                                
-                </div>
-              </div>
-              <div class="mt-3">
-                <div class="container">
-                  <h4 for="mendamiento">Mandamiento</h4>
-                  <button type="button" class="btn btn-success mt-1" value="mandamiento" onclick="generarReportes(this.value, '<%= session.user.clave_eje %>')">
-                    Generar mandamiento
-                  </button>
-                </div>
-              </div>
-              <div class="mt-3">
-                <div class="container">
-                  <h4 for="informe">Informe diario</h4>
-                  <button type="button" class="btn btn-light mt-1" value="informe" onclick="generarReportes(this.value, '<%= session.user.clave_eje %>')">
-                    Generar informe diario
-                  </button>
-                </div>
-              </div>
-              <div class="mt-3">
-                <div class="container">
-                  <h4 for="gastos">Gastos de ejecutor</h4>
-                  <button type="button" class="btn btn-warning mt-1" value="gastos" onclick="generarReportes(this.value, '<%= session.user.clave_eje %>')">
-                    Generar gastos de ejecutor
-                  </button>
                 </div>
               </div>
             </div>

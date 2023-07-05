@@ -90,6 +90,18 @@ const RaleCop = sequelize.define('rale_cop', {
   res_dil: {
     type: DataTypes.STRING(100),
     allowNull: true
+  },
+  cobrado_patron: {
+    type: DataTypes.INTEGER(100),
+    allowNull: true
+  },  
+  gatos_ejecutor: {
+    type: DataTypes.INTEGER(100),
+    allowNull: true
+  },
+  citatorio: {
+    type: DataTypes.STRING(2),
+    allowNull: true
   }
 }, {
   tableName: 'rale_cop',
