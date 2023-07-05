@@ -869,13 +869,13 @@ function showGraphics(id, perc) {
   ctx.moveTo(centerX, centerY);
   ctx.lineTo(x, y);
   ctx.lineWidth = 2;
-  ctx.strokeStyle = "black";
+  ctx.strokeStyle = "#FF0000";
   ctx.stroke();
 
   // Dibujar el círculo en la punta de la flecha
   ctx.beginPath();
   ctx.arc(x, y, 5, 0, Math.PI * 2);
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "#FF0000";
   ctx.fill();
 }
 
