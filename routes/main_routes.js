@@ -377,7 +377,7 @@ routes.post('/asignarPatrones' , async (req, res) =>{
     
 });
 
-routes.post('/elimarAfilFiltrado', async(req, res) =>{
+routes.post('/eliminarAfilFiltrado', async(req, res) =>{
     try {
         const fechaAfil = req.body.selectAfil;
 
@@ -397,7 +397,7 @@ routes.post('/elimarAfilFiltrado', async(req, res) =>{
     }
 });
 
-routes.post('/elimarCoinFiltrado', async(req, res) =>{
+routes.post('/eliminarCoinFiltrado', async(req, res) =>{
     try {
         const fechaCoin = req.body.selectCoin;
 
@@ -417,7 +417,7 @@ routes.post('/elimarCoinFiltrado', async(req, res) =>{
     }
 });
 
-routes.post('/elimarRaleCOPFiltrado', async(req, res) =>{
+routes.post('/eliminarRaleCOPFiltrado', async(req, res) =>{
     try {
         const fechaRaleCOP = req.body.selectRaleCOP;
 
@@ -437,7 +437,7 @@ routes.post('/elimarRaleCOPFiltrado', async(req, res) =>{
     }
 });
 
-routes.post('/elimarRaleRCVFiltrado', async(req, res) =>{
+routes.post('/eliminarRaleRCVFiltrado', async(req, res) =>{
     try {
         const fechaRaleRCV = req.body.selectRaleRCV;
 
@@ -511,6 +511,24 @@ routes.post('/generarGastos', async (req, res) => {
       } catch (error) {
         console.error(error);
       }       
+});
+
+
+//Rutas para visualizar patrones 
+routes.get('/verPatrones', (req, res) => {
+    console.log(req.session.user, )
+    // No existe la sesión
+    if (req.session.user === undefined) {
+        res.redirect('/login');
+        return;
+    }
+
+    // No es ejecutor
+    if (req.session.user.tipo_usuario != 'ejecutor') {
+        res.redirect('/login');
+        return;
+    }
+    res.render('verpatrones', { session: req.session });
 });
 
 
