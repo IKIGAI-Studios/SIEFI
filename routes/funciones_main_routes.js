@@ -803,11 +803,11 @@ export async function generarCitatorio(req, res) {
         if (typeof nomCredRecibido == 'string') {
             if (tipoRecibido == 'cop') {
                 const resCop = await RaleCop.update(
-                    { citatorio: 'Si' },
+                    { citatorio: true },
                     { where: { nom_cred: nomCredRecibido } });
             } else if (tipoRecibido == 'rcv') {
                 const resRcv = await RaleRcv.update(
-                    { citatorio: 'Si' },
+                    { citatorio: true },
                     { where: { nom_cred: nomCredRecibido } });
             }
         } else {
@@ -818,11 +818,11 @@ export async function generarCitatorio(req, res) {
 
                 if (value === 'cop') {
                     const resCop = await RaleCop.update(
-                        { citatorio: 'Si' },
+                        { citatorio: true },
                         { where: { nom_cred: nomCredValue } });
                 } else if (value === 'rcv') {
                     const resRcv = await RaleRcv.update(
-                        { citatorio: 'Si' },
+                        { citatorio: true },
                         { where: { nom_cred: nomCredValue } });
                 }
             }

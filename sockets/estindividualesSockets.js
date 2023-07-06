@@ -176,6 +176,37 @@ export function socket(io) {
       }
     );
 
+    socket.on("cliente:registrosListadoPatronal", async (user) =>{
+
+      //Obtener todos los registros de Rale COP que no estén cobrados, pero que estén en la tabla Afil. 
+      const registrosCop = await RaleCop.findAll({
+        attributes : ['reg_pat', 'dias', 'importe', 'nom_cred'],
+        where : {cobrado: false}
+      });
+
+      //Obtener todos los registros de Rale RCV que no estén cobrados. 
+      const registrosRcv = await RaleRcv.findAll({
+        attributes : ['reg_pat', 'dias', 'importe', 'nom_cred'],
+        where : {cobrado : false}
+      });
+
+        // Unir los registros en una variable y obtener importe y días
+        const registrosNoCobrados = registrosCop.concat(registrosRcv);
+
+
+      //Obtener los registros patronales que coincidan con el ejecutor y que se encuentren dentro del objeto anterior. 
+      const registrosCopRcv = await Afil.findAll({
+        attributes : ['reg_pat', 'patron', 'actividad', 'domicilio', 'localidad'],
+        where: { 
+          clave_eje: user, 
+          reg_pat: registrosNoCobrados.map(rp => rp.reg_pat)
+         }
+      });
+
+      socket.emit('servidor:registrosListadoPatronal', registrosCopRcv);
+
+    });
+
     // Maneja el evento de desconexión del cliente
     socket.on("disconnect", () => {
       // Programar eventos (innecesarios por ahora)
