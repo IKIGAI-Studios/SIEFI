@@ -101,6 +101,14 @@ socket.on('servidor:consultarRegistrosCoin', (data) => {
     $('#dateCOINscnd').prop('disabled', false);
 });
 
+socket.on('servidor:registrosListadoPatronal', (data) => {
+    //Sumar los importes, cuando coincida el reg_pat. 
+
+    //Contabilizar los números de crédito. 
+
+    //Tomar la cantidad de días ma
+});
+
 $('#nombreEjecutor').on('change', function() {
     $('#btn_fil_inc').prop('disabled', true)
     $('#btn_fil_res').prop('disabled', true)
@@ -452,4 +460,11 @@ function showTable () {
     const tableContainer = $('<div>').attr('id', 'tb-show-estadisticas-individuales');
     tableScrollContainer.appendTo(tableContainer);
     tableContainer.appendTo('#div-tabla-estadisticas-individuales');
+}
+
+//Funciones para generar el listado de los patrones 
+function generarListadoPatronal(user){
+
+    socket.emit('cliente:registrosListadoPatronal', user);
+
 }
