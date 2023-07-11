@@ -9,8 +9,11 @@ import RaleRcv from '../models/raleRCVModel.js';
 import Coin from '../models/coinModel.js'
 import path from 'path';
 import { generarInforme, generarGastos, generarMandamiento, generarCitatorio } from './funciones_main_routes.js';
+import fs from 'fs'
+import { subirArchivo } from '../middlewares/subirArchivos.js';
+import multer from 'multer'
 
-
+const upload = multer({ dest: 'src/imgs/' });
 const routes = express.Router();
 
 routes.get('/login', (req, res) => {
@@ -111,6 +114,14 @@ routes.get('/estadisticasGlobales', async (req, res) => {
         });
         res.render('estGlobales', { session: req.session, ejecutores });
         req.session.actualizarEjecutor = '';
+    } catch(error){
+        console.log(error);
+    }
+});
+
+routes.get('/changeTemplates', async (req, res) => {
+    try{
+        res.render('changeTemplates', { session: req.session });
     } catch(error){
         console.log(error);
     }
@@ -448,6 +459,25 @@ routes.post('/eliminarRaleRCVFiltrado', async(req, res) =>{
     } catch(error) {
         console.log('Error al eliminar el Rale RCV',error);
         res.redirect('/loadInfo');
+    }
+});
+
+// Subir header
+routes.post('/load_header', subirArchivo('header', 'file_header'), (req, res) => {
+    try {
+        res.redirect('/changeTemplates');
+    } catch (e) {
+        console.log(e)
+        res.redirect('/changeTemplates')
+    }
+});
+
+routes.post('/load_footer', subirArchivo('footer', 'file_footer'), (req, res) => {
+    try {
+        res.redirect('/changeTemplates');
+    } catch (e) {
+        console.log(e)
+        res.redirect('/changeTemplates')
     }
 });
 

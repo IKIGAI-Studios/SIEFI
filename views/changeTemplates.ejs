@@ -41,9 +41,9 @@
               <li class="active">
                 <h5>INFORMACIÓN</h5>
                 <ul class="">
-                    <li><a href="/loadInfo" class="sidebar-item activo">CARGAR INFORMACIÓN</a></li>
+                    <li><a href="/loadInfo" class="sidebar-item">CARGAR INFORMACIÓN</a></li>
                     <li><a href="/registrarAfil" class="sidebar-item">REGISTRAR AFIL</a></li>
-                    <li><a href="/changeTemplates" class="sidebar-item">CAMBIAR PLANTILLAS</a></li>
+                    <li><a href="/changeTemplates" class="sidebar-item activo">CAMBIAR PLANTILLAS</a></li>
                 </ul>
               </li>
               <li class="active mt-3">
@@ -66,45 +66,25 @@
           <div id="perfil" class="contenido activo text-center">
             <h2 class="texto-green text-center mt-2">Cargar Información</h2>
 
-            <div class="">
-              <div class="mt-3">
-                <div class="container">
-                  <h4 for="afil">Afil</h4>
-                  <a href="/registrarAfil" class="form-control" id="afil">Registrar Afil</a>
-                  <input type="file" class="form-control" name="Afil" id="Afil_input" accept=".xlsx"/>
-                  <p class="text-danger">Alerta! Asegurate de eliminar el archivo Afil anterior antes de cargar uno nuevo</p>
-                  <button type="button" class="btn btn-secondary mt-1"  onclick="verRegistrosAfil()">
-                    Ver registros Afil
-                  </button>
+            <div class="row mt-3">
+                <div class="col-6 text-center">
+                    <form action="load_header" method="post" enctype="multipart/form-data">
+                        <h4 class="texto-green">Encabezado</h4>
+                        <input type="file" name="file_header" id="file_header" class="form-control" accept="image/png">
+                        <button class="btn btn-sm btn-success mt-2" type="submit">Cambiar</button>
+                        <h5 class="texto-green text-center mt-3">Encabezado Actual</h5>
+                        <img src="imgs/encabezado-reportes.png" width="100%">
+                    </form>
                 </div>
-              </div>
-              <div class="mt-3">
-                <div class="container">
-                  <h4 for="Coin">Coin</h4>
-                  <input type="file" class="form-control" name="Coin" id="Coin_input" accept=".xlsx"/>
-                  <button type="button" class="btn btn-primary mt-1" onclick="verRegistrosCoin()">
-                    Ver registros Coin
-                  </button>
+                <div class="col-6 text-center">
+                    <form action="load_footer" method="post" enctype="multipart/form-data">
+                        <h4 class="texto-green">Pie de Página</h4>
+                        <input type="file" name="file_footer" id="file_footer" class="form-control" accept="image/png">
+                        <button class="btn btn-sm btn-success mt-2" type="submit">Cambiar</button>
+                        <h5 class="texto-green text-center mt-3">Pie de Página Actual</h5>
+                        <img src="imgs/footer-reportes.png" width="100%">
+                    </form>
                 </div>
-              </div>
-              <div class="mt-3">
-                <div class="container">
-                  <h4 for="Coin">Rale COP</h4>
-                  <input type="file" class="form-control" name="RaleCOP" id="RaleCOP_input" accept=".xlsx"/>
-                  <button type="button" class="btn btn-success mt-1" onclick="verRegistrosRaleCOP()">
-                    Ver registros Rale Cop
-                  </button>
-                </div>
-              </div>
-              <div class="mt-3">
-                <div class="container">
-                  <h4 for="Coin">Rale RCV</h4>
-                  <input type="file" class="form-control" name="RaleRCV" id="RaleRCV_input" accept=".xlsx"/>
-                  <button type="button" class="btn btn-light mt-1" data-bs-toggle="modal" data-bs-target="#modalRaleRCV" onclick="verRegistrosRaleRCV()">
-                    Ver registros Rale RCV
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>  

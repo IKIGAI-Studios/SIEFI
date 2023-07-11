@@ -44,7 +44,6 @@ actEjecutorSockets(io); // Configura los sockets de actualizar ejecutor en el se
 estGlobalesSockets(io); // Configura los sockets de estadisticas globales en el servidor
 reportesSocket(io); // Configura los sockets de reportes en el servidor
 
-
 httpServer.listen(port, () => {
     console.log(`Server in port http://localhost:${port}`);
 });
