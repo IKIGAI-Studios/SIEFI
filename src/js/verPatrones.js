@@ -304,27 +304,23 @@ socket.on("servidor:consultarRegistrosCoin", (data) => {
   $("#dateCOINfrst").prop("disabled", false);
 });
 
-$("#nombreEjecutor").on("change", function () {
-  $("#btn_fil_inc").prop("disabled", true);
-  $("#btn_fil_res").prop("disabled", true);
-  $("#btn_fil_con").prop("disabled", true);
-
-  $("#div-tabla-estadisticas-individuales").empty();
-
-  if ($("#nombreEjecutor").val() != "false")
-    socket.emit("cliente:ejecutorSeleccionadoEstInd", {
-      ejecutor: $("#nombreEjecutor").val(),
-      copDate: $("#dateCOPfrst").val(),
-      rcvDate: $("#dateRCVfrst").val(),
-      coinDate: $("#dateCOINfrst").val(),
-    });
-  else bsAlert("Selecciona la clave de ejecutor", "warning");
-});
-
 $('#btnListadoPatrones').on('click', function () {
-    socket.emit('cliente:generarListadoPatrones', {dataStats}, (cb) => {
-        console.log(cb);
-    });
+  socket.emit('cliente:generarListadoPatrones', { dataStats }, $('#switchOrdenar').prop('checked'), $("#nombreEjecutor").val(), (response) => {
+       // Crear un objeto Blob con los datos del archivo PDF
+       const blob = new Blob([response.fileData], { type: 'application/pdf' });
+
+       // Crear una URL de objeto para el Blob
+       const url = URL.createObjectURL(blob);
+   
+       // Crear un enlace para descargar el archivo
+       const link = document.createElement('a');
+       link.href = url;
+       link.download = response.fileName;
+       link.click();
+   
+       // Liberar la URL de objeto
+       URL.revokeObjectURL(url);
+  });
 });
 
 // Hacemos un on change al div con el id dateCOP porque se crea dinamicamente
@@ -347,12 +343,18 @@ $("#div-frst-selects").on("change", "#dateCOPfrst", function () {
       if (
         $("#dateRCVfrst").val() != $(this).val() ||
         $("#dateCOINfrst").val() != $(this).val()
-      )
+      ) {
         bsAlert(
           "Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
           "warning"
         );
-      $("#nombreEjecutor").prop("disabled", false);
+        socket.emit("cliente:ejecutorSeleccionadoEstInd", {
+          ejecutor: $("#nombreEjecutor").val(),
+          copDate: $("#dateCOPfrst").val(),
+          rcvDate: $("#dateRCVfrst").val(),
+          coinDate: $("#dateCOINfrst").val(),
+        });
+      }
     }
 });
 
@@ -374,12 +376,18 @@ $("#div-frst-selects").on("change", "#dateRCVfrst", function () {
       if (
         $("#dateCOPfrst").val() != $(this).val() ||
         $("#dateCOINfrst").val() != $(this).val()
-      )
+      ) {
         bsAlert(
           "Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
           "warning"
         );
-      $("#nombreEjecutor").prop("disabled", false);
+        socket.emit("cliente:ejecutorSeleccionadoEstInd", {
+          ejecutor: $("#nombreEjecutor").val(),
+          copDate: $("#dateCOPfrst").val(),
+          rcvDate: $("#dateRCVfrst").val(),
+          coinDate: $("#dateCOINfrst").val(),
+        });
+      }
     }
 });
 
@@ -401,12 +409,18 @@ $("#div-frst-selects").on("change", "#dateCOINfrst", function () {
       if (
         $("#dateCOPfrst").val() != $(this).val() ||
         $("#dateRCVfrst").val() != $(this).val()
-      )
+      ) {
         bsAlert(
           "Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
           "warning"
         );
-      $("#nombreEjecutor").prop("disabled", false);
+        socket.emit("cliente:ejecutorSeleccionadoEstInd", {
+          ejecutor: $("#nombreEjecutor").val(),
+          copDate: $("#dateCOPfrst").val(),
+          rcvDate: $("#dateRCVfrst").val(),
+          coinDate: $("#dateCOINfrst").val(),
+        });
+      }
     }
 });
 
@@ -833,7 +847,7 @@ function showGraphics(id, perc, type) {
   // Colores para las secciones
   if (type == "coin") colors = ["#FF0000", "#FF3300", "#FF6600", "#FF9900", "#FFCC00", "#FFFF00", "#D4FF00", "#AAFF00", "#55FF00", "#00FF00"];
   else colors = ["#FF0000", "#FFAA00", "#FFFF00", "#DA70D6", "#00FFFF"];
-  
+
   // Dibujar seccion por seccion
   colors.map((color, i) => {
     let start = (180 + i * (180 / colors.length)) * (Math.PI / 180),

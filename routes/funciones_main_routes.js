@@ -2,6 +2,7 @@
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { format } from 'date-fns';
+import { es } from 'date-fns/locale/index.js';
 import { Op } from 'sequelize';
 import RaleCop from '../models/raleCOPModel.js';
 import RaleRcv from '../models/raleRCVModel.js';
@@ -16,7 +17,7 @@ import {
     parrafo1M, parrafo2M, parrafo3M, parrafo4M, parrafo5M1, parrafo5M2, parrafo6M,
     parrafo7M, parrafo8M, parrafo9M, parrafo10M, parrafo11M, parrafo12M, parrafo13M,
     parrafo14M, parrafo15M, parrafo16M, parrafo17M,
-    parrafo1C, parrafo2C, parrafo3C, parrafo4C
+    parrafo1C, parrafo2C, parrafo3C
 } from './texo_por_defecto_reportes.js';
 
 import Ejecutor from '../models/ejecutorModel.js';
@@ -843,7 +844,7 @@ export async function generarCitatorio(req, res) {
 
     // Obtener la fecha actual
     const currentDate = new Date();
-    const formattedDate = format(currentDate, 'yyyy-MM-dd');
+    const formattedDate = format(currentDate, 'dd-MM-yyyy');
 
     // Crear la sesión del Usuario
     const { nombre, apellidos } = req.session.user;
@@ -1044,13 +1045,6 @@ export async function generarCitatorio(req, res) {
         .text("Nombre firma y fecha")
         .moveDown(3)
 
-    //Párrafo de recomendaciones 
-    doc.font('Helvetica')
-        .fontSize(8)
-        .lineGap(8 * 0.5)
-        .text(`${parrafo4C}`, 300, null, { align: 'justify' })
-        .moveDown(2)
-
 
     // Generar el nombre del archivo con la fecha
     const fileName = `${regRecibido}_${formattedDate}_CITATORIO.pdf`;
@@ -1127,7 +1121,7 @@ export async function generarMandamiento(req, res) {
 
     // Obtener la fecha actual
     const currentDate = new Date();
-    const formattedDate = format(currentDate, 'yyyy-MM-dd');
+    const formattedDate = format(currentDate, 'dd-MMMM-yyyy', { locale: es });
 
     // Crear la sesión del Usuario
     const { nombre, apellidos } = req.session.user;
@@ -1232,7 +1226,7 @@ export async function generarMandamiento(req, res) {
             const mes = partes[1];
             return `${mes}-${año}`;
         }
-
+        
         // Crear la tabla. 
         const datosTabla = [["CRÉDITO", "PÉRIODO", "IMPORTE"], ...datosRegistros];
         margenSuperior = 280;
@@ -1280,7 +1274,8 @@ export async function generarMandamiento(req, res) {
         .fillColor('blue')
         .text(nomEje.join(' y/o '), 60, null, { align: 'justify', continued: true })
         .fillColor('black')
-        .text(` ${parrafo5M2} `, 60, null, { align: 'justify' })
+        .text("  ", 60, null, { align: 'justify' , continued: true })
+        .text(`${parrafo5M2} `, 60, null, { align: 'justify' })
         .moveDown(1)
         .fontSize(9).lineGap(9 * 0.5)
         .text(`${parrafo6M}`, 60, null, { align: 'justify' })
