@@ -32,7 +32,6 @@ import {
   parrafo1C,
   parrafo2C,
   parrafo3C,
-  parrafo4C,
 } from "./texo_por_defecto_reportes.js";
 
 // Variables
