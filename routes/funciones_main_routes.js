@@ -990,9 +990,10 @@ export async function generarCitatorio(req, res) {
   var anchoColumna = 0;
   var altoFila = 30;
 
-  // Obtener la fecha actual
-  const currentDate = new Date();
-  const formattedDate = format(currentDate, "yyyy-MM-dd");
+
+    // Obtener la fecha actual
+    const currentDate = new Date();
+    const formattedDate = format(currentDate, 'dd-MM-yyyy');
 
   // Crear la sesión del Usuario
   const { nombre, apellidos } = req.session.user;
@@ -1229,20 +1230,13 @@ export async function generarCitatorio(req, res) {
     .text("Nombre firma y fecha")
     .moveDown(3);
 
-  //Párrafo de recomendaciones
-  doc
-    .font("Helvetica")
-    .fontSize(8)
-    .lineGap(8 * 0.5)
-    .text(`${parrafo4C}`, 300, null, { align: "justify" })
-    .moveDown(2);
 
-  // Generar el nombre del archivo con la fecha
-  const fileName = `${regRecibido}_${formattedDate}_CITATORIO.pdf`;
-  const filePath = `src/assets/pdf/${fileName}`;
-  const writeStream = fs.createWriteStream(filePath);
-  doc.pipe(writeStream);
-  doc.end();
+    // Generar el nombre del archivo con la fecha
+    const fileName = `${regRecibido}_${formattedDate}_CITATORIO.pdf`;
+    const filePath = `src/assets/pdf/${fileName}`;
+    const writeStream = fs.createWriteStream(filePath);
+    doc.pipe(writeStream);
+    doc.end();
 
   // Escuchar el evento 'finish' del stream de escritura
   writeStream.on("finish", () => {
@@ -1306,9 +1300,9 @@ export async function generarMandamiento(req, res) {
 
   const nomEje = nomEjecutores.map((registro) => registro.nombre);
 
-  // Obtener la fecha actual
-  const currentDate = new Date();
-  const formattedDate = format(currentDate, "yyyy-MM-dd");
+    // Obtener la fecha actual
+    const currentDate = new Date();
+    const formattedDate = format(currentDate, 'dd-MMMM-yyyy', { locale: es });
 
   // Crear la sesión del Usuario
   const { nombre, apellidos } = req.session.user;
@@ -1403,18 +1397,18 @@ export async function generarMandamiento(req, res) {
       datosRegistros.push([nomCred, periodo, importeFormateado]);
     }
 
-    // Función para convertir el formato de fecha de "aaaa-mm-dd" a "mm-aaaa"
-    function convertirFormatoFecha(fecha) {
-      const partes = fecha.split("-");
-      const año = partes[0];
-      const mes = partes[1];
-      return `${mes}-${año}`;
-    }
-
-    // Crear la tabla.
-    const datosTabla = [["CRÉDITO", "PÉRIODO", "IMPORTE"], ...datosRegistros];
-    margenSuperior = 280;
-    anchoColumna = 154;
+        // Función para convertir el formato de fecha de "aaaa-mm-dd" a "mm-aaaa"
+        function convertirFormatoFecha(fecha) {
+            const partes = fecha.split('-');
+            const año = partes[0];
+            const mes = partes[1];
+            return `${mes}-${año}`;
+        }
+        
+        // Crear la tabla. 
+        const datosTabla = [["CRÉDITO", "PÉRIODO", "IMPORTE"], ...datosRegistros];
+        margenSuperior = 280;
+        anchoColumna = 154;
 
     // Dibujar la tabla
     for (let fila = 0; fila < datosTabla.length; fila++) {
@@ -1442,32 +1436,30 @@ export async function generarMandamiento(req, res) {
   var posicionX = (doc.page.width - anchoTexto) / 2;
   doc.text(texto, posicionX);
 
-  doc
-    .font("Helvetica")
-    .fontSize(9)
-    .lineGap(9 * 0.5)
-    .text("En San Juan del Río a ", { continued: true })
-    .font("Helvetica-Bold")
-    .text(formattedDate)
-    .moveDown(2)
-    .text(`${parrafo1M}`, 60, null, { align: "justify" })
-    .moveDown(1)
-    .text(`${parrafo2M}`, 60, null, { align: "justify" })
-    .moveDown(1)
-    .text(`${parrafo3M}`, 60, null, { align: "justify" })
-    .moveDown(1)
-    .text(`${parrafo4M}`, 60, null, { align: "justify" })
-    .moveDown(1)
-    .text(`${parrafo5M1}`, 60, null, { align: "justify", continued: true })
-    .fillColor("blue")
-    .text(nomEje.join(" y/o "), 60, null, { align: "justify", continued: true })
-    .fillColor("black")
-    .text(` ${parrafo5M2} `, 60, null, { align: "justify" })
-    .moveDown(1)
-    .fontSize(9)
-    .lineGap(9 * 0.5)
-    .text(`${parrafo6M}`, 60, null, { align: "justify" })
-    .moveDown(1);
+    doc.font('Helvetica')
+        .fontSize(9).lineGap(9 * 0.5)
+        .text('En San Juan del Río a ', { continued: true })
+        .font('Helvetica-Bold')
+        .text(formattedDate)
+        .moveDown(2)
+        .text(`${parrafo1M}`, 60, null, { align: 'justify' })
+        .moveDown(1)
+        .text(`${parrafo2M}`, 60, null, { align: 'justify' })
+        .moveDown(1)
+        .text(`${parrafo3M}`, 60, null, { align: 'justify' })
+        .moveDown(1)
+        .text(`${parrafo4M}`, 60, null, { align: 'justify' })
+        .moveDown(1)
+        .text(`${parrafo5M1}`, 60, null, { align: 'justify', continued: true })
+        .fillColor('blue')
+        .text(nomEje.join(' y/o '), 60, null, { align: 'justify', continued: true })
+        .fillColor('black')
+        .text("  ", 60, null, { align: 'justify' , continued: true })
+        .text(`${parrafo5M2} `, 60, null, { align: 'justify' })
+        .moveDown(1)
+        .fontSize(9).lineGap(9 * 0.5)
+        .text(`${parrafo6M}`, 60, null, { align: 'justify' })
+        .moveDown(1);
 
   doc
     .font("Helvetica-Bold")

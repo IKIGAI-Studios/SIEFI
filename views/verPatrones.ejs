@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="/imgs/imss-logo.png">
-    <title>Patrones asignados</title>
+    <title>Estadísticas individuales</title>
     <style>
         .canvas {
           width: 300px;
@@ -28,7 +28,7 @@
                     <div class="col-10">
                         <div class="row"><span class="nombre-usuario" id=""><%= session.user ? session.user.nombre : "Nombre" %></span></div>
                         <div class="row"><span class="nombre-usuario" id=""><%= session.user ? session.user.apellidos : "Apellidos" %></span></div>
-                        <div class="row"><p class="tipo-usuario"><%= session.user ? session.user.tipo_usuario : "Ejecutor" %></p></div>
+                        <div class="row"><p class="tipo-usuario"><%= session.user ? session.user.tipo_usuario : "Administrador" %></p></div>
                     </div>
                     <a href="/logout" class="logout text-danger">CERRAR SESIÓN</a>
                 </div>
@@ -47,7 +47,7 @@
               <li class="active">
                 <h5>PATRONES</h5>
                 <ul class="">
-                    <li><a href="/verPatrones" class="sidebar-item activo">VER PATRONES</a></li>
+                    <li><a href="/verPatrones" class="sidebar-item activo ">VER PATRONES</a></li>
                 </ul>
               </li>
               <li class="active mt-3">
@@ -64,7 +64,6 @@
               </li>
             </ul>
         </div>
-        
           <div class="col-10 space-around">
             <div id="perfil" class="contenido activo text-center">
                 <div class="container">
@@ -82,7 +81,7 @@
                                 <option value="false">Selecciona una fecha para el primer Rale RCV</option>
                             </select>
                             <label for="dateCOINfrst" class="mt-3">Primer fecha de Coin</label>
-                            <select name="dateCOINfrst" id="dateCOINfrst" class="form-control input-group-text" disabled>
+                            <select name="dateCOINfrst" id="dateCOINfrst" class="form-control input-group-text">
                                 <option value="false">Selecciona una fecha para COIN</option>
                             </select>
                         </div>
@@ -99,6 +98,12 @@
                         </div>
                     </div>
 
+
+                    <h4 class="texto-green text-center mt-2">Ejecutor</h4>
+                    <select name="nombreEjecutor" id="nombreEjecutor" class="form-control input-group-text" readonly>
+                        <option value="<%= session.user.nombre + ' ' + session.user.apellidos %>"><%= session.user.nombre + ' ' + session.user.apellidos %></option> 
+                    </select>
+       
                     <div class="mt-2 row m-1">
                         <h4 class="texto-green text-center mt-2">Filtros</h4>
                         <div class="dropdown col-sm m-2">
@@ -309,20 +314,22 @@
                             <canvas id="canvas-prod-ind"></canvas>
                         </div>
                     </div>
-                </div>
 
-            <!-- Botón para generar documento con los patrones asignados  -->
-            <div class="mt-3">
-                <div class="container">
-                  <button type="button" class="btn btn-primary mt-1" onclick="generarListadoPatronal( '<%= session.user.clave_eje %>' )"> 
-                    Descargar patrones asignados para cobrar. 
-                  </button>                                
-                </div>
-              </div>
+                    <div>
+                        <button class="btn btn-lg btn-primary mt-5" id="btnListadoPatrones"> Descargar listado de patrones </button>
+                    </div>
 
+                    <div style="display: flex; justify-content: center;" class="mt-5">
+                        <label class="form-check-label col-3 text-center" for="flexSwitchCheckChecked">Ordenar por importe</label>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" id="switchOrdenar">
+                        </div>
+                        <label class="form-check-label col-2 text-center" for="flexSwitchCheckChecked">Ordenar por días</label>
+                      </div>
+                      
+
+                </div>
             </div>
-
-
           </div>  
       </div>
     </div>
@@ -349,7 +356,7 @@
 <%- include('templates/footer-pleca')%>
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 <script src="socket.io/socket.io.min.js"></script>
-<script src="/js/estIndividuales.js"></script>
+<script src="/js/verPatrones.js"></script>
 <script src="/libs/chart.js"></script>
 
 </html>
