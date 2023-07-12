@@ -10,6 +10,7 @@ import ExcelJS from "exceljs";
 import fs from "fs";
 import Afil63 from "../models/afilModel.js";
 import Ejecutor from "../models/ejecutorModel.js";
+import { es } from 'date-fns/locale/index.js';
 import {
   parrafo1M,
   parrafo2M,
