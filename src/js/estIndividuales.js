@@ -14,7 +14,7 @@ let dataStats,
   imp = {},
   confronta = {},
   regFal = { rales: [] };
-regExis = { rales: [] };
+    regExis = { rales: [] };
 
 window.onload = function () {
   socket.emit("cliente:consultarRegistrosRaleCOP");
@@ -456,8 +456,6 @@ $("#inp_DATES_fes").on("change", function () {
 });
 
 function getConfronta() {
-  console.log($("#dateRCVscnd").val(), $("#dateCOPscnd").val());
-
   socket.emit("cliente:confrontaEstInd", {
     ejecutor: $("#nombreEjecutor").val(),
     copDate: $("#dateCOPscnd").val(),
@@ -825,9 +823,21 @@ function showGraphics(id, perc, type) {
 
   var colors;
   // Colores para las secciones
-  if (type == "coin") colors = ["#FF0000", "#FF3300", "#FF6600", "#FF9900", "#FFCC00", "#FFFF00", "#D4FF00", "#AAFF00", "#55FF00", "#00FF00"];
+  if (type == "coin")
+    colors = [
+      "#FF0000",
+      "#FF3300",
+      "#FF6600",
+      "#FF9900",
+      "#FFCC00",
+      "#FFFF00",
+      "#D4FF00",
+      "#AAFF00",
+      "#55FF00",
+      "#00FF00",
+    ];
   else colors = ["#FF0000", "#FFAA00", "#FFFF00", "#DA70D6", "#00FFFF"];
-  
+
   // Dibujar seccion por seccion
   colors.map((color, i) => {
     let start = (180 + i * (180 / colors.length)) * (Math.PI / 180),
@@ -850,8 +860,12 @@ function showGraphics(id, perc, type) {
     var sectionNumber = i + 1;
     var sectionText = sectionNumber.toString();
     var sectionAngle = (start + end) / 2; // Ángulo medio de la sección
-    var textX = centerX + Math.cos(sectionAngle) * (innerRadius + (outerRadius - innerRadius) / 2);
-    var textY = centerY + Math.sin(sectionAngle) * (innerRadius + (outerRadius - innerRadius) / 2);
+    var textX =
+      centerX +
+      Math.cos(sectionAngle) * (innerRadius + (outerRadius - innerRadius) / 2);
+    var textY =
+      centerY +
+      Math.sin(sectionAngle) * (innerRadius + (outerRadius - innerRadius) / 2);
 
     ctx.fillStyle = "#000000"; // Color del texto
     ctx.font = "20px Arial"; // Fuente y tamaño del texto
@@ -861,7 +875,7 @@ function showGraphics(id, perc, type) {
   });
 
   // Calcular el ángulo correspondiente al porcentaje
-  var radianes = (((360 - 180) * perc / 100) + 180) * (Math.PI / 180);
+  var radianes = (((360 - 180) * perc) / 100 + 180) * (Math.PI / 180);
 
   // Calcular las coordenadas de la punta de la flecha
   var x = centerX + Math.cos(radianes) * 95;
