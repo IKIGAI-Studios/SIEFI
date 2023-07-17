@@ -270,7 +270,7 @@ socket.on('servidor:crearFormInforme', (data, value, user, registro) => {
 
     // Agregar encabezados adicionales para las nuevas columnas cuando sea informe
     if (value == 'informe'){
-      const folioSuaHeader = $('<th>').attr('scope', 'col').text('Folio Sua');
+      const folioSuaHeader = $('<th>').attr('scope', 'col').text('Folio SUA');
       const resultadosHeader = $('<th>').attr('scope', 'col').text('Resultados de la diligencia');
       folioSuaHeader.appendTo(headerRow);
       resultadosHeader.appendTo(headerRow);
