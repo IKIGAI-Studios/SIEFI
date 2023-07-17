@@ -63,9 +63,7 @@
               </ul>
           </div>
           <div class="col-10 space-around">
-            <div id="perfil" class="contenido activo text-center">
-
-                <form action="actualizarEjecutor" method="post">
+            <div id="perfil" class="contenido activo text-center">                
                     <div class="container">
                         <h2 class="texto-green text-center mt-2">Estadisticas Globales</h2>
                         <h4 class="texto-green text-center mt-2">Fechas</h4>
@@ -98,7 +96,8 @@
                             </div>
                         </div>
                         <div class="mt-2 row m-1">
-                            <h4 class="texto-green text-center mt-2">Filtros</h4>
+                        <h3 class="texto-green text-center mt-2">Patrones a Trabajar</h3>
+                        <h4 class="texto-green text-center mt-2">Filtros</h4>
                             <div class="dropdown col-sm m-2">
                                 <button class="btn btn-primary dropdown-toggle" id="btn_fil_inc" type="button" data-bs-toggle="dropdown" aria-expanded="false" disabled>
                                   Incidencia
@@ -119,7 +118,21 @@
                                 
                             </div>
                         </div>
+                        <div id="spinner">
+                            <h4 class="text-primary text-center mt-2">Cargando</h4>
+    
+                            <div class="spinner-grow text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div class="spinner-grow text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div class="spinner-grow text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                         <div id="div-tabla-estadisticas-globales" class="mt-4"></div>
+                        <h3 class="texto-green text-center mt-2">Estadisticas de los Patrones a Trabajar</h3>
                         <figcaption class="blockquote-footer mt-3">
                             Estadistísticas únicamente de patrones con inc 2 y 31
                         </figcaption>
@@ -308,7 +321,6 @@
                             </div>
                         </div>
                     </div>
-                </form>
             </div>
           </div>  
       </div>

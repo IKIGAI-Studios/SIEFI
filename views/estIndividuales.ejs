@@ -111,6 +111,7 @@
                             <% } %>
                     </select>
                     <div class="mt-2 row m-1">
+                        <h3 class="texto-green text-center mt-2">Patrones a Trabajar</h3>
                         <h4 class="texto-green text-center mt-2">Filtros</h4>
                         <div class="dropdown col-sm m-2">
                             <button class="btn btn-primary dropdown-toggle" id="btn_fil_inc" type="button" data-bs-toggle="dropdown" aria-expanded="false" disabled>
@@ -129,10 +130,23 @@
                                 Resultado
                             </button>
                             <ul class="dropdown-menu" id="res_fil"></ul>
-                            
+                        </div>
+                    </div>
+                    <div id="spinner">
+                        <h4 class="text-primary text-center mt-2">Cargando</h4>
+
+                        <div class="spinner-grow text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
                     <div id="div-tabla-estadisticas-individuales" class="mt-4"></div>
+                    <h3 class="texto-green text-center mt-2">Estadisticas de los Patrones a Trabajar</h3>
                     <figcaption class="blockquote-footer mt-3">
                             Estadistísticas únicamente de patrones con inc 2 y 31
                     </figcaption>
@@ -311,7 +325,7 @@
                         </table>
                     </div>
                     <div class="row">
-                        <div class="col-sm m-3 bg-white">
+                        <div class="col-sm m-3">
                             <h4 class="texto-green text-center mt-2">Coin 31</h4>
                             <canvas id="canvas-coin-31"></canvas>
                         </div>
@@ -319,6 +333,17 @@
                             <h4 class="texto-green text-center mt-2">Productividad Individual</h4>
                             <canvas id="canvas-prod-ind"></canvas>
                         </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-lg btn-primary mt-5" id="btnListadoPatrones"> Descargar listado de patrones </button>
+                    </div>
+
+                    <div style="display: flex; justify-content: center;" class="mt-2">
+                        <label class="form-check-label col-3 text-center" for="flexSwitchCheckChecked">Ordenar por importe</label>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" id="switchOrdenar">
+                        </div>
+                        <label class="form-check-label col-2 text-center" for="flexSwitchCheckChecked">Ordenar por días</label>
                     </div>
                 </div>
             </div>
