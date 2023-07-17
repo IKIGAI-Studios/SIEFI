@@ -182,10 +182,17 @@ export function socket(io) {
 
     //Socket para descargar el pdf del listado de los patrones.
     socket.on('cliente:generarListadoPatrones', async (data, ordenar, ejecutor, callback) => {
+      
+      // Variables
       var datosTabla = [];
       const registrosAgrupados = agruparArchivos(data, ordenar);
       const registrosAfil = await obtenerAfil(registrosAgrupados);
       const datosTotales = obtenerTotales (registrosAgrupados);
+      var margenIzquierdo = 20;
+      var margenSuperior = 0;
+      var anchoColumna = 0;
+      var altoFila = 34;
+      var y = 0;
 
       // Obtener la fecha actual
       const currentDate = new Date();
@@ -193,13 +200,6 @@ export function socket(io) {
 
       // Generar el documento de PDF
       const doc = new PDF();
-
-      // Agregar contenido al archivo PDF
-      var margenIzquierdo = 20;
-      var margenSuperior = 0;
-      var anchoColumna = 0;
-      var altoFila = 34;
-      var y = 0;
 
       // Encabezado
       const imageEncabezado = 'src/imgs/encabezado-reportes.png';
@@ -246,18 +246,41 @@ export function socket(io) {
       doc.fontSize(6);
 
       // Crear la tabla. 
-      datosTabla = [["REG_PAT", "PATRON", "DOMICILIO", "LOCALIDAD", "OPORTUNIDAD", "PROGRAMABLE", "CUENTA_CRED", "MAX_FECHA REAL","SUMA IMPORTES"]];
+      datosTabla = [[
+        "REG_PAT", 
+        "PATRON", 
+        "DOMICILIO", 
+        "LOCALIDAD", 
+        "OPORTUNIDAD", 
+        "PROGRAMABLE", 
+        "CUENTA_CRED", 
+        "MAX_FECHA REAL",
+        "SUMA IMPORTES"
+      ]];
       registrosAfil.map((afil) => {
-        var importeTotalFormat = afil.suma_imp.toLocaleString('es-MX', {style: 'currency', currency: 'MXN'});
-        let temp = [afil.reg_pat, afil.patron,  afil.domicilio, afil.localidad, afil.oportunidad, afil.programable, afil.no_creditos, afil.max_dias, importeTotalFormat];
+        var importeTotalFormat = afil.suma_imp.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+        let temp = [
+          afil.reg_pat, 
+          afil.patron, 
+          afil.domicilio, 
+          afil.localidad, 
+          afil.oportunidad, 
+          afil.programable, 
+          afil.no_creditos, 
+          afil.max_dias, 
+          importeTotalFormat
+        ];
         datosTabla.push(temp);
       })
+
       anchoColumna = [50, 100, 100, 80, 55, 60, 35, 35, 60];
       const registrosPorPagina = 15;
       margenSuperior = 180;
 
       // Dibujar la tabla
       for (let fila = 0; fila < datosTabla.length; fila++) {
+
+        // Evaluar si se han colocado 15 registros por hija, agregar una hoja más y agregar el encabezado 
         if (fila > 0 && fila % registrosPorPagina === 0) {
           margenSuperior = 130;
           doc.addPage();
@@ -273,6 +296,8 @@ export function socket(io) {
             x += anchoColumna[columna]; // Actualizar la posición x 
           }
         }
+
+        //Agregar los registros en la misma tabla. 
         let x = margenIzquierdo;
         for (let columna = 0; columna < datosTabla[fila].length; columna++) {
           const y = margenSuperior + ((fila % registrosPorPagina) * altoFila);
@@ -295,12 +320,13 @@ export function socket(io) {
       doc.moveDown(3);
 
       //Agregar totales al final de la página
+      // Convertir el totoal en formato moneda
       var importeTotalFormat = datosTotales[2].toLocaleString('es-MX', {style: 'currency', currency: 'MXN'});
       doc.font('Helvetica-Bold')
-      .fontSize(9)
-      .text(`TOTAL MÁXIMO DE IMPORTES: ${datosTotales[0]}\n`, margenIzquierdo, 650 + 20)
-      .text(`MÁXIMO DE DÍAS REALES: ${datosTotales[1]}\n`, margenIzquierdo)
-      .text(`TOTAL DE SUMA IMPORTES: ${importeTotalFormat}`, margenIzquierdo);   
+        .fontSize(9)
+        .text(`TOTAL DE IMPORTES: ${datosTotales[0]}\n`, margenIzquierdo, 650 + 20)
+        .text(`MÁXIMO DE DÍAS REALES: ${datosTotales[1]}\n`, margenIzquierdo)
+        .text(`TOTAL DE SUMA IMPORTES: ${importeTotalFormat}`, margenIzquierdo);   
 
       // Generar el nombre del archivo con la fecha
       const fileName = `LISTADO PATRONAL_${formattedDate}.pdf`;
@@ -343,6 +369,8 @@ export function socket(io) {
 
 // Funciones para la estructuración de los archivos 
 function agruparArchivos (data, ordenar){
+
+  //Variables. 
   const ralesNoCobrados = [];
   var registro_patronal;
   var diasMayores;
@@ -351,8 +379,10 @@ function agruparArchivos (data, ordenar){
   var oportunidad;
   let programable;
 
-  // Ordenar los registros de los Rales. 
+  // Contabilizar la cantidad de créditos, sumar los importes, tomar el día mayor, oportunidad y si es programable
   data.dataStats.rales.forEach(function(rale, index) {
+
+    // Inicializar variables
     if (index === 0){
       registro_patronal = rale.reg_pat;
       diasMayores = 0;
@@ -360,7 +390,11 @@ function agruparArchivos (data, ordenar){
       acuImportes = 0;
       oportunidad = 'En tiempo 2';
     }
+    //Obtener si es programable dependiendo del coin. 
     programable = data.dataStats.coin.find(coin => coin.reg_pat == rale.reg_pat && coin.num_credito == rale.nom_cred);
+
+    // Evaluar que los registros patronales sean los mismos. 
+    // Recorrer cada registro, comparando los valores, y cambiandolos si las condiciones son verdaderas. 
     if(rale.reg_pat == registro_patronal && rale.cobrado == false){
       contadorCreditos = contadorCreditos + 1;
       acuImportes = acuImportes + rale.importe;
@@ -370,6 +404,8 @@ function agruparArchivos (data, ordenar){
         else if(rale.oportunidad == 'En tiempo 31') oportunidad = rale.oportunidad;
       }
     } else {
+        // Se comienza a evaluar un registro patronal difernete. 
+        // Evaluar si el registro anterior no esta en el objeto de ralesNoCobrados, y sino, agregarlo
         if (!ralesNoCobrados.some(function(obj) { return obj.reg_pat === registro_patronal; })) {
         ralesNoCobrados.push({
         'reg_pat': registro_patronal,
@@ -380,6 +416,7 @@ function agruparArchivos (data, ordenar){
         'programable' : programable != undefined ? programable.estado : "En tiempo 2"
     });
       }
+        // Volver a inicializar las variables, para evaluar el siguiente registro patronal. 
         registro_patronal = rale.reg_pat;
         contadorCreditos = 1;
         acuImportes = rale.importe;
@@ -412,7 +449,7 @@ function agruparArchivos (data, ordenar){
 }
 
 
-
+// Funcion para realizar la consulta a la tabla Afil. 
 async function obtenerAfil(registrosAgrupados) {
   try {
     const listadoRale = [];
@@ -445,21 +482,19 @@ async function obtenerAfil(registrosAgrupados) {
 
 // Función para obtener los totales 
 function obtenerTotales (listadoAgrupado){
+
+  // Variables
   var listadoTotales = [];
   var totalCreditos = 0;
   var totalImporte = 0;
   var maximoDia = listadoAgrupado[0].max_dias;
-    listadoAgrupado.forEach(function(rale){
-      totalCreditos = totalCreditos + rale.no_creditos;
-      totalImporte = totalImporte + rale.suma_imp;
-      if (rale.max_dias >= maximoDia) maximoDia = rale.max_dias;
+
+  // Recorrer el arreglo de rales agrupados y sumar los valores
+  listadoAgrupado.forEach(function(rale){
+    totalCreditos = totalCreditos + rale.no_creditos;
+    totalImporte = totalImporte + rale.suma_imp;
+    if (rale.max_dias >= maximoDia) maximoDia = rale.max_dias;
   });
   listadoTotales.push(totalCreditos, maximoDia, totalImporte)
   return listadoTotales;
 }
-
-
-
-
-
-

@@ -1,88 +1,12 @@
 const socket = io('http://localhost:3000');
 
-function itemSeleccionado(ejecutores) {
-    ejecutores = JSON.parse(ejecutores);
-    var clave = document.getElementById("clave_eje").value; // Obtener la clave seleccionada
-    var ejecutor = {}; // Variable para almacenar la información del ejecutor seleccionado
-
-    // Buscar el ejecutor con la clave seleccionada y almacenar su información en la variable 'ejecutor'
-    for (var i = 0; i < ejecutores.length; i++) {
-        if (ejecutores[i].clave_eje == clave) {
-            ejecutor = ejecutores[i];
-            break;
-        }
-    }
-
-    // Actualizar los valores de los campos del formulario con la información del ejecutor seleccionado
-    document.getElementById("nombre").value = ejecutor.nombre;
-    document.getElementById("user").value = ejecutor.user;
-    document.getElementById("type").value = ejecutor.type;
-    document.getElementById("status").value = ejecutor.status;
-
-    if (ejecutor.type == 'ejecutor') document.getElementById("ejecutor").selected = true;
-    if (ejecutor.type == 'admin') document.getElementById("admin").selected = true;
-    if (ejecutor.status == '0') document.getElementById("deshabilitado").checked = true;
-    if (ejecutor.status == '1') document.getElementById("habilitado").checked = true;
-}
-
-function statusSeleccionado() {
-    if ((document.getElementById("deshabilitado").checked) == true) document.getElementById("status").value = '0';
-    if ((document.getElementById("habilitado").checked) == true) document.getElementById("status").value = '1';
-}
-
-function tipoSeleccionado() {
-    var tipo = document.getElementById("typeS").value; // Obtener la clave seleccionada
-
-    if (tipo == 'admin') document.getElementById("type").value = 'admin'; 
-    else if (tipo == 'ejecutor') document.getElementById("type").value = 'ejecutor';
-}
-
-function verPatronesAsignados(){
-    const clave_eje = $('#clave_eje').val();
-
-    $('#div-patrones-asignados').empty();
-    if (clave_eje != 'false'){
-        socket.emit('cliente:consultarPatronesAsignados', clave_eje);
-        
-        $('#verPatronesAsignadosModal').modal('show');
-    
-        $(`<h3 class="text-primary">Obteniendo patrones asignados</h3>`).appendTo('#div-patrones-asignados');
-        $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-patrones-asignados');
-        
-
-        $('#btnADesasignar').prop('disabled', true);
-        $('#btnACancelar').prop('disabled', true);
-        
-    } else bsAlert("Selecciona la clave de ejecutor", 'warning');
-}
-
-function verPatronesNoAsignados(){
-    const clave_eje = $('#clave_eje').val();
-    const nombre = $('#nombre').val();
-
-    $('#div-patrones-no-asignados').empty();
-    if (clave_eje != 'false') {
-        socket.emit('cliente:consultarPatronesNoAsignados', clave_eje);
-        $('#verPatronesNoAsignadosModal').modal('show');
-    
-        $(`<h3 class="text-primary">Obteniendo patrones no asignados</h3>`).appendTo('#div-patrones-no-asignados');
-        $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-patrones-no-asignados');
-
-        $('#btnNAsignar').prop('disabled', true);
-        $('#btnNCancelar').prop('disabled', true);
-
-        $("#claveEje").val(clave_eje);
-        $("#nomEje").val(nombre);  
-        
-    } else bsAlert("Selecciona la clave de ejecutor", 'warning');
-}
-
+// Socket para crear la tabla con los patrones asignados. 
 socket.on('servidor:patronesAsignados', (data) => {
     $('#div-patrones-asignados').empty();
     $('#btnADesasignar').prop('disabled', false);
     $('#btnACancelar').prop('disabled', false);
 
-    /// Crear tabla
+    // Crear tabla
     const table = $('<table class="table">').attr('id', 'afil-table');
 
     // Crear el encabezado de la tabla
@@ -122,8 +46,8 @@ socket.on('servidor:patronesAsignados', (data) => {
             const dataCell = $('<td>').text(value);
             dataCell.appendTo(dataRow);
         });
-
-    dataRow.appendTo(tbody);
+        
+        dataRow.appendTo(tbody);
     });
     tbody.appendTo(table);
 
@@ -134,6 +58,7 @@ socket.on('servidor:patronesAsignados', (data) => {
     tableContainer.appendTo('#div-patrones-asignados'); 
 });
 
+// Socket para crear la tabla con los patrones no asignados.
 socket.on('servidor:patronesNoAsignados', (data) => {
     $('#div-patrones-no-asignados').empty();
     $('#btnNAsignar').prop('disabled', false);
@@ -190,3 +115,93 @@ socket.on('servidor:patronesNoAsignados', (data) => {
     table.appendTo(tableContainer);
     tableContainer.appendTo('#div-patrones-no-asignados'); 
 });
+
+// Función para obtener los datos dependiendo de la clave del ejecutor seleccionado
+function itemSeleccionado(ejecutores) {
+    ejecutores = JSON.parse(ejecutores);
+    var clave = $('#clave_eje').val(); 
+    var ejecutor = {}; 
+
+    // Buscar el ejecutor con la clave seleccionada y almacenar su información en la variable 'ejecutor'
+    for (var i = 0; i < ejecutores.length; i++) {
+        if (ejecutores[i].clave_eje == clave) {
+            ejecutor = ejecutores[i];
+            break;
+        }
+    }
+
+    // Actualizar los valores de los campos del formulario con la información del ejecutor seleccionado
+    $("#nombre").val(ejecutor.nombre);
+    $("#user").val(ejecutor.user);
+    $("#type").val(ejecutor.type);
+    $("#status").val(ejecutor.status);
+    
+    // Evaluar las condiciones para el tipo y el estado del usuario
+    if (ejecutor.type == 'ejecutor') $("#ejecutor").prop("selected", true);
+    if (ejecutor.type == 'admin') $("#admin").prop("selected", true);
+    if (ejecutor.status == '0') $("#deshabilitado").prop("checked", true);
+    if (ejecutor.status == '1')$("#habilitado").prop("checked", true);
+}
+
+// Obtener el estatu seleccionado. 
+function statusSeleccionado() {
+    if ($('#deshabilitado').is(':checked')) $('#status').val('0');
+    if ($('#habilitado').is(':checked')) $('#status').val('1');
+  }
+  
+
+// Obtener el tipo seleccionado. 
+function tipoSeleccionado() {
+    var tipo = $('#typeS').val();
+    if (tipo == 'admin') $('#type').val('admin');
+    else if (tipo == 'ejecutor') $('#type').val('ejecutor');
+  }
+  
+
+//Función para obtener los patrones asignados. 
+function verPatronesAsignados(){
+    const clave_eje = $('#clave_eje').val();
+
+    // Evaluar si la clave de ejecutor es válida, si no, mandar un alerta. 
+    $('#div-patrones-asignados').empty();
+    if (clave_eje != 'false'){
+        // Llamar al socket, mientras carga, mostrar el modal con información de carga. 
+        socket.emit('cliente:consultarPatronesAsignados', clave_eje);
+        $('#verPatronesAsignadosModal').modal('show');
+        
+        $(`<h3 class="text-primary">Obteniendo patrones asignados</h3>`).appendTo('#div-patrones-asignados');
+        $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-patrones-asignados');
+        
+        $('#btnADesasignar').prop('disabled', true);
+        $('#btnACancelar').prop('disabled', true);
+        
+    } else bsAlert("Selecciona la clave de ejecutor", 'warning');
+}
+
+// Función para obtener los patrones no asignados. 
+function verPatronesNoAsignados(){
+
+    // Obtener los valores de los campos y asignarlos a las variables.
+    const clave_eje = $('#clave_eje').val();
+    const nombre = $('#nombre').val();
+    $('#div-patrones-no-asignados').empty();
+
+    // Evaluar si la clave de ejecutor es válida, si no, mandar un alerta.
+    if (clave_eje != 'false') {
+
+        // Llamar al socket, mientras carga, mostrar el modal con información de carga.
+        socket.emit('cliente:consultarPatronesNoAsignados', clave_eje);
+        $('#verPatronesNoAsignadosModal').modal('show');
+    
+        $(`<h3 class="text-primary">Obteniendo patrones no asignados</h3>`).appendTo('#div-patrones-no-asignados');
+        $('<img src="imgs/folder_azul.png" class="mt-3">').appendTo('#div-patrones-no-asignados');
+
+        $('#btnNAsignar').prop('disabled', true);
+        $('#btnNCancelar').prop('disabled', true);
+
+        $("#claveEje").val(clave_eje);
+        $("#nomEje").val(nombre);  
+        
+    } else bsAlert("Selecciona la clave de ejecutor", 'warning');
+}
+

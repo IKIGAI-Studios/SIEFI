@@ -9,7 +9,6 @@ export function socket(io) {
   io.on("connection", (socket) => {
 
 
-
 //Obtener las fechas de las tablas RCV y COP de los registros que estan asignados al ejecutor. 
 socket.on('cliente:capturarDatos', async (value, clave_eje) => {
 
@@ -54,18 +53,16 @@ socket.on('cliente:capturarDatos', async (value, clave_eje) => {
   const fechasCOPArray = fechasCOP.map(item => item.createdAt);
   const regPatCOPArray = RegPatCop.map(item => item.reg_pat);
 
-  // Extraer las fechas del resultado de RaleRCV
+  // Extraer las fechas y los registros patronales del resultado de RaleRCV
   const fechasRCVArray = fechasRCV.map(item => item.createdAt);
   const regPatRCVArray = RegPatRcv.map(item => item.reg_pat);
 
-  // Unir los arreglos de fechas en una sola variable llamada fechas
+  // Unir los arreglos de fechas y registros, en una sola variable para cada una llamadas fechas y registros
   const fechas = fechasCOPArray.concat(fechasRCVArray);
   const registros = regPatCOPArray.concat(regPatRCVArray);
 
-
   socket.emit('servidor:capturarDatos', fechas, registros, value, clave_eje);
 });
-
 
 
 // Obtener patrones y las fechas en las que se subio para mandamiento y citatorio
@@ -79,26 +76,26 @@ socket.on('cliente:obtenerPatrones', async (patron, fecha, value, clave_eje) => 
   // Obtener de la tabla Rale COP los registros que coincidan con la consulta anterior.
   const raleC = await RaleCop.findAll({
     attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'inc', 'createdAt'],
-    where: { 
-            reg_pat: reg_pat.map(rp => rp.reg_pat), 
-            reg_pat: patron,
-            createdAt: { 
-                [Op.eq]: Sequelize.literal(`DATE('${fecha}')`)
-              }  
-            }
-    });
+    where: {
+      reg_pat: reg_pat.map(rp => rp.reg_pat),
+      reg_pat: patron,
+      createdAt: {
+        [Op.eq]: Sequelize.literal(`DATE('${fecha}')`)
+      }
+    }
+  });
 
   // Obtener de la tabla Rale RCV los registros que coincidan con la consulta anterior.
   const raleR = await RaleRCV.findAll({
     attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'inc', 'createdAt'],
-    where: { 
-            reg_pat: reg_pat.map(rp => rp.reg_pat), 
-            reg_pat: patron,
-            createdAt: { 
-                [Op.eq]: Sequelize.literal(`DATE('${fecha}')`)
-                } 
-              }
-    });
+    where: {
+      reg_pat: reg_pat.map(rp => rp.reg_pat),
+      reg_pat: patron,
+      createdAt: {
+        [Op.eq]: Sequelize.literal(`DATE('${fecha}')`)
+      }
+    }
+  });
 
     // Agregar la propiedad 'type' a cada objeto en raleCop y raleRCV
     const raleCop = raleC.map(obj => ({ ...obj.dataValues, type: 'cop' }));
@@ -108,59 +105,61 @@ socket.on('cliente:obtenerPatrones', async (patron, fecha, value, clave_eje) => 
     const patrones = raleCop.concat(raleRCV);
 
     socket.emit('servidor:obtenerPatrones', patrones, value, clave_eje);
-
 });
 
 
+// Obtener patrones y las fechas en las que se subió para gastos e informes de ejecutor
+socket.on('cliente:obtenerPatronesEjecutor', async (value, clave_eje) => {
 
-    // Obtener patrones y las fechas en las que se subió para gastos e informes de ejecutor
-  socket.on('cliente:obtenerPatronesEjecutor', async (value, clave_eje) => {
-    // Obtener los registros de la tabla Afil que están en la tabla ejecutores.
-    const reg_pat = await Afil.findAll({
-      where: { clave_eje: clave_eje }
-    });
-
-    let raleC;
-    let raleR;
-
-    if (value == 'informe') {
-      raleC = await RaleCop.findAll({
-        attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'inc', 'createdAt', 'cobrado'],
-        where: { reg_pat: reg_pat.map(rp => rp.reg_pat) }
-      });
-
-      raleR = await RaleRCV.findAll({
-        attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'createdAt', 'inc', 'cobrado'],
-        where: { reg_pat: reg_pat.map(rp => rp.reg_pat) }
-      });
-
-    } else {
-      raleC = await RaleCop.findAll({
-        attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'inc', 'createdAt', 'cobrado'],
-        where: { reg_pat: reg_pat.map(rp => rp.reg_pat), cobrado: true }
-      });
-
-      raleR = await RaleRCV.findAll({
-        attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'createdAt', 'inc', 'cobrado'],
-        where: { reg_pat: reg_pat.map(rp => rp.reg_pat), cobrado: true }
-      });
-    }
-
-    const raleCop = raleC.map(obj => ({ ...obj.dataValues, type: 'cop', cobrado: obj.cobrado ? 'Cobrado' : 'No cobrado' }));
-    const raleRCV = raleR.map(obj => ({ ...obj.dataValues, type: 'rcv', cobrado: obj.cobrado ? 'Cobrado' : 'No cobrado' }));
-
-    const patrones = raleCop.concat(raleRCV);
-
-    socket.emit('servidor:obtenerPatrones', patrones, value, clave_eje);
+  // Obtener los registros de la tabla Afil que están en la tabla ejecutores.
+  const reg_pat = await Afil.findAll({
+    where: { clave_eje: clave_eje }
   });
 
+  let raleC;
+  let raleR;
+
+  // Evaluar si el valor de la variable value es 'gasto' o 'informe'
+  if (value == 'informe') {
+    // Obtener datos de la tabla Rale COP que coincidan con los registros de Afil
+    raleC = await RaleCop.findAll({
+      attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'inc', 'createdAt', 'cobrado'],
+      where: { reg_pat: reg_pat.map(rp => rp.reg_pat) }
+    });
+
+    // Obtener datos de la tabla Rale RCV que coincidan con los registros de Afil
+    raleR = await RaleRCV.findAll({
+      attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'createdAt', 'inc', 'cobrado'],
+      where: { reg_pat: reg_pat.map(rp => rp.reg_pat) }
+    });
+
+  } else {
+    // Obtener datos de la tabla Rale COP que coincidan con los registros de Afil
+    raleC = await RaleCop.findAll({
+      attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'inc', 'createdAt', 'cobrado'],
+      where: { reg_pat: reg_pat.map(rp => rp.reg_pat), cobrado: true }
+    });
+    // Obtener datos de la tabla Rale RCV que coincidan con los registros de Afil
+    raleR = await RaleRCV.findAll({
+      attributes: ['reg_pat', 'nom_cred', 'periodo', 'importe', 'td', 'createdAt', 'inc', 'cobrado'],
+      where: { reg_pat: reg_pat.map(rp => rp.reg_pat), cobrado: true }
+    });
+  }
+
+  const raleCop = raleC.map(obj => ({ ...obj.dataValues, type: 'cop', cobrado: obj.cobrado ? 'Cobrado' : 'No cobrado' }));
+  const raleRCV = raleR.map(obj => ({ ...obj.dataValues, type: 'rcv', cobrado: obj.cobrado ? 'Cobrado' : 'No cobrado' }));
+  const patrones = raleCop.concat(raleRCV);
+
+  socket.emit('servidor:obtenerPatrones', patrones, value, clave_eje);
+});
 
 
 // Obtener el registro patronal de las opciones seleccionadas
 socket.on('cliente:crearFormInforme', async (data, value, user) => {
   var dataM;
+
+  // Evaluar si el valor de la variable value es 'informe' o 'gastos'
   if (value == 'informe'){
-    //Obtener sólo los datos que se van a utilizar en la tabla
       dataM = data.map(obj => {
       return {
         reg_pat: obj.reg_pat,
@@ -172,8 +171,6 @@ socket.on('cliente:crearFormInforme', async (data, value, user) => {
     });
 
   } else if (value === 'gastos') {
-
-    // Obtener sólo los datos que se van a utilizar en la tabla
       dataM = await Promise.all(data.map(async (obj) => {
       const afilData = await Afil.findOne({
         attributes: ['patron'],
@@ -182,6 +179,7 @@ socket.on('cliente:crearFormInforme', async (data, value, user) => {
         }
       });
       
+      // Retornar los valores que se agregan en la tabla
       return {
         reg_pat: obj.reg_pat,
         patron: afilData.patron, 
@@ -192,6 +190,7 @@ socket.on('cliente:crearFormInforme', async (data, value, user) => {
     }));
   }
   
+  // Obtener el nombre del ejecutor
   const regEjecutor = await Ejecutor.findOne({
     attributes: ['clave_eje', 'nombre'],
     where: { clave_eje: user }
@@ -201,10 +200,10 @@ socket.on('cliente:crearFormInforme', async (data, value, user) => {
 });
 
 
+// Maneja el evento de desconexión del cliente
+socket.on("disconnect", () => {
+  // Programar eventos (innecesarios por ahora)
+});
 
-    // Maneja el evento de desconexión del cliente
-    socket.on("disconnect", () => {
-      // Programar eventos (innecesarios por ahora)
-    });
-  });
+});
 }
