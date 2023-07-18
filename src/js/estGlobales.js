@@ -17,7 +17,9 @@ let dataStats,
 (confronta = {}), (regFal = { rales: [] });
 (regExis = { rales: [] }), (nEjecutores = {});
 
-// Funcion al cargar la página
+/**
+ * Función que se ejecuta al cargar la página.
+ */
 window.onload = function () {
 	$("#spinner").hide();
 	socket.emit("cliente:consultarRegistrosRaleCOP");
@@ -25,7 +27,11 @@ window.onload = function () {
 	socket.emit("cliente:consultarRegistrosCoin");
 };
 
-// Socket para las estadisticas globales
+/**
+ * Callback que se ejecuta al recibir las estadísticas globales del servidor.
+ * @param {Object} data - Datos de las estadísticas globales.
+ * @param {Array} ejecutores - Lista de ejecutores.
+ */
 socket.on("servidor:estGlobales", ({ data, ejecutores }) => {
 	nEjecutores = ejecutores.length;
 	dataStats = data;
@@ -41,7 +47,10 @@ socket.on("servidor:estGlobales", ({ data, ejecutores }) => {
 	$("#dateCOINscnd").prop("disabled", false);
 });
 
-// Socket para la confronta de estadisticas globales
+/**
+ * Callback que se ejecuta al recibir la confronta de las estadísticas globales del servidor.
+ * @param {Object} data - Datos de la confronta de las estadísticas globales.
+ */
 socket.on("servidor:estGlobalesConfronta", ({ data }) => {
 	confronta = data;
 	var encontrado = false;
@@ -104,7 +113,7 @@ socket.on("servidor:estGlobalesConfronta", ({ data }) => {
 	$("#CUOTAS_coin_dilig").text(cuotas.coin_dilig);
 	$("#CUOTAS_diligenciado").text(cuotas.dil);
 
-	// Obtener los rcv asignadas si el tipo es rcv y la inc es 9
+	// Obtener los rcv asignados si el tipo es rcv y la inc es 9
 	rcv.asignado = data.rales.filter(
 		(obj) => obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31)
 	).length;
@@ -247,13 +256,16 @@ socket.on("servidor:estGlobalesConfronta", ({ data }) => {
 	$("#DATES_opor_imp").text(dates.opor_imp + "%");
 	$("#DATES_opor").text(dates.oport + "%");
 
-	// Mostrar los grafico y tabla
+	// Mostrar los gráficos y tabla
 	showGraphics("canvas-coin-31", dates.ava_coin, "coin");
 	showGraphics("canvas-prod-ind", dates.productividad, "prod");
 	showTable("confronta");
 });
 
-// Consultar las fechas de los registros de Rale COP
+/**
+ * Callback que se ejecuta al recibir los registros de Rale COP desde el servidor.
+ * @param {Array} data - Array de fechas de los registros de Rale COP.
+ */
 socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
 	$("#dateCOPfrst").empty();
 	$("#dateCOPscnd").empty();
@@ -289,6 +301,11 @@ socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
 });
 
 // Consultar las fechas de los registros de Rale RCV
+/**
+ * Callback que se ejecuta al recibir los registros de Rale RCV desde el servidor.
+ *
+ * @param {Array} data - Array de fechas de los registros de Rale RCV.
+ */
 socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
 	$("#dateRCVfrst").empty();
 	$("#dateRCVscnd").empty();
@@ -321,7 +338,10 @@ socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
 	$("#dateRCVfrst").prop("disabled", false);
 });
 
-// Consultar las fechas de los registros de COIN
+/**
+ * Callback que se ejecuta al recibir los registros de COIN desde el servidor.
+ * @param {Array} data - Array de fechas de los registros de COIN.
+ */
 socket.on("servidor:consultarRegistrosCoin", (data) => {
 	$("#dateCOINscnd").empty();
 	$("#dateCOINfrst").empty();
@@ -537,18 +557,23 @@ $("#inp_DATES_fes").on("change", function () {
 	}
 });
 
+/**
+ * Función para obtener los rales.
+ * Realiza acciones como deshabilitar botones de filtros de rales, vaciar la tabla de estadísticas globales,
+ * mostrar el spinner y enviar los datos de las fechas de COP, RCV y COIN al servidor.
+ */
 function getRales() {
 	// Deshabilitar los botones de filtros de rales
 	$("#btn_fil_inc").prop("disabled", true);
 	$("#btn_fil_res").prop("disabled", true);
 	$("#btn_fil_con").prop("disabled", true);
 
-	// Vaciar la tabla de estadisticas globales
+	// Vaciar la tabla de estadísticas globales
 	$("#div-tabla-estadisticas-globales").empty();
 
 	// Mostrar el spinner
 	$("#spinner").show();
-	// Ocultar la tabla de estadisticas globales
+	// Ocultar la tabla de estadísticas globales
 	$("#div-tabla-estadisticas-globales").hide();
 
 	// Enviar los datos de los inputs de la fecha de COP, RCV y COIN al servidor
@@ -559,11 +584,15 @@ function getRales() {
 	});
 }
 
-// Obtener las confrontas de los inputs de la fecha de COP, RCV y COIN
+/**
+ * Función para obtener la confronta de los inputs de las fechas de COP, RCV y COIN.
+ * Realiza acciones como mostrar el spinner, ocultar la tabla de estadísticas globales
+ * y enviar los datos de las fechas y el ejecutor al servidor.
+ */
 function getConfronta() {
 	// Mostrar el spinner
 	$("#spinner").show();
-	// Ocultar la tabla de estadisticas globales
+	// Ocultar la tabla de estadísticas globales
 	$("#div-tabla-estadisticas-globales").hide();
 	// Enviar los datos de los inputs de la fecha de COP, RCV y COIN al servidor
 	socket.emit("cliente:confrontaEstGlo", {
@@ -573,7 +602,12 @@ function getConfronta() {
 	});
 }
 
-// Llenar los filtros de incidencias, concepto y resultados
+/**
+ * Función para llenar los filtros de incidencias, concepto y resultados.
+ * Realiza acciones como borrar los filtros existentes, habilitar los botones de filtros,
+ * obtener los datos de incidencias, concepto y resultados de los rales,
+ * ordenar los datos y agregarlos a los filtros correspondientes.
+ */
 function fillFilters() {
 	// Borrar los filtros de incidencias, concepto y resultados
 	$("#inc_fil").empty();
@@ -714,7 +748,11 @@ function fillFilters() {
 	});
 }
 
-// Llenar las estadisticas globales
+/**
+ * Función para llenar las estadísticas globales.
+ * Realiza acciones como obtener y calcular diferentes datos estadísticos
+ * basados en los datos de los rales y las fechas seleccionadas, y mostrarlos en la interfaz.
+ */
 function fillStats() {
 	// Obtener las cuotas asignadas
 	cuotas.asig = dataStats.rales.filter(
@@ -970,15 +1008,15 @@ function fillStats() {
 				obj.oportunidad == "Fuera de tiempo"
 		)
 		.reduce((acumulador, obj) => acumulador + obj.importe, 0);
-    // Oportunidad por importe
+	// Oportunidad por importe
 	dates.opor_imp = (
 		((imp.dos + imp.tres_uno) / (imp.dos + imp.tres_uno + imp.fuera)) *
 		100
 	).toFixed(2);
-    // Oportunidad promedidada
+	// Oportunidad promedidada
 	dates.oport = (parseInt(dates.opor_docs) + parseInt(dates.opor_imp)) / 2;
 
-    // Mostrar los datos de las fechas
+	// Mostrar los datos de las fechas
 	$("#DATES_fec_ini").text(dates.fec_ini);
 	$("#DATES_fec_fin").text(dates.fec_fin);
 	$("#DATES_laborales").text(dates.laborales);
@@ -990,18 +1028,24 @@ function fillStats() {
 	$("#DATES_opor_imp").text(dates.opor_imp + "%");
 	$("#DATES_opor").text(dates.oport + "%");
 
-    // Mostrar los gráficos
+	// Mostrar los gráficos
 	showGraphics("canvas-coin-31", dates.ava_coin, "coin");
 	showGraphics("canvas-prod-ind", dates.productividad, "prod");
 }
 
+/**
+ * Muestra un gráfico de dona en un elemento canvas.
+ * @param {string} id - El ID del elemento canvas donde se mostrará el gráfico.
+ * @param {number} perc - El porcentaje de llenado del gráfico.
+ * @param {string} type - El tipo de gráfico a mostrar ("coin" o cualquier otro valor).
+ */
 function showGraphics(id, perc, type) {
 	// Obtén el elemento canvas
 	var canvas = document.getElementById(id);
 	var ctx = canvas.getContext("2d");
-    
-    // Inicializar el ctx y limpiar
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	// Inicializar el ctx y limpiar
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	// Configuración del dona
 	var centerX = canvas.width / 2;
@@ -1028,7 +1072,7 @@ function showGraphics(id, perc, type) {
 
 	// Dibujar seccion por seccion
 	colors.map((color, i) => {
-        // Obtener cords de inico y fin
+		// Obtener cords de inico y fin
 		let start = (180 + i * (180 / colors.length)) * (Math.PI / 180),
 			end = (180 + (i + 1) * (180 / colors.length)) * (Math.PI / 180);
 		// Dibuja la dona
@@ -1087,42 +1131,53 @@ function showGraphics(id, perc, type) {
 	ctx.fill();
 }
 
-// Obtener los días laborales de un mes
+/**
+ * Obtiene los días laborales de un mes específico.
+ * @param {number} month - El número del mes (0-11) donde 0 representa enero y 11 representa diciembre.
+ * @param {number} year - El año correspondiente a los días laborales que se desean obtener.
+ * @returns {Array} - Un array de objetos Date que representa los días laborales del mes y año especificados.
+ */
 function getWorkDays(month, year) {
 	const days = [];
-    // Obtener la fecha de el mes y año
+	// Obtener la fecha de el mes y año
 	const date = new Date(year, month, 1);
 
-    // Recorrer los días del mes
+	// Recorrer los días del mes
 	while (date.getMonth() === month) {
 		const day = date.getDay();
-        // Validar dia que no sea fin de semana
+		// Validar día que no sea fin de semana
 		if (day !== 0 && day !== 6) {
 			days.push(new Date(date));
 		}
-        // Aumentar fecha
+		// Aumentar fecha
 		date.setDate(date.getDate() + 1);
 	}
 	return days;
 }
 
-// Actualizar los filtros de los grupos de datos
+/**
+ * Actualiza los filtros de los grupos de datos.
+ * @param {string} group - El grupo de datos que se está actualizando ("inc" para incidencias, "con" para conceptos, "res" para resultados).
+ * @param {string|number} n - El valor del filtro que se está actualizando.
+ * @param {boolean} act - Indica si el filtro se activó (true) o desactivó (false).
+ * @returns {void}
+ */
 function updateFilters(group, n, act) {
-    // Mostrar spinner y ocultar tabla
+	// Mostrar spinner y ocultar tabla
 	$("#spinner").show();
 	$("#div-tabla-estadisticas-globales").hide();
-    // Validar el tipo de cambio
+	// Validar el tipo de cambio
 	switch (group) {
 		case "inc":
-            // Si se activo se inserta al arreglo
+			// Si se activó, se inserta al arreglo
 			if (act) inc.push(n);
 			else {
-                // Si no se activo se elimina del arreglo
+				// Si no se activó, se elimina del arreglo
 				inc = inc.filter(function (fil) {
 					return fil !== n;
 				});
 			}
-            // Se ordena de nuevo
+			// Se ordena de nuevo
 			inc.sort(function (a, b) {
 				return a - b;
 			});
@@ -1135,7 +1190,7 @@ function updateFilters(group, n, act) {
 				});
 			}
 			con.sort(function (a, b) {
-				a.localeCompare(b);
+				return a.localeCompare(b);
 			});
 			break;
 		case "res":
@@ -1146,25 +1201,29 @@ function updateFilters(group, n, act) {
 				});
 			}
 			res.sort(function (a, b) {
-				a.localeCompare(b);
+				return a.localeCompare(b);
 			});
 			break;
 		default:
 			break;
 	}
-    // Se muestra la tabla con los filtros actualizados
+	// Se muestra la tabla con los filtros actualizados
 	showTable("inicio");
 }
 
-// Mostrar tabla con los datos 
+/**
+ * Muestra una tabla con los datos.
+ * @param {string} type - El tipo de tabla a mostrar ("inicio" para la tabla de inicio, cualquier otro valor para la tabla de confronta).
+ * @returns {void}
+ */
 function showTable(type) {
-    // Valiar el tipo si es una tabla de inico o de confronta
+	// Valiar el tipo si es una tabla de inicio o de confronta
 	let data = type == "inicio" ? dataStats.rales : confronta.rales;
-    // Vaciar la tabla
+	// Vaciar la tabla
 	$("#div-tabla-estadisticas-globales").empty();
-    // Validar si no hay datos
+	// Validar si no hay datos
 	if (data.length < 1) {
-		bsAlert("No hay fningun patron asignado", "danger");
+		bsAlert("No hay ningún patrón asignado", "danger");
 		return;
 	}
 
@@ -1227,8 +1286,8 @@ function showTable(type) {
 	);
 	tableScrollContainer.appendTo(tableContainer);
 	tableContainer.appendTo("#div-tabla-estadisticas-globales");
-    // Ocultar spinner
+	// Ocultar spinner
 	$("#spinner").hide();
-    // Mostrar la tabla
+	// Mostrar la tabla
 	$("#div-tabla-estadisticas-globales").show();
 }
