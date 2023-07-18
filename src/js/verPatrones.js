@@ -1,3 +1,4 @@
+// @ts-nocheck
 const socket = io("http://localhost:3000");
 
 // Variables globales.
@@ -17,13 +18,20 @@ let dataStats,
 	regFal = { rales: [] };
 regExis = { rales: [] };
 
+/**
+ * Funciones al cargar la página.
+ */
 window.onload = function () {
+    $("#spinner").hide();
 	socket.emit("cliente:consultarRegistrosRaleCOP");
 	socket.emit("cliente:consultarRegistrosRaleRCV");
 	socket.emit("cliente:consultarRegistrosCoin");
 };
 
-// Socket para inicializar variables, deshabilitar botones inicialmente y llamar funciones.
+/**
+ * Socket para las estadísticas individuales.
+ * @param {{ data: any }} data - Datos recibidos del servidor.
+ */
 socket.on("servidor:estIndividuales", ({ data }) => {
 	dataStats = data;
 	fillFilters();
@@ -34,7 +42,10 @@ socket.on("servidor:estIndividuales", ({ data }) => {
 	$("#dateCOINscnd").prop("disabled", false);
 });
 
-// Socket para crear las estadisticas individuales.
+/**
+ * Socket para la confronta.
+ * @param {{ data: any }} data - Datos recibidos del servidor.
+ */
 socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 	confronta = data;
 	var encontrado = false;
@@ -237,7 +248,10 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 	showTable("confronta");
 });
 
-// Socket para consultar los registros de Rale Cop
+/**
+ * Socket para consultar las fechas de los registros de Rale COP.
+ * @param {any} data - Datos recibidos del servidor.
+ */
 socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
 	// Limpiar los div correspondientes, y agregar al div dateCopfrst información.
 	$("#dateCOPfrst").empty();
@@ -277,7 +291,10 @@ socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
 	$("#dateCOPfrst").prop("disabled", false);
 });
 
-// Socket para consultar los registros de Rale RCV
+/**
+ * Socket para consultar las fechas de los registros de Rale RCV.
+ * @param {any} data - Datos recibidos del servidor.
+ */
 socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
 	// Limpiar los div correspondientes, y agregar al div dateCopfrst información.
 	$("#dateRCVfrst").empty();
@@ -315,7 +332,10 @@ socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
 	$("#dateRCVfrst").prop("disabled", false);
 });
 
-// Socket para consultar los registros de COIN
+/**
+ * Socket para consultar las fechas de los registros de COIN.
+ * @param {any} data - Datos recibidos del servidor.
+ */
 socket.on("servidor:consultarRegistrosCoin", (data) => {
 	// Limpiar los div correspondientes, y agregar al div dateCOINscnd información.
 	$("#dateCOINscnd").empty();
@@ -353,7 +373,9 @@ socket.on("servidor:consultarRegistrosCoin", (data) => {
 	$("#dateCOINfrst").prop("disabled", false);
 });
 
-// Agregar el evento para cuando el botón generar listado de patrones sea seleccionado
+/**
+ * Evento que se ejecuta al presionar el botón de generar listado de patrones.
+ */
 $("#btnListadoPatrones").on("click", function () {
 	if (dataStats) {
 		socket.emit(
@@ -386,8 +408,9 @@ $("#btnListadoPatrones").on("click", function () {
 	bsAlert("No se ha realizado ninguna consulta", "warning");
 });
 
-// Hacemos un on change al div con el id div-frst-selects porque se crea dinamicamente
-// entonces no se puede crear un evento a un elemento que no existe
+/**
+ * Evento que se ejecuta cuando se selecciona una fecha para Rale COP.
+ */
 $("#div-frst-selects").on("change", "#dateCOPfrst", function () {
 	$("#btn_fil_inc").prop("disabled", true);
 	$("#btn_fil_res").prop("disabled", true);
@@ -414,6 +437,7 @@ $("#div-frst-selects").on("change", "#dateCOPfrst", function () {
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
+                $("#spinner").show();
 				// Se manda al socket los valores de los inputs correspondientes.
 				socket.emit("cliente:ejecutorSeleccionadoEstInd", {
 					ejecutor: $("#nombreEjecutor").val(),
@@ -425,7 +449,9 @@ $("#div-frst-selects").on("change", "#dateCOPfrst", function () {
 		}
 });
 
-// Se realiza un on change al div con el id dateRCV porque se crea dinamicamente
+/**
+ * Evento que se ejecuta cuando se selecciona una fecha para Rale RCV.
+ */
 $("#div-frst-selects").on("change", "#dateRCVfrst", function () {
 	$("#btn_fil_inc").prop("disabled", true);
 	$("#btn_fil_res").prop("disabled", true);
@@ -451,6 +477,7 @@ $("#div-frst-selects").on("change", "#dateRCVfrst", function () {
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
+                $("#spinner").show();
 				// Se manda al socket los valores de los inputs correspondientes.
 				socket.emit("cliente:ejecutorSeleccionadoEstInd", {
 					ejecutor: $("#nombreEjecutor").val(),
@@ -462,7 +489,9 @@ $("#div-frst-selects").on("change", "#dateRCVfrst", function () {
 		}
 });
 
-// Se realiza un on change al div con el id dateCOIN porque se crea dinamicamente
+/**
+ * Evento que se ejecuta cuando se selecciona una fecha para COIN.
+ */
 $("#div-frst-selects").on("change", "#dateCOINfrst", function () {
 	$("#btn_fil_inc").prop("disabled", true);
 	$("#btn_fil_res").prop("disabled", true);
@@ -488,6 +517,7 @@ $("#div-frst-selects").on("change", "#dateCOINfrst", function () {
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
+                $("#spinner").show();
 				// Se manda al socket los valores de los inputs correspondientes.
 				socket.emit("cliente:ejecutorSeleccionadoEstInd", {
 					ejecutor: $("#nombreEjecutor").val(),
@@ -499,8 +529,10 @@ $("#div-frst-selects").on("change", "#dateCOINfrst", function () {
 		}
 });
 
-// Confronta inputs
-// Se realiza un on change al div con el id div-scnd-selects porque se crea dinamicamente
+// *** Confronta inputs ***
+/**
+ * Evento que se ejecuta cuando se selecciona una fecha para Rale COP en el segundo input.
+ */
 $("#div-scnd-selects").on("change", "#dateCOPscnd", function () {
 	$("#dateCOPfrst option").prop("disabled", false);
 	$(`#dateCOPfrst option[value="${$(this).val()}"]`).prop(
@@ -520,7 +552,9 @@ $("#div-scnd-selects").on("change", "#dateCOPscnd", function () {
 		}
 });
 
-// Se realiza un on change al div con el id div-scnd-selects porque se crea dinamicamente.
+/**
+ * Evento que se ejecuta cuando se selecciona una fecha para Rale RCV en el segundo input.
+ */
 $("#div-scnd-selects").on("change", "#dateRCVscnd", function () {
 	$("#dateRCVfrst option").prop("disabled", false);
 	$(`#dateRCVfrst option[value="${$(this).val()}"]`).prop(
@@ -540,7 +574,9 @@ $("#div-scnd-selects").on("change", "#dateRCVscnd", function () {
 		}
 });
 
-// Se realiza un on change al div con el id inp_DATES_fes porque se crea dinamicamente.
+/**
+ * Evento que se ejecuta al cambiar los días festivos.
+ */
 $("#inp_DATES_fes").on("change", function () {
 	if (
 		$("#dateCOPfrst").val() == "false" ||
@@ -550,19 +586,31 @@ $("#inp_DATES_fes").on("change", function () {
 	if ($(this).val() == "")
 		bsAlert("Inserta un número en los dias festivos", "warning");
 	else {
+		// Obtener los dias laborales
 		dates.laborales =
 			getWorkDays(fecha.getMonth(), fecha.getFullYear()).length -
 			($("#inp_DATES_fes").val() != "" ? $("#inp_DATES_fes").val() : 0);
-		dates.dilig = dates.laborales * 5 < 0 ? 0 : dates.laborales * 5;
-		$("#DATES_laborales").text(dates.laborales);
-		$("#DATES_dilig").text(dates.dilig);
+		// Diligencias por dia
+		dates.dilig = dates.laborales * 5 > 0 ? dates.laborales * 5 : 0;
+		// Productividad
+		dates.productividad = ((dates.pat_dilig / dates.dilig) * 100).toFixed(
+			2
+		);
+		// Mostrar los graficos
 		showGraphics("canvas-prod-ind", dates.productividad, "prod");
+		// Insertar los datos
+		$("#DATES_laborales").text(dates.laborales < 0 ? 0 : dates.laborales);
+		$("#DATES_dilig").text(dates.dilig);
+		$("#DATES_pat_dilig").text(dates.pat_dilig);
+		$("#DATES_product").text(dates.productividad + "%");
 	}
 });
 
-// Función para llamar un socket, enviando como valores, los valores de los inputs correspondientes.
+/**
+ * Función para obtener la confronta de estadísticas individuales.
+ */
 function getConfronta() {
-	console.log($("#dateRCVscnd").val(), $("#dateCOPscnd").val());
+	$("#spinner").show();
 	socket.emit("cliente:confrontaEstInd", {
 		ejecutor: $("#nombreEjecutor").val(),
 		copDate: $("#dateCOPscnd").val(),
@@ -570,7 +618,9 @@ function getConfronta() {
 	});
 }
 
-// Función para llenar los filtros de incidencias
+/**
+ * Llena los filtros, los habilita y los muestra en un dropdown.
+ */
 function fillFilters() {
 	$("#inc_fil").empty();
 	$("#btn_fil_inc").prop("disabled", false);
@@ -718,7 +768,9 @@ function fillFilters() {
 	});
 }
 
-// Se encarga de actualizar los filtros de incidencias, dependiendo de si el checkbox está activo o no.
+/**
+ * Llena las tablas de estadísticas con los datos correspondientes.
+ */
 function fillStats() {
 	// Contabilizar las cuotas asign y asignarlas a cuotas.asig.
 	cuotas.asig = dataStats.rales.filter(
@@ -962,6 +1014,12 @@ function fillStats() {
 	showGraphics("canvas-prod-ind", dates.productividad, "prod");
 }
 
+/**
+ * Muestra un gráfico de dona en el elemento canvas especificado.
+ * @param {string} id - El ID del elemento canvas.
+ * @param {number} perc - El porcentaje para la sección resaltada en el gráfico.
+ * @param {string} type - El tipo de gráfico. Puede ser "coin" o cualquier otro valor.
+ */
 function showGraphics(id, perc, type) {
 	// Obtén el elemento canvas
 	var canvas = document.getElementById(id);
@@ -1051,7 +1109,12 @@ function showGraphics(id, perc, type) {
 	ctx.fill();
 }
 
-// Función para obtener los días laborales
+/**
+ * Obtiene un arreglo de objetos Date que representan los días laborales de un mes y año específicos.
+ * @param {number} month - El número de mes (0-11) del cual se desean obtener los días laborales.
+ * @param {number} year - El año del cual se desean obtener los días laborales.
+ * @returns {Date[]} Un arreglo de objetos Date que representan los días laborales del mes y año especificados.
+ */
 function getWorkDays(month, year) {
 	// Define a la variable date, los valores recibidos en la función.
 	const days = [];
@@ -1068,6 +1131,12 @@ function getWorkDays(month, year) {
 	return days;
 }
 
+/**
+ * Actualiza los filtros según la acción realizada en un grupo específico.
+ * @param {string} group - El grupo al que pertenece el filtro a actualizar ('inc', 'con' o 'res').
+ * @param {string|number} n - El valor del filtro a actualizar.
+ * @param {boolean} act - Indica si la acción es activar (true) o desactivar (false) el filtro.
+ */
 function updateFilters(group, n, act) {
 	switch (group) {
 		case "inc":
@@ -1109,6 +1178,10 @@ function updateFilters(group, n, act) {
 	showTable("inicio");
 }
 
+/**
+ * Muestra una tabla de estadísticas individuales según el tipo especificado.
+ * @param {string} type - El tipo de tabla a mostrar ('inicio' para la tabla inicial o cualquier otro valor para la tabla de confronta).
+ */
 function showTable(type) {
 	let data = type == "inicio" ? dataStats.rales : confronta.rales;
 	$("#div-tabla-estadisticas-individuales").empty();
@@ -1176,4 +1249,5 @@ function showTable(type) {
 	);
 	tableScrollContainer.appendTo(tableContainer);
 	tableContainer.appendTo("#div-tabla-estadisticas-individuales");
+    $("#spinner").hide();
 }

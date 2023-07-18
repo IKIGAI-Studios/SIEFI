@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
@@ -7,17 +8,13 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import main_routes from './routes/main_routes.js';
-//import socketConnection from './sockets/sockets.js';
 import { socket as loadInfoSockets } from './sockets/loadInfoSockets.js';
 import { socket as estIndividualesSockets } from './sockets/estindividualesSockets.js';
 import { socket as estGlobalesSockets } from './sockets/estGlobalesSockets.js';
 import { socket as actEjecutorSockets } from './sockets/actEjecutorSockets.js';
-// import { socket as confrontaSockets } from './sockets/confrontaSockets.js';
 import { socket as reportesSocket } from './sockets/reportesSocket.js';
 import http from 'http';
 import { Server } from 'socket.io'
-
-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -42,7 +39,6 @@ const io = new Server(httpServer);
 loadInfoSockets(io); // Configura los sockets de load Info en el servidor
 estIndividualesSockets(io); // Configura los sockets de estadisticas individuales en el servidor
 actEjecutorSockets(io); // Configura los sockets de actualizar ejecutor en el servidor
-// confrontaSockets(io); // Configura los sockets de confronta ejecutor en el servidor
 estGlobalesSockets(io); // Configura los sockets de estadisticas globales en el servidor
 reportesSocket(io); // Configura los sockets de reportes en el servidor
 

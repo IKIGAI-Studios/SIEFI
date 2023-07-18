@@ -1,0 +1,11 @@
+{
+    "source": {
+        "include": ["./middlewares", "./models", "./routes", "./sockets", "./src/js", "./"],
+        "includePattern": ".+\\.js(doc|x)?$",
+        "exclude": "node_modules/|docs"
+    },
+    "plugins": [],
+    "opts": {
+        "destination": "docs/"
+    }
+}

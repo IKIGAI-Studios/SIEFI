@@ -1,4 +1,32 @@
-import { dirname, join } from "path";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: routes/funciones_main_routes.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: routes/funciones_main_routes.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { format } from "date-fns";
 import { Op } from "sequelize";
@@ -88,7 +116,7 @@ export async function generarInforme(req, res) {
 		// Se enviaron varios registros
 		else {
 			// Obtener los datos de cada credito
-			for (let index = 0; index < nom_cred.length; index++) {
+			for (let index = 0; index &lt; nom_cred.length; index++) {
 				const value = type[index];
 				const nomCredValue = nom_cred[index];
 				const folioSuaValue = folioSua[index];
@@ -378,7 +406,7 @@ export async function generarGastos(req, res) {
 		}
 		// Se enviaron varios registros
 		else {
-			for (let index = 0; index < nom_cred.length; index++) {
+			for (let index = 0; index &lt; nom_cred.length; index++) {
 				// Variables
 				const value = type[index];
 				const nomCredValue = nom_cred[index];
@@ -573,13 +601,13 @@ export async function generarGastos(req, res) {
 
 		// Validar el tabulador.
 		switch (true) {
-			case sumaFormat <= 37000.99:
+			case sumaFormat &lt;= 37000.99:
 				tabulador = 350;
 				break;
-			case sumaFormat >= 37001.0 && sumaFormat <= 45000.99:
+			case sumaFormat >= 37001.0 &amp;&amp; sumaFormat &lt;= 45000.99:
 				tabulador = 600;
 				break;
-			case sumaFormat >= 45001.0 && sumaFormat <= 60000:
+			case sumaFormat >= 45001.0 &amp;&amp; sumaFormat &lt;= 60000:
 				tabulador = 850;
 				break;
 			default:
@@ -615,7 +643,7 @@ export async function generarGastos(req, res) {
 		const tabulador = [];
 
 		//Agregar filas debajo de la fila 9, dependiendo de la longitud del reg_pat
-		for (let i = 0; i < longitudRegPat; i++) {
+		for (let i = 0; i &lt; longitudRegPat; i++) {
 			const fila = 9 + i;
 			worksheet.duplicateRow(10, 1, fila);
 		}
@@ -716,7 +744,7 @@ export async function generarGastos(req, res) {
 		});
 
 		// Llenar la columna A, con números consecutivos:
-		for (let i = 0; i < reg_pat.length; i++) {
+		for (let i = 0; i &lt; reg_pat.length; i++) {
 			const fila = 10 + i;
 			const celda = worksheet.getCell(`A${fila}`);
 			celda.value = i + 1;
@@ -726,7 +754,7 @@ export async function generarGastos(req, res) {
 		}
 
 		//Llenar la columna K (total) con la suma de I y J y guardar datos numéricos en el arreglo de tabulador.
-		for (let i = 0; i < reg_pat.length; i++) {
+		for (let i = 0; i &lt; reg_pat.length; i++) {
 			//Variables locales que almacenan las celdas y el número de fila
 			const fila = 10 + i;
 			const celdaI = worksheet.getCell(`I${fila}`);
@@ -744,13 +772,13 @@ export async function generarGastos(req, res) {
 
 			//Evaluar la condición y agregar los datos en tabulador.
 			switch (true) {
-				case sumaFormat <= 37000.99:
+				case sumaFormat &lt;= 37000.99:
 					tabulador.push(350);
 					break;
-				case sumaFormat >= 37001.0 && sumaFormat <= 45000.99:
+				case sumaFormat >= 37001.0 &amp;&amp; sumaFormat &lt;= 45000.99:
 					tabulador.push(600);
 					break;
-				case sumaFormat >= 45001.0 && sumaFormat <= 60000:
+				case sumaFormat >= 45001.0 &amp;&amp; sumaFormat &lt;= 60000:
 					tabulador.push(850);
 					break;
 				default:
@@ -863,7 +891,7 @@ export async function generarCitatorio(req, res) {
 		}
 		// Se enviaron varios registros
 		else {
-			for (let index = 0; index < nomCredRecibido.length; index++) {
+			for (let index = 0; index &lt; nomCredRecibido.length; index++) {
 				const value = tipoRecibido[index];
 				const nomCredValue = nomCredRecibido[index];
 
@@ -946,8 +974,8 @@ export async function generarCitatorio(req, res) {
 	anchoColumna = 250;
 
 	// Dibujar la tabla
-	for (let fila = 0; fila < datosRow1.length; fila++) {
-		for (let columna = 0; columna < datosRow1[fila].length; columna++) {
+	for (let fila = 0; fila &lt; datosRow1.length; fila++) {
+		for (let columna = 0; columna &lt; datosRow1[fila].length; columna++) {
 			const x = margenIzquierdo + columna * anchoColumna;
 			const y = margenSuperior + fila * altoFila;
 			// Dibujar el borde de la celda
@@ -967,7 +995,7 @@ export async function generarCitatorio(req, res) {
 	anchoColumna = 500;
 
 	// Dibujar la tabla
-	for (let fila = 0; fila < datosRow2.length; fila++) {
+	for (let fila = 0; fila &lt; datosRow2.length; fila++) {
 		const x = margenIzquierdo;
 		const y = margenSuperior + fila * altoFila;
 		// Dibujar el borde de la celda
@@ -989,7 +1017,7 @@ export async function generarCitatorio(req, res) {
 	// Crear la tabla con los registros seleccionados.
 	const datosRegistros = [];
 
-	for (let i = 0; i < dataLength; i++) {
+	for (let i = 0; i &lt; dataLength; i++) {
 		const nomCred = datR.nom_cred[i];
 		const periodo = convertirFormatoFecha(datR.periodo[i]);
 		const importe = datR.importe[i];
@@ -1016,8 +1044,8 @@ export async function generarCitatorio(req, res) {
 	anchoColumna = 160;
 
 	// Dibujar la tabla
-	for (let fila = 0; fila < datosRegistro.length; fila++) {
-		for (let columna = 0; columna < datosRegistro[fila].length; columna++) {
+	for (let fila = 0; fila &lt; datosRegistro.length; fila++) {
+		for (let columna = 0; columna &lt; datosRegistro[fila].length; columna++) {
 			const x = margenIzquierdo + columna * anchoColumna;
 			const y = margenSuperior + fila * altoFila;
 			if (fila === 0) {
@@ -1049,10 +1077,10 @@ export async function generarCitatorio(req, res) {
 	anchoColumna = 120;
 
 	// Dibujar la tabla
-	for (let fila = 0; fila < datosConceptos.length; fila++) {
+	for (let fila = 0; fila &lt; datosConceptos.length; fila++) {
 		for (
 			let columna = 0;
-			columna < datosConceptos[fila].length;
+			columna &lt; datosConceptos[fila].length;
 			columna++
 		) {
 			const x = margenIzquierdo + columna * anchoColumna;
@@ -1296,7 +1324,7 @@ export async function generarMandamiento(req, res) {
 		// Crear la tabla con los registros seleccionados.
 		const datosRegistros = [];
 
-		for (let i = 0; i < dataLength; i++) {
+		for (let i = 0; i &lt; dataLength; i++) {
 			const nomCred = datR.nom_cred[i];
 			const periodo = convertirFormatoFecha(datR.periodo[i]);
 			const importe = datR.importe[i];
@@ -1324,10 +1352,10 @@ export async function generarMandamiento(req, res) {
 		anchoColumna = 154;
 
 		// Dibujar la tabla
-		for (let fila = 0; fila < datosTabla.length; fila++) {
+		for (let fila = 0; fila &lt; datosTabla.length; fila++) {
 			for (
 				let columna = 0;
-				columna < datosTabla[fila].length;
+				columna &lt; datosTabla[fila].length;
 				columna++
 			) {
 				const x = margenIzquierdo + columna * anchoColumna;
@@ -1478,8 +1506,8 @@ export async function generarMandamiento(req, res) {
 	altoFila = 40;
 
 	// Dibujar la tabla
-	for (let fila = 0; fila < datosTabla.length; fila++) {
-		for (let columna = 0; columna < datosTabla[fila].length; columna++) {
+	for (let fila = 0; fila &lt; datosTabla.length; fila++) {
+		for (let columna = 0; columna &lt; datosTabla[fila].length; columna++) {
 			const x = margenIzquierdo + columna * anchoColumna;
 			const y = margenSuperior + fila * altoFila;
 			// Dibujar el borde de la celda
@@ -1500,8 +1528,8 @@ export async function generarMandamiento(req, res) {
 	altoFila = 40;
 
 	// Dibujar la tabla
-	for (let fila = 0; fila < datosTabla.length; fila++) {
-		for (let columna = 0; columna < datosTabla[fila].length; columna++) {
+	for (let fila = 0; fila &lt; datosTabla.length; fila++) {
+		for (let columna = 0; columna &lt; datosTabla[fila].length; columna++) {
 			const x = margenIzquierdo + columna * anchoColumna;
 			const y = margenSuperior + fila * altoFila;
 			// Dibujar el borde de la celda
@@ -1538,3 +1566,26 @@ export async function generarMandamiento(req, res) {
 		res.status(500).send("Error al crear el archivo PDF");
 	});
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#agruparArchivos">agruparArchivos</a></li><li><a href="global.html#generarCitatorio">generarCitatorio</a></li><li><a href="global.html#generarGastos">generarGastos</a></li><li><a href="global.html#generarInforme">generarInforme</a></li><li><a href="global.html#generarMandamiento">generarMandamiento</a></li><li><a href="global.html#obtenerAfil">obtenerAfil</a></li><li><a href="global.html#obtenerTotales">obtenerTotales</a></li><li><a href="global.html#processAfil">processAfil</a></li><li><a href="global.html#processCoin">processCoin</a></li><li><a href="global.html#processRale">processRale</a></li><li><a href="global.html#sequelize">sequelize</a></li><li><a href="global.html#socket">socket</a></li><li><a href="global.html#subirArchivo">subirArchivo</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Jul 18 2023 13:26:03 GMT-0500 (hora de verano central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

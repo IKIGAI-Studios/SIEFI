@@ -1,4 +1,32 @@
-// @ts-nocheck
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: sockets/loadInfoSockets.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: sockets/loadInfoSockets.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// @ts-nocheck
 import XLSX from "xlsx";
 import Coin from "../models/coinModel.js";
 import Afil from "../models/afilModel.js";
@@ -140,7 +168,7 @@ export function socket(io) {
 
 				let reg_pat_no_ins = [];
 				// Recorrer el arreglo de registros no insertados
-				for (var i = 0; i < registrosNoInsertados.length; i++) {
+				for (var i = 0; i &lt; registrosNoInsertados.length; i++) {
 					if (
 						reg_pat_no_ins.indexOf(registrosNoInsertados[i]) === -1
 					) {
@@ -316,7 +344,7 @@ export function socket(io) {
 
 					let reg_pat_no_ins = [];
 					// Recorrer todos los registros no insertados
-					for (var i = 0; i < registrosNoInsertados.length; i++) {
+					for (var i = 0; i &lt; registrosNoInsertados.length; i++) {
 						if (
 							reg_pat_no_ins.indexOf(registrosNoInsertados[i]) ===
 							-1
@@ -448,7 +476,7 @@ export function socket(io) {
 
 					let reg_pat_no_ins = [];
 					// Recorrer todos los registros no insertados
-					for (var i = 0; i < registrosNoInsertados.length; i++) {
+					for (var i = 0; i &lt; registrosNoInsertados.length; i++) {
 						if (
 							reg_pat_no_ins.indexOf(registrosNoInsertados[i]) ===
 							-1
@@ -898,7 +926,7 @@ export function socket(io) {
 /**
  * Procesa un archivo Coin y retorna los datos procesados como un arreglo de objetos.
  * @param {ArrayBuffer} file - Archivo Coin en formato de arreglo de bytes.
- * @returns {Array<Object>} - Arreglo de objetos con los datos procesados del archivo Coin.
+ * @returns {Array&lt;Object>} - Arreglo de objetos con los datos procesados del archivo Coin.
  */
 function processCoin(file) {
 	// Leer el archivo
@@ -941,7 +969,7 @@ function processCoin(file) {
 
 	// Buscar los índices de las columnas en el encabezado
 	const headers = data[0];
-	for (let i = 0; i < headers.length; i++) {
+	for (let i = 0; i &lt; headers.length; i++) {
 		const header = headers[i];
 		if (headerIndex.hasOwnProperty(header)) {
 			headerIndex[header] = i;
@@ -950,7 +978,7 @@ function processCoin(file) {
 
 	// Procesar los datos
 	const result = [];
-	for (let i = 1; i < data.length; i++) {
+	for (let i = 1; i &lt; data.length; i++) {
 		const row = data[i];
 		const obj = {};
 
@@ -958,12 +986,12 @@ function processCoin(file) {
 		for (const header in headerIndex) {
 			const columnIndex = headerIndex[header];
 			// Validar que exista la columna en el registro
-			if (columnIndex !== null && columnIndex < row.length) {
+			if (columnIndex !== null &amp;&amp; columnIndex &lt; row.length) {
 				let value = row[columnIndex];
 
 				// Validar que exista reg_pat
 				if (
-					header === "rp" &&
+					header === "rp" &amp;&amp;
 					(value === null || value === "" || value === "TOTAL DE")
 				)
 					continue;
@@ -1064,7 +1092,7 @@ function processRale(file) {
 
 	// Buscar los índices de las columnas en el encabezado
 	const headers = data[0];
-	for (let i = 0; i < headers.length; i++) {
+	for (let i = 0; i &lt; headers.length; i++) {
 		const header = headers[i];
 		if (headerIndex.hasOwnProperty(header)) {
 			headerIndex[header] = i;
@@ -1076,14 +1104,14 @@ function processRale(file) {
 	let raleType = "";
 
 	// Recorrer las columnas de interés y asignar valores a las propiedades del objeto
-	for (let i = 1; i < data.length; i++) {
+	for (let i = 1; i &lt; data.length; i++) {
 		const row = data[i];
 		const obj = {};
 
 		// Recorrer las columnas de interés y asignar valores a las propiedades del objeto
 		for (const header in headerIndex) {
 			const columnIndex = headerIndex[header];
-			if (columnIndex !== null && columnIndex < row.length) {
+			if (columnIndex !== null &amp;&amp; columnIndex &lt; row.length) {
 				let value = row[columnIndex];
 				obj[header] = value;
 			}
@@ -1195,7 +1223,7 @@ function processRale(file) {
 /**
  * Procesa un archivo Afil y retorna los datos procesados como un arreglo de objetos.
  * @param {ArrayBuffer} file - Archivo Afil en formato de arreglo de bytes.
- * @returns {Array<Object>} - Arreglo de objetos con los datos procesados del archivo Afil.
+ * @returns {Array&lt;Object>} - Arreglo de objetos con los datos procesados del archivo Afil.
  */
 async function processAfil(file) {
 	// Leer el archivo excel
@@ -1224,7 +1252,7 @@ async function processAfil(file) {
 
 	// Buscar los índices de las columnas en el encabezado
 	const headers = data[0];
-	for (let i = 0; i < headers.length; i++) {
+	for (let i = 0; i &lt; headers.length; i++) {
 		const header = headers[i];
 		if (headerIndex.hasOwnProperty(header)) {
 			headerIndex[header] = i;
@@ -1238,7 +1266,7 @@ async function processAfil(file) {
 	let dict = {};
 	// Recorrer los ejecutores y guardarlos en un diccionario
 	eje.map((item) => {
-		if (item.type === "ejecutor" && item.status == 1) {
+		if (item.type === "ejecutor" &amp;&amp; item.status == 1) {
 			dict[item.nombre] = item.clave_eje;
 		}
 	});
@@ -1249,18 +1277,18 @@ async function processAfil(file) {
 	const result = [];
 
 	// Recorrer los datos y agregarlos al resultado
-	for (let i = 1; i < data.length; i++) {
+	for (let i = 1; i &lt; data.length; i++) {
 		const row = data[i];
 		const obj = {};
 		// Validar que existan las columnas de interés
 		for (const header in headerIndex) {
 			const columnIndex = headerIndex[header];
-			if (columnIndex !== null && columnIndex < row.length) {
+			if (columnIndex !== null &amp;&amp; columnIndex &lt; row.length) {
 				let value = row[columnIndex];
 
 				// Validar que exista reg_pat
 				if (
-					header === "REG PAT" &&
+					header === "REG PAT" &amp;&amp;
 					(value === null || value === "" || value === "TOTAL DE")
 				)
 					continue;
@@ -1292,3 +1320,26 @@ async function processAfil(file) {
 	}
 	return result;
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#agruparArchivos">agruparArchivos</a></li><li><a href="global.html#generarCitatorio">generarCitatorio</a></li><li><a href="global.html#generarGastos">generarGastos</a></li><li><a href="global.html#generarInforme">generarInforme</a></li><li><a href="global.html#generarMandamiento">generarMandamiento</a></li><li><a href="global.html#obtenerAfil">obtenerAfil</a></li><li><a href="global.html#obtenerTotales">obtenerTotales</a></li><li><a href="global.html#processAfil">processAfil</a></li><li><a href="global.html#processCoin">processCoin</a></li><li><a href="global.html#processRale">processRale</a></li><li><a href="global.html#sequelize">sequelize</a></li><li><a href="global.html#socket">socket</a></li><li><a href="global.html#subirArchivo">subirArchivo</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Jul 18 2023 13:26:03 GMT-0500 (hora de verano central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

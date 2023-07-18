@@ -1,5 +1,8 @@
+// @ts-nocheck
+// Importar los sockets
 const socket = io("http://localhost:3000");
 
+// Variables globales
 let dataStats,
 	inc,
 	res,
@@ -16,6 +19,9 @@ let dataStats,
 	regFal = { rales: [] };
 regExis = { rales: [] };
 
+/**
+ * Funciones al cargar la página.
+ */
 window.onload = function () {
 	$("#spinner").hide();
 	$("#div-tabla-estadisticas-individuales").hide();
@@ -24,19 +30,32 @@ window.onload = function () {
 	socket.emit("cliente:consultarRegistrosCoin");
 };
 
+/**
+ * Socket para las estadísticas individuales.
+ * @param {{ data: any }} data - Datos recibidos del servidor.
+ */
 socket.on("servidor:estIndividuales", ({ data }) => {
 	dataStats = data;
+	// Llenar filtro de Rales
 	fillFilters();
+	// Mostrar la tabla con la información que sea tipo inicio
 	showTable("inicio");
+	// Llenar estadisticas individuales
 	fillStats();
+	// Habilitar los campos secundaroios para la confronta
 	$("#dateCOPscnd").prop("disabled", false);
 	$("#dateRCVscnd").prop("disabled", false);
 	$("#dateCOINscnd").prop("disabled", false);
 });
 
+/**
+ * Socket para la confronta.
+ * @param {{ data: any }} data - Datos recibidos del servidor.
+ */
 socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 	confronta = data;
 	var encontrado = false;
+	// Recorrer el objeto rales
 	for (var i = 0; i < dataStats.rales.length; i++) {
 		encontrado = false;
 		var reg_pat = dataStats.rales[i].reg_pat;
@@ -58,21 +77,15 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 		if (!encontrado) regFal.rales.push(dataStats.rales[i]);
 	}
 
+	// Cuotas asignadas
 	cuotas.asig = data.rales.filter(
 		(obj) => obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31)
 	).length;
-
+	// Cuotas pendientes
 	cuotas.pen = data.rales.filter(
 		(obj) => obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31)
 	).length;
-
-	cuotas.pen = data.rales.filter(
-		(obj) =>
-			obj.type === "cuotas" &&
-			(obj.inc == 2 || obj.inc == 31) &&
-			!obj.cobrado
-	).length;
-
+	// Coin diligenciado
 	cuotas.coin_dilig += dataStats.coin
 		.map((coin) =>
 			regFal.rales.filter(
@@ -84,27 +97,29 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 			)
 		)
 		.filter((objetos) => objetos.length > 0).length;
-
+	// Cuotas diligenciado
 	cuotas.dil = regFal.rales.filter(
 		(obj) => obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31)
 	).length;
 
+	// Insertar los datos
 	$("#CUOTAS_asignado").text(cuotas.asig);
 	$("#CUOTAS_pendiente").text(cuotas.pen);
 	$("#CUOTAS_coin_dilig").text(cuotas.coin_dilig);
 	$("#CUOTAS_diligenciado").text(cuotas.dil);
 
+	// Rcv asignado
 	rcv.asignado = data.rales.filter(
 		(obj) => obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31)
 	).length;
-
+	// Rcv pendiente
 	rcv.pendiente = data.rales.filter(
 		(obj) =>
 			obj.type === "rcv" &&
 			(obj.inc == 2 || obj.inc == 31) &&
 			!obj.cobrado
 	).length;
-
+	// Coin diligenciado
 	rcv.coin_dilig += dataStats.coin
 		.map((coin) =>
 			regFal.rales.filter(
@@ -116,28 +131,35 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 			)
 		)
 		.filter((objetos) => objetos.length > 0).length;
-
+	// RCV diligenciado
 	rcv.dil = regFal.rales.filter(
 		(obj) => obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31)
 	).length;
 
+	// Insertar los datos
 	$("#RCV_asignado").text(rcv.asignado);
 	$("#RCV_pendiente").text(rcv.pendiente);
 	$("#RCV_coin_dilig").text(rcv.coin_dilig);
 	$("#RCV_diligenciado").text(rcv.dil);
 
+	// Cop y Rcv entregados
 	cop_rcv.entregados = cuotas.asig + rcv.asignado;
+	// Cop y Rcv diligenciados
 	cop_rcv.req_pago = cuotas.dil + rcv.dil;
+	// Cop y Rcv no localizados
 	cop_rcv.no_local = cuotas.inc_09 + rcv.inc_09;
+	// Cop y Rcv embargos
 	cop_rcv.embargo = cuotas.embargo + rcv.embargo;
+	// Cop y Rcv citatorios
 	cop_rcv.citatorios = cuotas.citatorios + rcv.citatorio;
+	// Cop y Rcv notificaciones
 	cop_rcv.notif = data.rales.filter(
 		(obj) =>
 			(obj.type === "rcv" || obj.type === "cop") &&
 			(obj.inc == 2 || obj.inc == 31) &&
 			obj.res_dil == "NOTIFICACIÓN"
 	).length;
-
+	// Insertar los datos
 	$("#COP_RCV_entregados").text(cop_rcv.entregados);
 	$("#COP_RCV_req_pago").text(cop_rcv.req_pago);
 	$("#COP_RCV_no_local").text(cop_rcv.no_local);
@@ -145,8 +167,9 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 	$("#COP_RCV_citatorios").text(cop_rcv.citatorios);
 	$("#COP_RCV_notif").text(cop_rcv.notif);
 
+	// Obtener la fecha del primer input
 	fecha = new Date($("#dateCOPfrst").val());
-
+	// Patrones diligenciados
 	dates.pat_dilig =
 		cuotas.dil +
 		cuotas.inc_09 +
@@ -154,26 +177,33 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 		rcv.dil +
 		rcv.inc_09 +
 		rcv.embargo;
+	// Productividad
 	dates.productividad = ((dates.pat_dilig / dates.dilig) * 100).toFixed(2);
+	// Avance de coin
 	dates.ava_coin = ((cuotas.coin_dilig / cuotas.coin) * 100).toFixed(2);
+	// Oportunidad 2
 	oports.dos = data.rales.filter(
 		(obj) =>
 			(obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "En tiempo 2"
 	).length;
+	// Oportunidad 31
 	oports.tres_uno = data.rales.filter(
 		(obj) =>
 			(obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "En tiempo 31"
 	).length;
+	// Oportunidad Fuera de Tiempo
 	oports.fuera = data.rales.filter(
 		(obj) =>
 			(obj.inc == 2 || obj.inc == 31) &&
 			obj.oportunidad == "Fuera de tiempo"
 	).length;
+	// Oportunidad por documentos
 	dates.opor_docs = (
 		((oports.dos + oports.tres_uno) /
 			(oports.dos + oports.tres_uno + oports.fuera)) *
 		100
 	).toFixed(2);
+	// Importe 2
 	imp.dos = data.rales
 		.filter(
 			(obj) =>
@@ -181,6 +211,7 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 				obj.oportunidad == "En tiempo 2"
 		)
 		.reduce((acumulador, obj) => acumulador + obj.importe, 0);
+	// Importe 31
 	imp.tres_uno = data.rales
 		.filter(
 			(obj) =>
@@ -188,6 +219,7 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 				obj.oportunidad == "En tiempo 31"
 		)
 		.reduce((acumulador, obj) => acumulador + obj.importe, 0);
+	// Importe Fuera de Tiempo
 	imp.fuera = data.rales
 		.filter(
 			(obj) =>
@@ -195,12 +227,14 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 				obj.oportunidad == "Fuera de tiempo"
 		)
 		.reduce((acumulador, obj) => acumulador + obj.importe, 0);
+	// Oportunidad por importe
 	dates.opor_imp = (
 		((imp.dos + imp.tres_uno) / (imp.dos + imp.tres_uno + imp.fuera)) *
 		100
 	).toFixed(2);
+	// Oportunidad promediada
 	dates.oport = (parseInt(dates.opor_docs) + parseInt(dates.opor_imp)) / 2;
-
+	// Insertar los datos
 	$("#DATES_fec_ini").text(dates.fec_ini);
 	$("#DATES_fec_fin").text(dates.fec_fin);
 	$("#DATES_laborales").text(dates.laborales);
@@ -212,11 +246,17 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 	$("#DATES_opor_imp").text(dates.opor_imp + "%");
 	$("#DATES_opor").text(dates.oport + "%");
 
+	// Mostrar los gráfico
 	showGraphics("canvas-coin-31", dates.ava_coin, "coin");
 	showGraphics("canvas-prod-ind", dates.productividad, "prod");
+	// Mostrar la tabla
 	showTable("confronta");
 });
 
+/**
+ * Socket para consultar las fechas de los registros de Rale COP.
+ * @param {any} data - Datos recibidos del servidor.
+ */
 socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
 	$("#dateCOPfrst").empty();
 	$("#dateCOPscnd").empty();
@@ -251,6 +291,10 @@ socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
 	$("#dateCOPfrst").prop("disabled", false);
 });
 
+/**
+ * Socket para consultar las fechas de los registros de Rale RCV.
+ * @param {any} data - Datos recibidos del servidor.
+ */
 socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
 	$("#dateRCVfrst").empty();
 	$("#dateRCVscnd").empty();
@@ -283,6 +327,10 @@ socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
 	$("#dateRCVfrst").prop("disabled", false);
 });
 
+/**
+ * Socket para consultar las fechas de los registros de COIN.
+ * @param {any} data - Datos recibidos del servidor.
+ */
 socket.on("servidor:consultarRegistrosCoin", (data) => {
 	$("#dateCOINscnd").empty();
 	$("#dateCOINfrst").empty();
@@ -315,16 +363,24 @@ socket.on("servidor:consultarRegistrosCoin", (data) => {
 	$("#dateCOINfrst").prop("disabled", false);
 });
 
+/**
+ * Evento que se ejecuta cuando se selecciona un ejecutor.
+ */
 $("#nombreEjecutor").on("change", function () {
+	// Deshabilitar los filtros
 	$("#btn_fil_inc").prop("disabled", true);
 	$("#btn_fil_res").prop("disabled", true);
 	$("#btn_fil_con").prop("disabled", true);
 
+	// Vaciar las estadisticas individuales
 	$("#div-tabla-estadisticas-individuales").empty();
 
+	// Validar que el nombre de ejecutor no sea falso
 	if ($("#nombreEjecutor").val() != "false") {
+		// Mostrar spinner y ocultar tabla
 		$("#spinner").show();
 		$("#div-tabla-estadisticas-individuales").hide();
+		// Petición al servidor para obtener las estadisticas individuales con el ejecutor y las fechas seleccionadas
 		socket.emit("cliente:ejecutorSeleccionadoEstInd", {
 			ejecutor: $("#nombreEjecutor").val(),
 			copDate: $("#dateCOPfrst").val(),
@@ -334,14 +390,18 @@ $("#nombreEjecutor").on("change", function () {
 	} else bsAlert("Selecciona la clave de ejecutor", "warning");
 });
 
-// Hacemos un on change al div con el id dateCOP porque se crea dinamicamente
-// entonces no se puede crear un evento a un elemento que no existe
+/**
+ * Evento que se ejecuta cuando se selecciona una fecha para Rale COP.
+ */
 $("#div-frst-selects").on("change", "#dateCOPfrst", function () {
+	// Deshabilitar los filtros
 	$("#btn_fil_inc").prop("disabled", true);
 	$("#btn_fil_res").prop("disabled", true);
 	$("#btn_fil_con").prop("disabled", true);
 
+	// Habilitar todas las opciones del segundo input
 	$("#dateCOPscnd option").prop("disabled", false);
+	// Deshabilitar la opcion seleccionada en el otro input siempre y cuando no sea diferente de false
 	$(`#dateCOPscnd option[value="${$(this).val()}"]`).prop(
 		"disabled",
 		$(this).val() != "false"
@@ -351,6 +411,7 @@ $("#div-frst-selects").on("change", "#dateCOPfrst", function () {
 			$("#dateRCVfrst").val() != "false" &&
 			$("#dateCOINfrst").val() != "false"
 		) {
+			// Validar que no haya falsos
 			if (
 				$("#dateRCVfrst").val() != $(this).val() ||
 				$("#dateCOINfrst").val() != $(this).val()
@@ -359,22 +420,30 @@ $("#div-frst-selects").on("change", "#dateCOPfrst", function () {
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
+			// Habilitar en nombre de ejecutor
 			$("#nombreEjecutor").prop("disabled", false);
 		}
 });
 
+/**
+ * Evento que se ejecuta cuando se selecciona una fecha para Rale RCV.
+ */
 $("#div-frst-selects").on("change", "#dateRCVfrst", function () {
+	// Deshabilitar los filtros
 	$("#btn_fil_inc").prop("disabled", true);
 	$("#btn_fil_res").prop("disabled", true);
 	$("#btn_fil_con").prop("disabled", true);
 
+	// Habilitar todas las opciones del segundo input
 	$("#dateRCVscnd option").prop("disabled", false);
+	// Deshabilitar la opcion seleccionada en el otro input siempre y cuando no sea diferente de false
 	$(`#dateRCVscnd option[value="${$(this).val()}"]`).prop(
 		"disabled",
 		$(this).val() != "false"
 	);
 	if ($(this).val() != "false")
 		if (
+			// Validar que no haya false
 			$("#dateCOPfrst").val() != "false" &&
 			$("#dateCOINfrst").val() != "false"
 		) {
@@ -386,22 +455,30 @@ $("#div-frst-selects").on("change", "#dateRCVfrst", function () {
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
+			// Habilitar en nombre de ejecutor
 			$("#nombreEjecutor").prop("disabled", false);
 		}
 });
 
+/**
+ * Evento que se ejecuta cuando se selecciona una fecha para COIN.
+ */
 $("#div-frst-selects").on("change", "#dateCOINfrst", function () {
+	// Deshabilitar los filtros
 	$("#btn_fil_inc").prop("disabled", true);
 	$("#btn_fil_res").prop("disabled", true);
 	$("#btn_fil_con").prop("disabled", true);
 
+	// Habilitar todas las opciones del segundo input
 	$("#dateCOINscnd option").prop("disabled", false);
+	// Deshabilitar la opcion seleccionada en el otro input siempre y cuando no sea diferente de false
 	$(`#dateCOINscnd option[value="${$(this).val()}"]`).prop(
 		"disabled",
 		$(this).val() != "false"
 	);
 	if ($(this).val() != "false")
 		if (
+			// Validar que no haya falsos
 			$("#dateCOPfrst").val() != "false" &&
 			$("#dateRCVfrst").val() != "false"
 		) {
@@ -413,17 +490,24 @@ $("#div-frst-selects").on("change", "#dateCOINfrst", function () {
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
+			// Habilitar el nombre del ejecutor
 			$("#nombreEjecutor").prop("disabled", false);
 		}
 });
 
-// Confronta inputs
+// *** Confronta inputs ***
+/**
+ * Evento que se ejecuta cuando se selecciona una fecha para Rale COP en el segundo input.
+ */
 $("#div-scnd-selects").on("change", "#dateCOPscnd", function () {
+	// Habilitar todos los options del otro input
 	$("#dateCOPfrst option").prop("disabled", false);
+	// Deshabilitar el option seleccionado del otro input siempre y cuando no sea diferente de false
 	$(`#dateCOPfrst option[value="${$(this).val()}"]`).prop(
 		"disabled",
 		$(this).val() != "false"
 	);
+	// Validar que no haya falsos
 	if ($(this).val() != "false")
 		if ($("#dateRCVscnd").val() != "false") {
 			if ($("#dateRCVscnd").val() != $(this).val())
@@ -431,16 +515,23 @@ $("#div-scnd-selects").on("change", "#dateCOPscnd", function () {
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
+			// Obtener la confronta
 			getConfronta();
 		}
 });
 
+/**
+ * Evento que se ejecuta cuando se selecciona una fecha para Rale RCV en el segundo input.
+ */
 $("#div-scnd-selects").on("change", "#dateRCVscnd", function () {
+	// Habilitar todos los options del otro input
 	$("#dateRCVfrst option").prop("disabled", false);
+	// Deshabilitar el option seleccionado del otro input siempre y cuando no sea diferente de false
 	$(`#dateRCVfrst option[value="${$(this).val()}"]`).prop(
 		"disabled",
 		$(this).val() != "false"
 	);
+	// Validar que no haya falsos
 	if ($(this).val() != "false")
 		if ($("#dateCOPscnd").val() != "false") {
 			if ($("#dateCOPscnd").val() != $(this).val())
@@ -448,27 +539,37 @@ $("#div-scnd-selects").on("change", "#dateRCVscnd", function () {
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
+			// Obtener la confronta
 			getConfronta();
 		}
 });
 
+/**
+ * Evento que se ejecuta al cambiar los días festivos.
+ */
 $("#inp_DATES_fes").on("change", function () {
 	if (
 		$("#dateCOPfrst").val() == "false" ||
 		$("#dateRCVfrst").val() == "false"
 	)
 		return;
+	// Validar que sea numero valido
 	if ($(this).val() == "" || $(this).val() < 0)
 		bsAlert("Inserta un número valido en los dias festivos", "warning");
 	else {
+		// Obtener los dias laborales
 		dates.laborales =
 			getWorkDays(fecha.getMonth(), fecha.getFullYear()).length -
 			($("#inp_DATES_fes").val() != "" ? $("#inp_DATES_fes").val() : 0);
+		// Diligencias por dia
 		dates.dilig = dates.laborales * 5 > 0 ? dates.laborales * 5 : 0;
+		// Productividad
 		dates.productividad = ((dates.pat_dilig / dates.dilig) * 100).toFixed(
 			2
 		);
+		// Mostrar los graficos
 		showGraphics("canvas-prod-ind", dates.productividad, "prod");
+		// Insertar los datos
 		$("#DATES_laborales").text(dates.laborales < 0 ? 0 : dates.laborales);
 		$("#DATES_dilig").text(dates.dilig);
 		$("#DATES_pat_dilig").text(dates.pat_dilig);
@@ -476,8 +577,13 @@ $("#inp_DATES_fes").on("change", function () {
 	}
 });
 
+/**
+ * Evento que se ejecuta al presionar el botón de generar listado de patrones.
+ */
 $("#btnListadoPatrones").on("click", function () {
+	// Validar que haya informacion
 	if (dataStats) {
+		// Obtener listado de patrones
 		socket.emit(
 			"cliente:generarListadoPatrones",
 			{
@@ -508,9 +614,15 @@ $("#btnListadoPatrones").on("click", function () {
 	bsAlert("No se ha realizado ninguna consulta", "warning");
 });
 
+/**
+ * Función para obtener la confronta de estadísticas individuales.
+ */
 function getConfronta() {
+	// Mostrar spinner
 	$("#spinner").show();
+	// Ocultar tabla
 	$("#div-tabla-estadisticas-individuales").hide();
+	// Peticion para la confronta de estadisticas individuales
 	socket.emit("cliente:confrontaEstInd", {
 		ejecutor: $("#nombreEjecutor").val(),
 		copDate: $("#dateCOPscnd").val(),
@@ -518,29 +630,37 @@ function getConfronta() {
 	});
 }
 
+/**
+ * Llena los filtros, los habilita y los muestra en un dropdown.
+ */
 function fillFilters() {
+	// Vaciar los filtros y deshabilitarlos
 	$("#inc_fil").empty();
 	$("#btn_fil_inc").prop("disabled", false);
 	$("#btn_fil_con").prop("disabled", false);
 	$("#btn_fil_res").prop("disabled", false);
+	// Filtro de incidencia
 	inc = Array.from(
 		dataStats.rales.reduce(function (res, obj) {
 			res.add(obj.inc);
 			return res;
 		}, new Set())
 	);
+	// Filtro de concepto
 	con = Array.from(
 		dataStats.rales.reduce(function (res, obj) {
 			res.add(obj.type);
 			return res;
 		}, new Set())
 	);
+	// Filtro de resultado
 	res = Array.from(
 		dataStats.rales.reduce(function (res, obj) {
 			if (obj.res_dil) res.add(obj.res_dil);
 			return res;
 		}, new Set())
 	);
+	// Orderar cada filtro
 	inc.sort(function (a, b) {
 		return a - b;
 	});
@@ -550,6 +670,7 @@ function fillFilters() {
 	res.sort(function (a, b) {
 		a.localeCompare(b);
 	});
+	// Mostrar en un dropdown
 	inc.map((data) => {
 		$("#inc_fil").append(
 			$("<li>").append(
@@ -651,16 +772,22 @@ function fillFilters() {
 	});
 }
 
+/**
+ * Llena las tablas de estadísticas con los datos correspondientes.
+ */
 function fillStats() {
+	// Cuotas asignadas
 	cuotas.asig = dataStats.rales.filter(
 		(obj) => obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31)
 	).length;
+	// Cuotas pendeintes
 	cuotas.pen = dataStats.rales.filter(
 		(obj) =>
 			obj.type === "cuotas" &&
 			(obj.inc == 2 || obj.inc == 31) &&
 			!obj.cobrado
 	).length;
+	// Cuootas coin
 	cuotas.coin = dataStats.coin
 		.map((coin) =>
 			dataStats.rales.filter(
@@ -672,6 +799,7 @@ function fillStats() {
 			)
 		)
 		.filter((objetos) => objetos.length > 0).length;
+	// Cuotas coin diligenciadas
 	cuotas.coin_dilig = dataStats.coin
 		.map((coin) =>
 			dataStats.rales.filter(
@@ -684,15 +812,18 @@ function fillStats() {
 			)
 		)
 		.filter((objetos) => objetos.length > 0).length;
+	// Cuotas diligenciadas
 	cuotas.dil = dataStats.rales.filter(
 		(obj) =>
 			obj.type === "cuotas" &&
 			(obj.inc == 2 || obj.inc == 31) &&
 			obj.cobrado
 	).length;
+	// Cuotas inc 09
 	cuotas.inc_09 = dataStats.rales.filter(
 		(obj) => obj.inc === 9 && obj.type === "cuotas"
 	).length;
+	// Cuotas embargo
 	cuotas.embargo = dataStats.rales.filter(
 		(obj) =>
 			obj.type === "cuotas" &&
@@ -705,6 +836,7 @@ function fillStats() {
 			(obj.inc == 2 || obj.inc == 31) &&
 			obj.res_dil == "citatorio"
 	).length;
+	// Insertar datos
 	$("#CUOTAS_asignado").text(cuotas.asig);
 	$("#CUOTAS_pendiente").text(cuotas.pen);
 	$("#CUOTAS_coin").text(cuotas.coin);
@@ -714,15 +846,18 @@ function fillStats() {
 	$("#CUOTAS_embargo").text(cuotas.embargo);
 	$("#CUOTAS_citatorios").text(cuotas.citatorios);
 
+	// RCV asignado
 	rcv.asignado = dataStats.rales.filter(
 		(obj) => obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31)
 	).length;
+	// RCV Pendiente
 	rcv.pendiente = dataStats.rales.filter(
 		(obj) =>
 			obj.type === "rcv" &&
 			(obj.inc == 2 || obj.inc == 31) &&
 			!obj.cobrado
 	).length;
+	// RCV Coin
 	rcv.coin = dataStats.coin
 		.map((coin) =>
 			dataStats.rales.filter(
@@ -734,6 +869,7 @@ function fillStats() {
 			)
 		)
 		.filter((objetos) => objetos.length > 0).length;
+	// RCV Coin Diligenciada
 	rcv.coin_dilig = dataStats.coin
 		.map((coin) =>
 			dataStats.rales.filter(
@@ -746,26 +882,30 @@ function fillStats() {
 			)
 		)
 		.filter((objetos) => objetos.length > 0).length;
+	// RCV Diligenciada
 	rcv.dil = dataStats.rales.filter(
 		(obj) =>
 			obj.type === "rcv" && (obj.inc == 2 || obj.inc == 31) && obj.cobrado
 	).length;
+	// RCV Inc 09
 	rcv.inc_09 = dataStats.rales.filter(
 		(obj) => obj.inc === 9 && obj.type === "rcv"
 	).length;
+	// RCV Embargo
 	rcv.embargo = dataStats.rales.filter(
 		(obj) =>
 			obj.type === "rcv" &&
 			(obj.inc == 2 || obj.inc == 31) &&
 			(obj.res_dil == 33 || obj.res_dil == 43)
 	).length;
+	// RCV Citatorios
 	rcv.citatorio = dataStats.rales.filter(
 		(obj) =>
 			obj.type === "rcv" &&
 			(obj.inc == 2 || obj.inc == 31) &&
 			obj.res_dil == "citatoio"
 	).length;
-
+	// Insertar datos
 	$("#RCV_asignado").text(rcv.asignado);
 	$("#RCV_pendiente").text(rcv.pendiente);
 	$("#RCV_coin").text(rcv.coin);
@@ -775,11 +915,17 @@ function fillStats() {
 	$("#RCV_embargo").text(rcv.embargo);
 	$("#RCV_citatorios").text(rcv.citatorio);
 
+	// Cop RCV entregados
 	cop_rcv.entregados = cuotas.asig + rcv.asignado;
+	// Cop RCV requeridos
 	cop_rcv.req_pago = cuotas.dil + rcv.dil;
+	// Cop RCV no localizados
 	cop_rcv.no_local = cuotas.inc_09 + rcv.inc_09;
+	// Cop RCV embargo
 	cop_rcv.embargo = cuotas.embargo + rcv.embargo;
+	// Cop RCV citatorios
 	cop_rcv.citatorios = cuotas.citatorios + rcv.citatorio;
+	// Cop RCV notificaciones
 	cop_rcv.notif = dataStats.rales.filter(
 		(obj) =>
 			(obj.type === "rcv" || obj.type === "cop") &&
@@ -787,6 +933,7 @@ function fillStats() {
 			obj.res_dil == "NOTIFICACIÓN"
 	).length;
 
+	// Insertar datos
 	$("#COP_RCV_entregados").text(cop_rcv.entregados);
 	$("#COP_RCV_req_pago").text(cop_rcv.req_pago);
 	$("#COP_RCV_no_local").text(cop_rcv.no_local);
@@ -794,8 +941,10 @@ function fillStats() {
 	$("#COP_RCV_citatorios").text(cop_rcv.citatorios);
 	$("#COP_RCV_notif").text(cop_rcv.notif);
 
+	// Obtener input de fecha
 	fecha = new Date($("#dateCOPfrst").val());
 
+	// Fecha de inicio
 	dates.fec_ini = new Date(
 		fecha.getFullYear(),
 		fecha.getMonth(),
@@ -805,6 +954,7 @@ function fillStats() {
 		month: "long",
 		day: "numeric",
 	});
+	// Fecha de fin
 	dates.fec_fin = new Date(
 		fecha.getFullYear(),
 		fecha.getMonth() + 1,
@@ -814,10 +964,13 @@ function fillStats() {
 		month: "long",
 		day: "numeric",
 	});
+	// Dias laborales
 	dates.laborales =
 		getWorkDays(fecha.getMonth(), fecha.getFullYear()).length -
 		($("#inp_DATES_fes").val() != "" ? $("#inp_DATES_fes").val() : 0);
+	// Dilgencias
 	dates.dilig = dates.laborales * 5;
+	// Patrones diligenciados
 	dates.pat_dilig =
 		cuotas.dil +
 		cuotas.inc_09 +
@@ -825,26 +978,33 @@ function fillStats() {
 		rcv.dil +
 		rcv.inc_09 +
 		rcv.embargo;
+	// Prroductividad
 	dates.productividad = ((dates.pat_dilig / dates.dilig) * 100).toFixed(2);
+	// Avance en coin
 	dates.ava_coin = ((cuotas.coin_dilig / cuotas.coin) * 100).toFixed(2);
+	// Oportunidad 2
 	oports.dos = dataStats.rales.filter(
 		(obj) =>
 			(obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "En tiempo 2"
 	).length;
+	// Oportunidad 31
 	oports.tres_uno = dataStats.rales.filter(
 		(obj) =>
 			(obj.inc == 2 || obj.inc == 31) && obj.oportunidad == "En tiempo 31"
 	).length;
+	// Oportunidad Fuera de tiempo
 	oports.fuera = dataStats.rales.filter(
 		(obj) =>
 			(obj.inc == 2 || obj.inc == 31) &&
 			obj.oportunidad == "Fuera de tiempo"
 	).length;
+	// Oportunidad por documentos
 	dates.opor_docs = (
 		((oports.dos + oports.tres_uno) /
 			(oports.dos + oports.tres_uno + oports.fuera)) *
 		100
 	).toFixed(2);
+	// Oportunidad por importe 2
 	imp.dos = dataStats.rales
 		.filter(
 			(obj) =>
@@ -852,6 +1012,7 @@ function fillStats() {
 				obj.oportunidad == "En tiempo 2"
 		)
 		.reduce((acumulador, obj) => acumulador + obj.importe, 0);
+	// Importe 31
 	imp.tres_uno = dataStats.rales
 		.filter(
 			(obj) =>
@@ -859,6 +1020,7 @@ function fillStats() {
 				obj.oportunidad == "En tiempo 31"
 		)
 		.reduce((acumulador, obj) => acumulador + obj.importe, 0);
+	// Importe Fuera de tiempo
 	imp.fuera = dataStats.rales
 		.filter(
 			(obj) =>
@@ -866,12 +1028,15 @@ function fillStats() {
 				obj.oportunidad == "Fuera de tiempo"
 		)
 		.reduce((acumulador, obj) => acumulador + obj.importe, 0);
+	// Oportunidad por importe
 	dates.opor_imp = (
 		((imp.dos + imp.tres_uno) / (imp.dos + imp.tres_uno + imp.fuera)) *
 		100
 	).toFixed(2);
+	// Oportunidad promediada
 	dates.oport = (parseInt(dates.opor_docs) + parseInt(dates.opor_imp)) / 2;
 
+	// Insertar datos de fecha
 	$("#DATES_fec_ini").text(dates.fec_ini);
 	$("#DATES_fec_fin").text(dates.fec_fin);
 	$("#DATES_laborales").text(dates.laborales);
@@ -883,10 +1048,17 @@ function fillStats() {
 	$("#DATES_opor_imp").text(dates.opor_imp + "%");
 	$("#DATES_opor").text(dates.oport + "%");
 
+	// Mostrar gráfico
 	showGraphics("canvas-coin-31", dates.ava_coin, "coin");
 	showGraphics("canvas-prod-ind", dates.productividad, "prod");
 }
 
+/**
+ * Muestra un gráfico de dona en el elemento canvas especificado.
+ * @param {string} id - El ID del elemento canvas.
+ * @param {number} perc - El porcentaje para la sección resaltada en el gráfico.
+ * @param {string} type - El tipo de gráfico. Puede ser "coin" o cualquier otro valor.
+ */
 function showGraphics(id, perc, type) {
 	// Obtén el elemento canvas
 	var canvas = document.getElementById(id);
@@ -976,38 +1148,12 @@ function showGraphics(id, perc, type) {
 	ctx.fill();
 }
 
-async function getGraphics() {
-	new Chart($("#canv_coin"), {
-		type: "doughnut",
-		data: {
-			labels: ["No diligenciado", "Diligenciado"],
-			datasets: [
-				{
-					label: "My First Dataset",
-					data: [cuotas.coin, cuotas.coin_dilig],
-					backgroundColor: ["rgb(220, 53, 69)", "rgb(25, 135, 84)"],
-					hoverOffset: 4,
-				},
-			],
-		},
-	});
-
-	new Chart($("#canv_prod"), {
-		type: "doughnut",
-		data: {
-			labels: ["No diligenciado", "Diligenciado"],
-			datasets: [
-				{
-					label: "My First Dataset",
-					data: [dates.dilig, dates.pat_dilig],
-					backgroundColor: ["rgb(220, 53, 69)", "rgb(25, 135, 84)"],
-					hoverOffset: 4,
-				},
-			],
-		},
-	});
-}
-
+/**
+ * Obtiene un arreglo de objetos Date que representan los días laborales de un mes y año específicos.
+ * @param {number} month - El número de mes (0-11) del cual se desean obtener los días laborales.
+ * @param {number} year - El año del cual se desean obtener los días laborales.
+ * @returns {Date[]} Un arreglo de objetos Date que representan los días laborales del mes y año especificados.
+ */
 function getWorkDays(month, year) {
 	const days = [];
 	const date = new Date(year, month, 1);
@@ -1022,15 +1168,25 @@ function getWorkDays(month, year) {
 	return days;
 }
 
+/**
+ * Actualiza los filtros según la acción realizada en un grupo específico.
+ * @param {string} group - El grupo al que pertenece el filtro a actualizar ('inc', 'con' o 'res').
+ * @param {string|number} n - El valor del filtro a actualizar.
+ * @param {boolean} act - Indica si la acción es activar (true) o desactivar (false) el filtro.
+ */
 function updateFilters(group, n, act) {
+	// Validar grupo
 	switch (group) {
 		case "inc":
+			// Si la accion es verdadera insertamos el filtro en el arreglo
 			if (act) inc.push(n);
 			else {
+				// Si no eliminamos el filtro del arreglo
 				inc = inc.filter(function (fil) {
 					return fil !== n;
 				});
 			}
+			// Ordenamos el arreglo
 			inc.sort(function (a, b) {
 				return a - b;
 			});
@@ -1060,12 +1216,20 @@ function updateFilters(group, n, act) {
 		default:
 			break;
 	}
+	// Mostrar tabla
 	showTable("inicio");
 }
 
+/**
+ * Muestra una tabla de estadísticas individuales según el tipo especificado.
+ * @param {string} type - El tipo de tabla a mostrar ('inicio' para la tabla inicial o cualquier otro valor para la tabla de confronta).
+ */
 function showTable(type) {
+	// Validar el tipo de tabla
 	let data = type == "inicio" ? dataStats.rales : confronta.rales;
+	// Vaciar la tabla
 	$("#div-tabla-estadisticas-individuales").empty();
+	// Validar que haya patrones asignados
 	if (data.length < 1) {
 		bsAlert("El ejecutor no tiene ningun patron asignado", "danger");
 		return;
@@ -1130,6 +1294,8 @@ function showTable(type) {
 	);
 	tableScrollContainer.appendTo(tableContainer);
 	tableContainer.appendTo("#div-tabla-estadisticas-individuales");
+	// Ocultar spinner
 	$("#spinner").hide();
+	// Mostrar tabla
 	$("#div-tabla-estadisticas-individuales").show();
 }
