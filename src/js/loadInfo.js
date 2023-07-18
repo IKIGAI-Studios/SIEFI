@@ -276,6 +276,10 @@ $("#btn_insertar").on("click", async function (e) {
 	$("#btn_insertar").prop("disabled", true);
 });
 
+/**
+ * Evento para manejar el resultado del servidor para los datos COIN.
+ * @param {Object[]} data - Los datos COIN recibidos desde el servidor.
+ */
 socket.on("server:result-coin", (data) => {
 	$("#div-table").empty();
 
@@ -358,7 +362,7 @@ socket.on("server:result-coin", (data) => {
 		err = true;
 	}
 
-	// Si hubo alguna diferente mostrar el error
+	// Si hubo alguna diferencia, mostrar el error
 	if (err) {
 		$("#modal_title").text("ERROR");
 		$(
@@ -425,15 +429,19 @@ socket.on("server:result-coin", (data) => {
 	});
 	tbody.appendTo(table);
 
-	// Mostrar la tabla con el numero de registros que tiene
+	// Mostrar la tabla con el número de registros que tiene
 	const tableContainer = $("<div>").attr("id", "tb-show-coin");
-	$(`<b >Se encontraron ${data.length} registros<b>`).appendTo(
+	$(`<b>Se encontraron ${data.length} registros</b>`).appendTo(
 		tableContainer
 	);
 	table.appendTo(tableContainer);
 	tableContainer.appendTo("#div-table");
 });
 
+/**
+ * Evento para manejar el resultado del servidor para los datos AFIL.
+ * @param {Object[]} data - Los datos AFIL recibidos desde el servidor.
+ */
 socket.on("server:result-afil", (data) => {
 	console.log(data);
 	// Vaciar div del modal
@@ -487,15 +495,19 @@ socket.on("server:result-afil", (data) => {
 	});
 	tbody.appendTo(table);
 
-	// Mostrar la tabla con el numero de registros que tiene
+	// Mostrar la tabla con el número de registros que tiene
 	const tableContainer = $("<div>").attr("id", "tb-show-coin");
-	$(`<b >Se encontraron ${data.length} registros<b>`).appendTo(
+	$(`<b>Se encontraron ${data.length} registros</b>`).appendTo(
 		tableContainer
 	);
 	table.appendTo(tableContainer);
 	tableContainer.appendTo("#div-table");
 });
 
+/**
+ * Evento para manejar el resultado del servidor para los datos RALE COP.
+ * @param {Object[]} data - Los datos RALE COP recibidos desde el servidor.
+ */
 socket.on("server:result-rale-cop", (data) => {
 	console.log(data);
 	$("#modal_title").text("Rale COP");
@@ -566,7 +578,7 @@ socket.on("server:result-rale-cop", (data) => {
 		err = true;
 	}
 
-	// Si hubo alguna diferente mostrar el error
+	// Si hubo alguna diferencia, mostrar el error
 	if (err) {
 		$("#modal_title").text("ERROR");
 		$(
@@ -576,7 +588,7 @@ socket.on("server:result-rale-cop", (data) => {
 			"#div-table"
 		);
 		$(
-			'<h3 class="mt-3 text-primary">Por favor asegurate de que la estructura coincida con la siguiente</h3>'
+			'<h3 class="mt-3 text-primary">Por favor asegúrate de que la estructura coincida con la siguiente</h3>'
 		).appendTo("#div-table");
 
 		$("#btn_cancelar").prop("disabled", false);
@@ -634,15 +646,19 @@ socket.on("server:result-rale-cop", (data) => {
 	});
 	tbody.appendTo(table);
 
-	// Mostrar la tabla con el numero de registros que tiene
+	// Mostrar la tabla con el número de registros que tiene
 	const tableContainer = $("<div>").attr("id", "tb-show-rale-cop");
-	$(`<b >Se encontraron ${data.length} registros<b>`).appendTo(
+	$(`<b>Se encontraron ${data.length} registros</b>`).appendTo(
 		tableContainer
 	);
 	table.appendTo(tableContainer);
 	tableContainer.appendTo("#div-table");
 });
 
+/**
+ * Evento para manejar el resultado del servidor para los datos RALE RCV.
+ * @param {Object[]} data - Los datos RALE RCV recibidos desde el servidor.
+ */
 socket.on("server:result-rale-rcv", (data) => {
 	$("#modal_title").text("Rale RCV");
 
@@ -712,7 +728,7 @@ socket.on("server:result-rale-rcv", (data) => {
 		err = true;
 	}
 
-	// Si hubo alguna diferente mostrar el error
+	// Si hubo alguna diferencia, mostrar el error
 	if (err) {
 		$("#modal_title").text("ERROR");
 		$(
@@ -722,7 +738,7 @@ socket.on("server:result-rale-rcv", (data) => {
 			"#div-table"
 		);
 		$(
-			'<h3 class="mt-3 text-primary">Por favor asegurate de que la estructura coincida con la siguiente</h3>'
+			'<h3 class="mt-3 text-primary">Por favor asegúrate de que la estructura coincida con la siguiente</h3>'
 		).appendTo("#div-table");
 
 		$("#btn_cancelar").prop("disabled", false);
@@ -780,15 +796,19 @@ socket.on("server:result-rale-rcv", (data) => {
 	});
 	tbody.appendTo(table);
 
-	// Mostrar la tabla con el numero de registros que tiene
+	// Mostrar la tabla con el número de registros que tiene
 	const tableContainer = $("<div>").attr("id", "tb-show-rale-rcv");
-	$(`<b >Se encontraron ${data.length} registros<b>`).appendTo(
+	$(`<b>Se encontraron ${data.length} registros</b>`).appendTo(
 		tableContainer
 	);
 	table.appendTo(tableContainer);
 	tableContainer.appendTo("#div-table");
 });
 
+/**
+ * Evento para manejar la consulta de registros RALE COP desde el servidor.
+ * @param {string[]} data - Los datos de los registros RALE COP recibidos desde el servidor.
+ */
 socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
 	$("#div-registros-rale-cop").empty();
 	$("#btnCerrarRaleCOP").prop("disabled", false);
@@ -824,6 +844,10 @@ socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
 	$("#div-registros-rale-cop").append(selectRaleCOP);
 });
 
+/**
+ * Evento para manejar el filtrado de registros RALE COP desde el servidor.
+ * @param {Object[]} data - Los datos de los registros RALE COP filtrados recibidos desde el servidor.
+ */
 socket.on("servidor:filtrarRaleCOP", (data) => {
 	//$('#div-registros-rale-cop').empty();
 	$("#btnCerrarRaleCOP").prop("disabled", false);
@@ -879,6 +903,10 @@ socket.on("servidor:filtrarRaleCOP", (data) => {
 	tableContainer.appendTo("#div-registros-rale-cop");
 });
 
+/**
+ * Evento para manejar el filtrado de registros Coin desde el servidor.
+ * @param {Object[]} data - Los datos de los registros Coin filtrados recibidos desde el servidor.
+ */
 socket.on("servidor:filtrarCoin", (data) => {
 	//$('#div-registros-coin').empty();
 	$("#btnCerrarCoin").prop("disabled", false);
@@ -931,6 +959,10 @@ socket.on("servidor:filtrarCoin", (data) => {
 	tableContainer.appendTo("#div-registros-coin");
 });
 
+/**
+ * Evento para consultar los registros de afiliación desde el servidor.
+ * @param {string[]} data - Los datos de los registros de afiliación recibidos desde el servidor.
+ */
 socket.on("servidor:consultarRegistrosAfil", (data) => {
 	$("#div-registros-afil").empty();
 	$("#btnCerrarAfil").prop("disabled", false);
@@ -966,6 +998,10 @@ socket.on("servidor:consultarRegistrosAfil", (data) => {
 	$("#div-registros-afil").append(selectAfil);
 });
 
+/**
+ * Evento para filtrar los registros de afiliación y mostrar los resultados filtrados.
+ * @param {Object[]} data - Los datos de los registros de afiliación filtrados.
+ */
 socket.on("servidor:filtrarAfil", (data) => {
 	//$('#div-registros-afil').empty();
 	$("#btnCerrarAfil").prop("disabled", false);
@@ -1016,6 +1052,10 @@ socket.on("servidor:filtrarAfil", (data) => {
 	tableContainer.appendTo("#div-registros-afil");
 });
 
+/**
+ * Evento para consultar los registros de COIN y mostrar las opciones de filtrado.
+ * @param {string[]} data - Los datos de las fechas de los registros de COIN.
+ */
 socket.on("servidor:consultarRegistrosCoin", (data) => {
 	$("#div-registros-coin").empty();
 	$("#btnCerrarCoin").prop("disabled", false);
@@ -1051,6 +1091,10 @@ socket.on("servidor:consultarRegistrosCoin", (data) => {
 	$("#div-registros-coin").append(selectCoin);
 });
 
+/**
+ * Evento para consultar los registros de Rale RCV y mostrar las opciones de filtrado.
+ * @param {string[]} data - Los datos de las fechas de los registros de Rale RCV.
+ */
 socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
 	$("#div-registros-rale-rcv").empty();
 	$("#btnCerrarRaleRCV").prop("disabled", false);
@@ -1086,6 +1130,10 @@ socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
 	$("#div-registros-rale-rcv").append(selectRaleRCV);
 });
 
+/**
+ * Evento para filtrar los registros de Rale RCV y mostrar la tabla de resultados.
+ * @param {Object[]} data - Los datos filtrados de los registros de Rale RCV.
+ */
 socket.on("servidor:filtrarRaleRCV", (data) => {
 	//$('#div-registros-rale-rcv').empty();
 	$("#btnCerrarRaleRCV").prop("disabled", false);
@@ -1149,6 +1197,12 @@ socket.on("disconnect", () => {
 	// console.log('Conexión perdida con el servidor');
 });
 
+/**
+ * Muestra el resultado de una operación en el elemento con ID 'div-table'.
+ * @param {Object} rslt - El resultado de la operación.
+ * @param {boolean} rslt.status - El estado del resultado. Verdadero si la operación fue exitosa, falso de lo contrario.
+ * @param {string} rslt.msg - El mensaje del resultado que se mostrará en el elemento 'div-table'.
+ */
 function showResult(rslt) {
 	if (rslt.status) {
 		$(`<h3 class="text-success">${rslt.msg}</h3>`).appendTo("#div-table");
@@ -1164,58 +1218,96 @@ function showResult(rslt) {
 	$("#btn_insertar").prop("disabled", true);
 }
 
+/**
+ * Muestra los registros de Afil en el elemento con ID 'div-registros-afil'.
+ * Se comunica con el servidor para obtener los registros y activa el modal de visualización.
+ */
 function verRegistrosAfil() {
 	$("#div-registros-afil").empty();
 
+	// Emitir evento al servidor para solicitar los registros de Afil
 	socket.emit("cliente:consultarRegistrosAfil");
+
+	// Mostrar el modal de visualización de Afil
 	$("#verAfilModal").modal("show");
 
+	// Mostrar mensaje de obtención de registros
 	$(`<h3 class="text-primary">Obteniendo registros de Afil</h3>`).appendTo(
 		"#div-registros-afil"
 	);
 
+	// Deshabilitar los botones de cierre y eliminación de registros de Afil
 	$("#btnCerrarAfil").prop("disabled", true);
 	$("#btnEliminarAfil").prop("disabled", true);
 }
 
+/**
+ * Muestra los registros de Coin en el elemento con ID 'div-registros-coin'.
+ * Se comunica con el servidor para obtener los registros y activa el modal de visualización.
+ */
 function verRegistrosCoin() {
 	$("#div-registros-coin").empty();
 
+	// Emitir evento al servidor para solicitar los registros de Coin
 	socket.emit("cliente:consultarRegistrosCoin");
+
+	// Mostrar el modal de visualización de Coin
 	$("#verCoinModal").modal("show");
 
+	// Mostrar mensaje de obtención de registros
 	$(`<h3 class="text-primary">Obteniendo registros de Coin</h3>`).appendTo(
 		"#div-registros-coin"
 	);
 
+	// Deshabilitar los botones de cierre y eliminación de registros de Coin
 	$("#btnCerrarCoin").prop("disabled", true);
 	$("#btnEliminarCoin").prop("disabled", true);
 }
 
+/**
+ * Muestra los registros de Rale COP.
+ */
 function verRegistrosRaleCOP() {
 	$("#div-registros-rale-cop").empty();
 
+	// Emite un evento para consultar los registros de Rale COP al servidor.
 	socket.emit("cliente:consultarRegistrosRaleCOP");
+
+	// Muestra el modal para ver los registros de Rale COP.
 	$("#verRaleCOPModal").modal("show");
 
+	// Agrega un encabezado al contenedor de registros de Rale COP.
 	$(
 		`<h3 class="text-primary">Obteniendo registros de Rale COP</h3>`
 	).appendTo("#div-registros-rale-cop");
 
+	// Deshabilita el botón de cerrar Rale COP.
 	$("#btnCerrarRaleCOP").prop("disabled", true);
+
+	// Deshabilita el botón de eliminar Rale COP.
 	$("#btnEliminarRaleCop").prop("disabled", true);
 }
 
+/**
+ * Muestra los registros de Rale RCV.
+ */
 function verRegistrosRaleRCV() {
 	$("#div-registros-rale-rcv").empty();
 
+	// Emite un evento para consultar los registros de Rale RCV al servidor.
 	socket.emit("cliente:consultarRegistrosRaleRCV");
+
+	// Muestra el modal para ver los registros de Rale RCV.
 	$("#verRaleRCVModal").modal("show");
 
+	// Agrega un encabezado al contenedor de registros de Rale RCV.
 	$(
 		`<h3 class="text-primary">Obteniendo registros de Rale RCV</h3>`
 	).appendTo("#div-registros-rale-rcv");
 
+	// Deshabilita el botón de cerrar Rale RCV.
 	$("#btnCerrarRaleRCV").prop("disabled", true);
+
+	// Deshabilita el botón de eliminar Rale RCV.
 	$("#btnEliminarRaleRCV").prop("disabled", true);
 }
