@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<title>SIEFI: Source: database.js</title>
+		<title>SIEFI: Source: src/js/registrarAfil.js</title>
 
 		<script src="scripts/prettify/prettify.js"></script>
 		<script src="scripts/prettify/lang-css.js"></script>
@@ -23,47 +23,120 @@
 
 	<body>
 		<div id="main">
-			<h1 class="page-title">Source: database.js</h1>
+			<h1 class="page-title">Source: src/js/registrarAfil.js</h1>
 
 			<section>
 				<article>
-					<pre
-						class="prettyprint source linenums"
-					><code>import { Sequelize } from "sequelize";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-/**
- * Instancia de Sequelize para la conexión a la base de datos.
- * @type {Sequelize}
+					<pre class="prettyprint source linenums"><code>/**
+ * Valida un RFC ingresado por el usuario.
  */
-const sequelize = new Sequelize(
-	process.env.DB_NAME,
-	process.env.DB_USER,
-	process.env.DB_PASS,
-	{
-		host: process.env.DB_HOST,
-		port: parseInt(process.env.DB_PORT),
-		dialect: "mysql",
-		logging: false, // Establecer a false para desactivar los mensajes de sequelize
+function validarRFC() {
+	/**
+	 * Obtén el valor del campo de texto del RFC.
+	 * @type {string}
+	 */
+	var rfc = document.getElementById("rfc").value;
+
+	/**
+	 * Verifica la longitud del RFC y muestra una alerta en caso de ser inválido.
+	 */
+	if (rfc.length &lt;= 11 || rfc.length >= 14) {
+		/**
+		 * Limpia el campo de texto del RFC.
+		 */
+		document.getElementById("rfc").value = "";
+
+		/**
+		 * Muestra una alerta indicando que se debe ingresar un RFC válido.
+		 * @param {string} message - El mensaje de la alerta.
+		 * @param {string} type - El tipo de alerta (por ejemplo, "warning").
+		 */
+		bsAlert("Ingresa un RFC válido", "warning");
 	}
-);
+}
 
 /**
- * Sincroniza los modelos con la base de datos.
- * @returns {Promise} Una promesa que se resuelve una vez que se ha completado la sincronización.
+ * Valida un código postal ingresado por el usuario.
  */
-sequelize
-	.sync({ force: false })
-	.then(() => {
-		console.info("Connected to MYSQL");
-	})
-	.catch((e) => {
-		console.error(`Error: ${e}`);
-	});
+function validarCP() {
+	/**
+	 * Obtén el valor del campo de texto del código postal.
+	 * @type {string}
+	 */
+	var cp = document.getElementById("cp").value;
 
-export default sequelize;
+	/**
+	 * Verifica la longitud del código postal y muestra una alerta en caso de ser inválido.
+	 */
+	if (cp.length &lt;= 4 || cp.length >= 6) {
+		/**
+		 * Limpia el campo de texto del código postal.
+		 */
+		document.getElementById("cp").value = "";
+
+		/**
+		 * Muestra una alerta indicando que se debe ingresar un código postal válido.
+		 * @param {string} message - El mensaje de la alerta.
+		 * @param {string} type - El tipo de alerta (por ejemplo, "warning").
+		 */
+		bsAlert("Ingresa un código postal válido", "warning");
+	}
+}
+
+/**
+ * Se ejecuta cuando se selecciona un elemento.
+ * @param {string} usuEjecutores - JSON que contiene los ejecutores disponibles.
+ */
+function itemSeleccionado(usuEjecutores) {
+	/**
+	 * Convierte el JSON de ejecutores en un objeto.
+	 * @type {Array&lt;Object>}
+	 */
+	usuEjecutores = JSON.parse(usuEjecutores);
+
+	/**
+	 * Muestra en la consola los ejecutores disponibles.
+	 */
+	console.log(usuEjecutores);
+
+	/**
+	 * Obtiene el valor del campo de texto de ejecutor seleccionado.
+	 * @type {string}
+	 */
+	var nombre = document.getElementById("ejecutorS").value;
+
+	/**
+	 * Muestra en la consola el nombre del ejecutor seleccionado.
+	 */
+	console.log(nombre);
+
+	/**
+	 * Almacena la información del ejecutor seleccionado.
+	 * @type {Object}
+	 */
+	var ejecutor = {};
+
+	/**
+	 * Busca el ejecutor con el nombre seleccionado y almacena su información en la variable 'ejecutor'.
+	 */
+	for (var i = 0; i &lt; usuEjecutores.length; i++) {
+		if (usuEjecutores[i].nombre == nombre) {
+			ejecutor = usuEjecutores[i];
+			break;
+		}
+	}
+
+	/**
+	 * Muestra en la consola la información del ejecutor seleccionado.
+	 */
+	console.log(ejecutor);
+
+	/**
+	 * Actualiza los valores de los campos del formulario con la información del ejecutor seleccionado.
+	 */
+	document.getElementById("clave_eje").value = ejecutor.clave_eje;
+	document.getElementById("ejecutor").value = ejecutor.nombre;
+}
 </code></pre>
 				</article>
 			</section>

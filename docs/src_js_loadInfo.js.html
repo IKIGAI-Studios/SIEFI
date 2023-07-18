@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>SIEFI: Source: src/js/loadInfo.js</title>
+
+		<script src="scripts/prettify/prettify.js"></script>
+		<script src="scripts/prettify/lang-css.js"></script>
+		<!--[if lt IE 9]>
+			<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link
+			type="text/css"
+			rel="stylesheet"
+			href="styles/prettify-tomorrow.css"
+		/>
+		<link
+			type="text/css"
+			rel="stylesheet"
+			href="styles/jsdoc-default.css"
+		/>
+	</head>
+
+	<body>
+		<div id="main">
+			<h1 class="page-title">Source: src/js/loadInfo.js</h1>
+
+			<section>
+				<article>
+					<pre
+						class="prettyprint source linenums"
+					><code>// Instanciar los sockets
+const socket = io("http://localhost:3000");
+
+let objCoin;
+let objAfil;
+let objRaleCOP;
+let objRaleRCV;
+
+let insrt;
+
+$("#validateModal").on("hidden.bs.modal", function () {
+	location.href = "/loadInfo";
+});
+
+$("#Coin_input").on("change", function (e) {
+	$("#div-table").empty();
+	// Obtener el archivo
+	const file = e.target.files[0];
+
+	if (file.size > 1000000) {
+		$("#validateModal").modal("show");
+		$("#modal_title").text("ERROR");
+
+		$(`&lt;h3 class="text-danger">
+            Asegurate de subir archivos que pesen menos de 1 mb &lt;br>&lt;br>
+            En caso de que pesen mas separa en distintos archivos los registros para poder ser procesados correctamente
+        &lt;/h3>`).appendTo("#div-table");
+		$('&lt;img src="imgs/X.png" class="mt-3">').appendTo("#div-table");
+		return;
+	}
+
+	// Validar si existe el archivo
+	if (file) {
+		// Estructurar el modal
+		$("#validateModal").modal("show");
+		$("#modal_title").text("COIN");
+
+		$(`&lt;h3 class="text-primary">Procesando EXCEL&lt;/h3>`).appendTo(
+			"#div-table"
+		);
+		$('&lt;img src="imgs/folder_azul.png" class="mt-3">').appendTo(
+			"#div-table"
+		);
+
+		$("#btn_cancelar").prop("disabled", true);
+		$("#btn_insertar").prop("disabled", true);
+
+		const reader = new FileReader();
+
+		// Enviar por el socket el archivo para procesar con librearia XLSX
+		reader.onload = function (e) {
+			const content = new Uint8Array(e.target.result);
+			socket.emit("client:load-coin", { file: content });
+		};
+
+		reader.readAsArrayBuffer(file);
+	} else bsAlert(`No has seleccionado ningun archivo COIN`, "danger");
+});
+
+$("#Afil_input").on("change", function (e) {
+	$("#div-table").empty();
+	// Obtener el archivo
+	const file = e.target.files[0];
+
+	if (file.size > 1000000) {
+		$("#validateModal").modal("show");
+		$("#modal_title").text("ERROR");
+
+		$(`&lt;h3 class="text-danger">
+            Asegurate de subir archivos que pesen menos de 1 mb &lt;br>&lt;br>
+            En caso de que pesen mas separa en distintos archivos los registros para poder ser procesados correctamente
+        &lt;/h3>`).appendTo("#div-table");
+		$('&lt;img src="imgs/X.png" class="mt-3">').appendTo("#div-table");
+		return;
+	}
+
+	// Validar si existe el archivo
+	if (file) {
+		// Estructurar el modal
+		$("#validateModal").modal("show");
+		$("#modal_title").text("AFIL");
+
+		$(`&lt;h3 class="text-primary">Procesando EXCEL&lt;/h3>`).appendTo(
+			"#div-table"
+		);
+		$('&lt;img src="imgs/folder_azul.png" class="mt-3">').appendTo(
+			"#div-table"
+		);
+
+		$("#btn_cancelar").prop("disabled", true);
+		$("#btn_insertar").prop("disabled", true);
+
+		const reader = new FileReader();
+
+		// Enviar por el socket el archivo para procesar con librearia XLSX
+		reader.onload = function (e) {
+			const content = new Uint8Array(e.target.result);
+			socket.emit("client:load-afil", { file: content });
+		};
+
+		reader.readAsArrayBuffer(file);
+	} else bsAlert(`No has seleccionado ningun archivo AFIL`, "danger");
+});
+
+$("#RaleCOP_input").on("change", function (e) {
+	$("#div-table").empty();
+	// Obtener el archivo
+	const file = e.target.files[0];
+
+	if (file.size > 1000000) {
+		$("#validateModal").modal("show");
+		$("#modal_title").text("ERROR");
+
+		$(`&lt;h3 class="text-danger">
+            Asegurate de subir archivos que pesen menos de 1 mb &lt;br>&lt;br>
+            En caso de que pesen mas separa en distintos archivos los registros para poder ser procesados correctamente
+        &lt;/h3>`).appendTo("#div-table");
+		$('&lt;img src="imgs/X.png" class="mt-3">').appendTo("#div-table");
+		return;
+	}
+
+	// Validar si existe el archivo
+	if (file) {
+		// Estructurar el modal
+		$("#validateModal").modal("show");
+		$("#modal_title").text("Rale");
+
+		$(`&lt;h3 class="text-primary">Procesando EXCEL&lt;/h3>`).appendTo(
+			"#div-table"
+		);
+		$('&lt;img src="imgs/folder_azul.png" class="mt-3">').appendTo(
+			"#div-table"
+		);
+
+		$("#btn_cancelar").prop("disabled", true);
+		$("#btn_insertar").prop("disabled", true);
+
+		const reader = new FileReader();
+
+		// Enviar por el socket el archivo para procesar con librearia XLSX
+		reader.onload = function (e) {
+			const content = new Uint8Array(e.target.result);
+			socket.emit("client:load-rale", { file: content }, (cb) => {
+				if (!cb.status) {
+					$("#div-table").empty();
+					showResult(cb);
+				}
+			});
+		};
+
+		reader.readAsArrayBuffer(file);
+	} else bsAlert(`No has seleccionado ningun archivo RALE COP`, "danger");
+});
+
+$("#RaleRCV_input").on("change", function (e) {
+	$("#div-table").empty();
+	// Obtener el archivo
+	const file = e.target.files[0];
+
+	if (file.size > 1000000) {
+		$("#validateModal").modal("show");
+		$("#modal_title").text("ERROR");
+
+		$(`&lt;h3 class="text-danger">
+            Asegurate de subir archivos que pesen menos de 1 mb &lt;br>&lt;br>
+            En caso de que pesen mas separa en distintos archivos los registros para poder ser procesados correctamente
+        &lt;/h3>`).appendTo("#div-table");
+		$('&lt;img src="imgs/X.png" class="mt-3">').appendTo("#div-table");
+		return;
+	}
+
+	// Validar si existe el archivo
+	if (file) {
+		// Estructurar el modal
+		$("#validateModal").modal("show");
+		$("#modal_title").text("Rale");
+
+		$(`&lt;h3 class="text-primary">Procesando EXCEL&lt;/h3>`).appendTo(
+			"#div-table"
+		);
+		$('&lt;img src="imgs/folder_azul.png" class="mt-3">').appendTo(
+			"#div-table"
+		);
+
+		$("#btn_cancelar").prop("disabled", true);
+		$("#btn_insertar").prop("disabled", true);
+
+		const reader = new FileReader();
+
+		// Enviar por el socket el archivo para procesar con librearia XLSX
+		reader.onload = function (e) {
+			const content = new Uint8Array(e.target.result);
+			socket.emit("client:load-rale", { file: content });
+		};
+
+		reader.readAsArrayBuffer(file);
+	} else bsAlert(`No has seleccionado ningun archivo RALE RCV`, "danger");
+});
+
+$("#btn_insertar").on("click", async function (e) {
+	$("#div-table").empty();
+
+	$(`&lt;h3 class="text-primary">Insertando en la Base de Datos&lt;/h3>`).appendTo(
+		"#div-table"
+	);
+	$('&lt;img src="imgs/folder_azul.png" class="mt-3">').appendTo("#div-table");
+
+	let i = 0;
+
+	switch (insrt) {
+		case "coin":
+			while (i &lt; objCoin.length) {
+				const batch = objCoin.slice(i, i + 1000);
+				// Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
+				await socket.emit(
+					"client:insert-coin",
+					{ coin: batch, lote: i },
+					(res) => {
+						if (i == 0) $("#div-table").empty();
+						showResult(res);
+					}
+				);
+				i += 1000;
+			}
+			break;
+		case "afil":
+			while (i &lt; objAfil.length) {
+				const batch = objAfil.slice(i, i + 1000);
+				// Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
+				await socket.emit(
+					"client:insert-afil",
+					{ afil: batch, lote: i, lenght: objAfil.length },
+					(res) => {
+						if (i == 0) $("#div-table").empty();
+						showResult(res);
+					}
+				);
+				i += 1000;
+			}
+			break;
+		case "raleCOP":
+			while (i &lt; objRaleCOP.length) {
+				const batch = objRaleCOP.slice(i, i + 1000);
+				// Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
+				await socket.emit(
+					"client:insert-rale-cop",
+					{ rale: batch, lote: i },
+					(res) => {
+						if (i == 0) $("#div-table").empty();
+						showResult(res);
+					}
+				);
+				i += 1000;
+			}
+			break;
+		case "raleRCV":
+			while (i &lt; objRaleRCV.length) {
+				const batch = objRaleRCV.slice(i, i + 1000);
+				// Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
+				await socket.emit(
+					"client:insert-rale-rcv",
+					{ rale: batch, lote: i },
+					(res) => {
+						if (i == 0) $("#div-table").empty();
+						showResult(res);
+					}
+				);
+				i += 1000;
+			}
+			break;
+		default:
+			break;
+	}
+
+	$("#btn_cancelar").prop("disabled", true);
+	$("#btn_insertar").prop("disabled", true);
+});
+
+/**
+ * Evento para manejar el resultado del servidor para los datos COIN.
+ * @param {Object[]} data - Los datos COIN recibidos desde el servidor.
+ */
+socket.on("server:result-coin", (data) => {
+	$("#div-table").empty();
+
+	var err = false;
+	// Validar que sea un archivo COIN verificando cada columna
+	if (!data.some((obj) => "deleg_control" in obj)) {
+		alert(`La columna deleg_control no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "subdeleg_control" in obj)) {
+		alert(`La columna subdeleg_control no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "deleg_emision" in obj)) {
+		alert(`La columna deleg_emision no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "subdeleg_emision" in obj)) {
+		alert(`La columna subdeleg_emision no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "rp" in obj)) {
+		alert(`La columna rp no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "esencial" in obj)) {
+		alert(`La columna esencial no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "clasificacion" in obj)) {
+		alert(`La columna clasificacion no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "cve_mov_pat" in obj)) {
+		alert(`La columna cve_mov_pat no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "fecha_mov_pat" in obj)) {
+		alert(`La columna fecha_mov_pat no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "razon_social" in obj)) {
+		alert(`La columna razon_social no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "num_credito" in obj)) {
+		alert(`La columna num_credito no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "periodo" in obj)) {
+		alert(`La columna periodo no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "importe" in obj)) {
+		alert(`La columna importe no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "tipo_documento" in obj)) {
+		alert(`La columna tipo_documento no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "seguro" in obj)) {
+		alert(`La columna seguro no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "dias_estancia" in obj)) {
+		alert(`La columna dias_estancia no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "incidencia" in obj)) {
+		alert(`La columna incidencia no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "fecha_incidencia" in obj)) {
+		alert(`La columna fecha_incidencia no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "estado" in obj)) {
+		alert(`La columna estado no se encontró en el archivo`);
+		err = true;
+	}
+
+	// Si hubo alguna diferencia, mostrar el error
+	if (err) {
+		$("#modal_title").text("ERROR");
+		$(
+			'&lt;h3 class="text-danger">Error: Los campos introducidos del excel no coinciden con la estructura predeterminada&lt;/h3>'
+		).appendTo("#div-table");
+		$('&lt;img src="imgs/coin_example.png" class="mt-3">').appendTo(
+			"#div-table"
+		);
+		$(
+			'&lt;h3 class="mt-3 text-primary">Por favor asegurate de que la estructura coincida con la siguiente&lt;/h3>'
+		).appendTo("#div-table");
+
+		$("#btn_cancelar").prop("disabled", false);
+		$("#btn_insertar").prop("disabled", true);
+
+		return;
+	}
+
+	$("#btn_cancelar").prop("disabled", false);
+	$("#btn_insertar").prop("disabled", false);
+
+	// Guardar el objeto
+	objCoin = data;
+	insrt = "coin";
+
+	const table = $('&lt;table class="table">').attr("id", "coin-table");
+
+	// Obtener todas las propiedades de los objetos en el conjunto de datos
+	const allProperties = Array.from(
+		data.reduce((acc, obj) => {
+			Object.keys(obj).forEach((prop) => acc.add(prop));
+			return acc;
+		}, new Set())
+	);
+
+	// Crear el encabezado de la tabla
+	const thead = $("&lt;thead>");
+	const headerRow = $("&lt;tr>");
+
+	// Recorrer todas las propiedades para agregar encabezados a la tabla
+	allProperties.forEach((property) => {
+		const headerCell = $('&lt;th scope="col">').text(property);
+		headerCell.appendTo(headerRow);
+	});
+
+	headerRow.appendTo(thead);
+	thead.appendTo(table);
+
+	// Crear el cuerpo de la tabla
+	const tbody = $("&lt;tbody>");
+
+	// Recorrer los objetos y agregar filas a la tabla
+	data.forEach((obj) => {
+		const dataRow = $("&lt;tr>");
+
+		// Recorrer todas las propiedades y agregar celdas a la fila
+		allProperties.forEach((property) => {
+			const value = obj[property] || ""; // Obtener el valor de la propiedad o usar una cadena vacía si no existe
+			const dataCell = $("&lt;td>").text(value);
+			dataCell.appendTo(dataRow);
+		});
+
+		dataRow.appendTo(tbody);
+	});
+	tbody.appendTo(table);
+
+	// Mostrar la tabla con el número de registros que tiene
+	const tableContainer = $("&lt;div>").attr("id", "tb-show-coin");
+	$(`&lt;b>Se encontraron ${data.length} registros&lt;/b>`).appendTo(
+		tableContainer
+	);
+	table.appendTo(tableContainer);
+	tableContainer.appendTo("#div-table");
+});
+
+/**
+ * Evento para manejar el resultado del servidor para los datos AFIL.
+ * @param {Object[]} data - Los datos AFIL recibidos desde el servidor.
+ */
+socket.on("server:result-afil", (data) => {
+	console.log(data);
+	// Vaciar div del modal
+	$("#div-table").empty();
+
+	$("#btn_cancelar").prop("disabled", false);
+	$("#btn_insertar").prop("disabled", false);
+
+	// Guardar el objeto
+	objAfil = data;
+	insrt = "afil";
+
+	const table = $('&lt;table class="table">').attr("id", "coin-table");
+
+	// Obtener todas las propiedades de los objetos en el conjunto de datos
+	const allProperties = Array.from(
+		data.reduce((acc, obj) => {
+			Object.keys(obj).forEach((prop) => acc.add(prop));
+			return acc;
+		}, new Set())
+	);
+
+	// Crear el encabezado de la tabla
+	const thead = $("&lt;thead>");
+	const headerRow = $("&lt;tr>");
+
+	// Recorrer todas las propiedades para agregar encabezados a la tabla
+	allProperties.forEach((property) => {
+		const headerCell = $('&lt;th scope="col">').text(property);
+		headerCell.appendTo(headerRow);
+	});
+
+	headerRow.appendTo(thead);
+	thead.appendTo(table);
+
+	// Crear el cuerpo de la tabla
+	const tbody = $("&lt;tbody>");
+
+	// Recorrer los objetos y agregar filas a la tabla
+	data.forEach((obj) => {
+		const dataRow = $("&lt;tr>");
+
+		// Recorrer todas las propiedades y agregar celdas a la fila
+		allProperties.forEach((property) => {
+			const value = obj[property] || ""; // Obtener el valor de la propiedad o usar una cadena vacía si no existe
+			const dataCell = $("&lt;td>").text(value);
+			dataCell.appendTo(dataRow);
+		});
+
+		dataRow.appendTo(tbody);
+	});
+	tbody.appendTo(table);
+
+	// Mostrar la tabla con el número de registros que tiene
+	const tableContainer = $("&lt;div>").attr("id", "tb-show-coin");
+	$(`&lt;b>Se encontraron ${data.length} registros&lt;/b>`).appendTo(
+		tableContainer
+	);
+	table.appendTo(tableContainer);
+	tableContainer.appendTo("#div-table");
+});
+
+/**
+ * Evento para manejar el resultado del servidor para los datos RALE COP.
+ * @param {Object[]} data - Los datos RALE COP recibidos desde el servidor.
+ */
+socket.on("server:result-rale-cop", (data) => {
+	console.log(data);
+	$("#modal_title").text("Rale COP");
+
+	// Vaciar div del modal
+	$("#div-table").empty();
+
+	var err = false;
+	// Validar que sea un archivo COIN verificando cada columna
+	if (!data.some((obj) => "REG. PATRONAL" in obj)) {
+		alert(`La columna REG. PATRONAL no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "M" in obj)) {
+		alert(`La columna M no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "OV. PATRONAL" in obj)) {
+		alert(`La columna OV. PATRONAL no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "SECT" in obj)) {
+		alert(`La columna SECT no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "NUM.CRED." in obj)) {
+		alert(`La columna NUM.CRED. no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "CE" in obj)) {
+		alert(`La columna CE no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "PERIODO" in obj)) {
+		alert(`La columna PERIODO no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "TD" in obj)) {
+		alert(`La columna TD no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "FECHA ALTA" in obj)) {
+		alert(`La columna FECHA ALTA no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "FEC. NOTIF." in obj)) {
+		alert(`La columna FEC. NOTIF. no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "INC." in obj)) {
+		alert(`La columna INC. no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "FEC. INCID." in obj)) {
+		alert(`La columna FEC. INCID. no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "DIAS" in obj)) {
+		alert(`La columna DIAS no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "I M P O R T E" in obj)) {
+		alert(`La columna I M P O R T E no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "DC SC" in obj)) {
+		alert(`La columna DC SC no se encontró en el archivo`);
+		err = true;
+	}
+
+	// Si hubo alguna diferencia, mostrar el error
+	if (err) {
+		$("#modal_title").text("ERROR");
+		$(
+			'&lt;h3 class="text-danger">Error: Los campos introducidos del excel no coinciden con la estructura predeterminada&lt;/h3>'
+		).appendTo("#div-table");
+		$('&lt;img src="imgs/rale_example.png" class="mt-3">').appendTo(
+			"#div-table"
+		);
+		$(
+			'&lt;h3 class="mt-3 text-primary">Por favor asegúrate de que la estructura coincida con la siguiente&lt;/h3>'
+		).appendTo("#div-table");
+
+		$("#btn_cancelar").prop("disabled", false);
+		$("#btn_insertar").prop("disabled", true);
+
+		return;
+	}
+
+	$("#btn_cancelar").prop("disabled", false);
+	$("#btn_insertar").prop("disabled", false);
+
+	// Guardar el objeto
+	objRaleCOP = data;
+	insrt = "raleCOP";
+
+	// Crear tabla
+	const table = $('&lt;table class="table">').attr("id", "rale-cop-table");
+
+	// Obtener todas las propiedades de los objetos en el conjunto de datos
+	const allProperties = Array.from(
+		data.reduce((acc, obj) => {
+			Object.keys(obj).forEach((prop) => acc.add(prop));
+			return acc;
+		}, new Set())
+	);
+
+	// Crear el encabezado de la tabla
+	const thead = $("&lt;thead>");
+	const headerRow = $("&lt;tr>");
+
+	// Recorrer todas las propiedades para agregar encabezados a la tabla
+	allProperties.forEach((property) => {
+		const headerCell = $('&lt;th scope="col">').text(property);
+		headerCell.appendTo(headerRow);
+	});
+
+	headerRow.appendTo(thead);
+	thead.appendTo(table);
+
+	// Crear el cuerpo de la tabla
+	const tbody = $("&lt;tbody>");
+
+	// Recorrer los objetos y agregar filas a la tabla
+	data.forEach((obj) => {
+		const dataRow = $("&lt;tr>");
+
+		// Recorrer todas las propiedades y agregar celdas a la fila
+		allProperties.forEach((property) => {
+			const value = obj[property] || ""; // Obtener el valor de la propiedad o usar una cadena vacía si no existe
+			const dataCell = $("&lt;td>").text(value);
+			dataCell.appendTo(dataRow);
+		});
+
+		dataRow.appendTo(tbody);
+	});
+	tbody.appendTo(table);
+
+	// Mostrar la tabla con el número de registros que tiene
+	const tableContainer = $("&lt;div>").attr("id", "tb-show-rale-cop");
+	$(`&lt;b>Se encontraron ${data.length} registros&lt;/b>`).appendTo(
+		tableContainer
+	);
+	table.appendTo(tableContainer);
+	tableContainer.appendTo("#div-table");
+});
+
+/**
+ * Evento para manejar el resultado del servidor para los datos RALE RCV.
+ * @param {Object[]} data - Los datos RALE RCV recibidos desde el servidor.
+ */
+socket.on("server:result-rale-rcv", (data) => {
+	$("#modal_title").text("Rale RCV");
+
+	// Vaciar div del modal
+	$("#div-table").empty();
+
+	var err = false;
+	// Validar que sea un archivo COIN verificando cada columna
+	if (!data.some((obj) => "REG. PATRONAL" in obj)) {
+		alert(`La columna REG. PATRONAL no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "M" in obj)) {
+		alert(`La columna M no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "OV. PATRONAL" in obj)) {
+		alert(`La columna OV. PATRONAL no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "SECT" in obj)) {
+		alert(`La columna SECT no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "NUM.CRED." in obj)) {
+		alert(`La columna NUM.CRED. no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "CE" in obj)) {
+		alert(`La columna CE no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "PERIODO" in obj)) {
+		alert(`La columna PERIODO no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "TD" in obj)) {
+		alert(`La columna TD no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "FECHA ALTA" in obj)) {
+		alert(`La columna FECHA ALTA no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "FEC. NOTIF." in obj)) {
+		alert(`La columna FEC. NOTIF. no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "INC." in obj)) {
+		alert(`La columna INC. no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "FEC. INCID." in obj)) {
+		alert(`La columna FEC. INCID. no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "DIAS" in obj)) {
+		alert(`La columna DIAS no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "I M P O R T E" in obj)) {
+		alert(`La columna I M P O R T E no se encontró en el archivo`);
+		err = true;
+	}
+	if (!data.some((obj) => "DC SC" in obj)) {
+		alert(`La columna DC SC no se encontró en el archivo`);
+		err = true;
+	}
+
+	// Si hubo alguna diferencia, mostrar el error
+	if (err) {
+		$("#modal_title").text("ERROR");
+		$(
+			'&lt;h3 class="text-danger">Error: Los campos introducidos del excel no coinciden con la estructura predeterminada&lt;/h3>'
+		).appendTo("#div-table");
+		$('&lt;img src="imgs/rale_example.png" class="mt-3">').appendTo(
+			"#div-table"
+		);
+		$(
+			'&lt;h3 class="mt-3 text-primary">Por favor asegúrate de que la estructura coincida con la siguiente&lt;/h3>'
+		).appendTo("#div-table");
+
+		$("#btn_cancelar").prop("disabled", false);
+		$("#btn_insertar").prop("disabled", true);
+
+		return;
+	}
+
+	$("#btn_cancelar").prop("disabled", false);
+	$("#btn_insertar").prop("disabled", false);
+
+	// Guardar el objeto
+	objRaleRCV = data;
+	insrt = "raleRCV";
+
+	// Crear tabla
+	const table = $('&lt;table class="table">').attr("id", "rale-rcv-table");
+
+	// Obtener todas las propiedades de los objetos en el conjunto de datos
+	const allProperties = Array.from(
+		data.reduce((acc, obj) => {
+			Object.keys(obj).forEach((prop) => acc.add(prop));
+			return acc;
+		}, new Set())
+	);
+
+	// Crear el encabezado de la tabla
+	const thead = $("&lt;thead>");
+	const headerRow = $("&lt;tr>");
+
+	// Recorrer todas las propiedades para agregar encabezados a la tabla
+	allProperties.forEach((property) => {
+		const headerCell = $('&lt;th scope="col">').text(property);
+		headerCell.appendTo(headerRow);
+	});
+
+	headerRow.appendTo(thead);
+	thead.appendTo(table);
+
+	// Crear el cuerpo de la tabla
+	const tbody = $("&lt;tbody>");
+
+	// Recorrer los objetos y agregar filas a la tabla
+	data.forEach((obj) => {
+		const dataRow = $("&lt;tr>");
+
+		// Recorrer todas las propiedades y agregar celdas a la fila
+		allProperties.forEach((property) => {
+			const value = obj[property] || ""; // Obtener el valor de la propiedad o usar una cadena vacía si no existe
+			const dataCell = $("&lt;td>").text(value);
+			dataCell.appendTo(dataRow);
+		});
+
+		dataRow.appendTo(tbody);
+	});
+	tbody.appendTo(table);
+
+	// Mostrar la tabla con el número de registros que tiene
+	const tableContainer = $("&lt;div>").attr("id", "tb-show-rale-rcv");
+	$(`&lt;b>Se encontraron ${data.length} registros&lt;/b>`).appendTo(
+		tableContainer
+	);
+	table.appendTo(tableContainer);
+	tableContainer.appendTo("#div-table");
+});
+
+/**
+ * Evento para manejar la consulta de registros RALE COP desde el servidor.
+ * @param {string[]} data - Los datos de los registros RALE COP recibidos desde el servidor.
+ */
+socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
+	$("#div-registros-rale-cop").empty();
+	$("#btnCerrarRaleCOP").prop("disabled", false);
+
+	// Crear la etiqueta select
+	const selectRaleCOP = $("&lt;select>").attr({
+		id: "selectRaleCOP",
+		name: "selectRaleCOP",
+	});
+
+	// Crear la opción "Seleccionar" con valor falso y seleccionarla por defecto
+	const defaultOption = $("&lt;option>")
+		.text("Seleccionar")
+		.val(false)
+		.prop("selected", true);
+	selectRaleCOP.append(defaultOption);
+
+	// Recorrer los datos y crear las opciones adicionales
+	data.forEach((item) => {
+		const option = $("&lt;option>").text(item).val(item);
+		selectRaleCOP.append(option);
+	});
+
+	// Agregar un evento de cambio al select
+	selectRaleCOP.on("change", function () {
+		const fechaRaleCOP = $(this).val(); // Obtener el valor de la opción seleccionada
+		socket.emit("cliente:filtrarRaleCOP", fechaRaleCOP); // Enviar el valor al servidor a través del socket
+
+		$("#btnCerrarRaleCOP").prop("disabled", true);
+	});
+
+	// Agregar el select al elemento con el ID 'div-registros-rale-cop'
+	$("#div-registros-rale-cop").append(selectRaleCOP);
+});
+
+/**
+ * Evento para manejar el filtrado de registros RALE COP desde el servidor.
+ * @param {Object[]} data - Los datos de los registros RALE COP filtrados recibidos desde el servidor.
+ */
+socket.on("servidor:filtrarRaleCOP", (data) => {
+	//$('#div-registros-rale-cop').empty();
+	$("#btnCerrarRaleCOP").prop("disabled", false);
+	$("#btnEliminarRaleCOP").prop("disabled", false);
+	$("#selectRaleCOP").hide();
+
+	// Crear tabla
+	const table = $('&lt;table class="table">').attr(
+		"id",
+		"rale-cop-filtrado-table"
+	);
+
+	// Crear el encabezado de la tabla
+	const thead = $("&lt;thead>");
+	const headerRow = $("&lt;tr>");
+
+	// Obtener los nombres de las propiedades del primer objeto
+	const headers = Object.keys(data[0]);
+
+	// Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+	headers.forEach((header) => {
+		const headerCell = $('&lt;th scope="col">').text(header);
+		headerCell.appendTo(headerRow);
+	});
+
+	headerRow.appendTo(thead);
+	thead.appendTo(table);
+
+	// Crear el cuerpo de la tabla
+	const tbody = $("&lt;tbody>");
+
+	// Recorrer los objetos y agregar filas a la tabla
+	data.forEach((obj) => {
+		const dataRow = $("&lt;tr>");
+
+		// Recorrer las propiedades de cada objeto y agregar celdas a la fila
+		Object.values(obj).forEach((value) => {
+			const dataCell = $("&lt;td>").text(value);
+			dataCell.appendTo(dataRow);
+		});
+
+		dataRow.appendTo(tbody);
+	});
+
+	tbody.appendTo(table);
+
+	// Mostrar la tabla con el numero de registros que tiene
+	const tableContainer = $("&lt;div>").attr("id", "tb-show-rale-cop-filtrado");
+	$(`&lt;b >Se encontraron ${data.length} registros de Rale Cop&lt;b>`).appendTo(
+		tableContainer
+	);
+	table.appendTo(tableContainer);
+	tableContainer.appendTo("#div-registros-rale-cop");
+});
+
+/**
+ * Evento para manejar el filtrado de registros Coin desde el servidor.
+ * @param {Object[]} data - Los datos de los registros Coin filtrados recibidos desde el servidor.
+ */
+socket.on("servidor:filtrarCoin", (data) => {
+	//$('#div-registros-coin').empty();
+	$("#btnCerrarCoin").prop("disabled", false);
+	$("#btnEliminarCoin").prop("disabled", false);
+	$("#selectCoin").hide();
+
+	// Crear tabla
+	const table = $('&lt;table class="table">').attr("id", "coin-filtrado-table");
+
+	// Crear el encabezado de la tabla
+	const thead = $("&lt;thead>");
+	const headerRow = $("&lt;tr>");
+
+	// Obtener los nombres de las propiedades del primer objeto
+	const headers = Object.keys(data[0]);
+
+	// Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+	headers.forEach((header) => {
+		const headerCell = $('&lt;th scope="col">').text(header);
+		headerCell.appendTo(headerRow);
+	});
+
+	headerRow.appendTo(thead);
+	thead.appendTo(table);
+
+	// Crear el cuerpo de la tabla
+	const tbody = $("&lt;tbody>");
+
+	// Recorrer los objetos y agregar filas a la tabla
+	data.forEach((obj) => {
+		const dataRow = $("&lt;tr>");
+
+		// Recorrer las propiedades de cada objeto y agregar celdas a la fila
+		Object.values(obj).forEach((value) => {
+			const dataCell = $("&lt;td>").text(value);
+			dataCell.appendTo(dataRow);
+		});
+
+		dataRow.appendTo(tbody);
+	});
+
+	tbody.appendTo(table);
+
+	// Mostrar la tabla con el numero de registros que tiene
+	const tableContainer = $("&lt;div>").attr("id", "tb-show-coin-filtrado");
+	$(`&lt;b >Se encontraron ${data.length} registros de Coin&lt;b>`).appendTo(
+		tableContainer
+	);
+	table.appendTo(tableContainer);
+	tableContainer.appendTo("#div-registros-coin");
+});
+
+/**
+ * Evento para consultar los registros de afiliación desde el servidor.
+ * @param {string[]} data - Los datos de los registros de afiliación recibidos desde el servidor.
+ */
+socket.on("servidor:consultarRegistrosAfil", (data) => {
+	$("#div-registros-afil").empty();
+	$("#btnCerrarAfil").prop("disabled", false);
+
+	// Crear la etiqueta select
+	const selectAfil = $("&lt;select>").attr({
+		id: "selectAfil",
+		name: "selectAfil",
+	});
+
+	// Crear la opción "Seleccionar" con valor falso y seleccionarla por defecto
+	const defaultOption = $("&lt;option>")
+		.text("Seleccionar")
+		.val(false)
+		.prop("selected", true);
+	selectAfil.append(defaultOption);
+
+	// Recorrer los datos y crear las opciones adicionales
+	data.forEach((item) => {
+		const option = $("&lt;option>").text(item).val(item);
+		selectAfil.append(option);
+	});
+
+	// Agregar un evento de cambio al select
+	selectAfil.on("change", function () {
+		const fechaAfil = $(this).val(); // Obtener el valor de la opción seleccionada
+		socket.emit("cliente:filtrarAfil", fechaAfil); // Enviar el valor al servidor a través del socket
+
+		$("#btnCerrarAfil").prop("disabled", true);
+	});
+
+	// Agregar el select al elemento con el ID 'div-registros-afil'
+	$("#div-registros-afil").append(selectAfil);
+});
+
+/**
+ * Evento para filtrar los registros de afiliación y mostrar los resultados filtrados.
+ * @param {Object[]} data - Los datos de los registros de afiliación filtrados.
+ */
+socket.on("servidor:filtrarAfil", (data) => {
+	//$('#div-registros-afil').empty();
+	$("#btnCerrarAfil").prop("disabled", false);
+	$("#btnEliminarAfil").prop("disabled", false);
+	$("#selectAfil").hide();
+
+	// Crear tabla
+	const table = $('&lt;table class="table">').attr("id", "afil-filtrado-table");
+
+	// Crear el encabezado de la tabla
+	const thead = $("&lt;thead>");
+	const headerRow = $("&lt;tr>");
+
+	// Obtener los nombres de las propiedades del primer objeto
+	const headers = Object.keys(data[0]);
+
+	// Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+	headers.forEach((header) => {
+		const headerCell = $('&lt;th scope="col">').text(header);
+		headerCell.appendTo(headerRow);
+	});
+	headerRow.appendTo(thead);
+	thead.appendTo(table);
+
+	// Crear el cuerpo de la tabla
+	const tbody = $("&lt;tbody>");
+
+	// Recorrer los objetos y agregar filas a la tabla
+	data.forEach((obj) => {
+		const dataRow = $("&lt;tr>");
+
+		// Recorrer las propiedades de cada objeto y agregar celdas a la fila
+		Object.values(obj).forEach((value) => {
+			const dataCell = $("&lt;td>").text(value);
+			dataCell.appendTo(dataRow);
+		});
+
+		dataRow.appendTo(tbody);
+	});
+	tbody.appendTo(table);
+
+	// Mostrar la tabla con el numero de registros que tiene
+	const tableContainer = $("&lt;div>").attr("id", "tb-show-afil-filtrado");
+	$(`&lt;b >Se encontraron ${data.length} registros de Afil&lt;b>`).appendTo(
+		tableContainer
+	);
+	table.appendTo(tableContainer);
+	tableContainer.appendTo("#div-registros-afil");
+});
+
+/**
+ * Evento para consultar los registros de COIN y mostrar las opciones de filtrado.
+ * @param {string[]} data - Los datos de las fechas de los registros de COIN.
+ */
+socket.on("servidor:consultarRegistrosCoin", (data) => {
+	$("#div-registros-coin").empty();
+	$("#btnCerrarCoin").prop("disabled", false);
+
+	// Crear la etiqueta select
+	const selectCoin = $("&lt;select>").attr({
+		id: "selectCoin",
+		name: "selectCoin",
+	});
+
+	// Crear la opción "Seleccionar" con valor falso y seleccionarla por defecto
+	const defaultOption = $("&lt;option>")
+		.text("Seleccionar")
+		.val(false)
+		.prop("selected", true);
+	selectCoin.append(defaultOption);
+
+	// Recorrer los datos y crear las opciones adicionales
+	data.forEach((item) => {
+		const option = $("&lt;option>").text(item).val(item);
+		selectCoin.append(option);
+	});
+
+	// Agregar un evento de cambio al select
+	selectCoin.on("change", function () {
+		const fechaCoin = $(this).val(); // Obtener el valor de la opción seleccionada
+		socket.emit("cliente:filtrarCoin", fechaCoin); // Enviar el valor al servidor a través del socket
+
+		$("#btnCerrarCoin").prop("disabled", true);
+	});
+
+	// Agregar el select al elemento con el ID 'div-registros-coin'
+	$("#div-registros-coin").append(selectCoin);
+});
+
+/**
+ * Evento para consultar los registros de Rale RCV y mostrar las opciones de filtrado.
+ * @param {string[]} data - Los datos de las fechas de los registros de Rale RCV.
+ */
+socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
+	$("#div-registros-rale-rcv").empty();
+	$("#btnCerrarRaleRCV").prop("disabled", false);
+
+	// Crear la etiqueta select
+	const selectRaleRCV = $("&lt;select>").attr({
+		id: "selectRaleRCV",
+		name: "selectRaleRCV",
+	});
+
+	// Crear la opción "Seleccionar" con valor falso y seleccionarla por defecto
+	const defaultOption = $("&lt;option>")
+		.text("Seleccionar")
+		.val(false)
+		.prop("selected", true);
+	selectRaleRCV.append(defaultOption);
+
+	// Recorrer los datos y crear las opciones adicionales
+	data.forEach((item) => {
+		const option = $("&lt;option>").text(item).val(item);
+		selectRaleRCV.append(option);
+	});
+
+	// Agregar un evento de cambio al select
+	selectRaleRCV.on("change", function () {
+		const fechaRaleRCV = $(this).val(); // Obtener el valor de la opción seleccionada
+		socket.emit("cliente:filtrarRaleRCV", fechaRaleRCV); // Enviar el valor al servidor a través del socket
+
+		$("#btnCerrarRaleRCV").prop("disabled", true);
+	});
+
+	// Agregar el select al elemento con el ID 'div-registros-rale-rcv'
+	$("#div-registros-rale-rcv").append(selectRaleRCV);
+});
+
+/**
+ * Evento para filtrar los registros de Rale RCV y mostrar la tabla de resultados.
+ * @param {Object[]} data - Los datos filtrados de los registros de Rale RCV.
+ */
+socket.on("servidor:filtrarRaleRCV", (data) => {
+	//$('#div-registros-rale-rcv').empty();
+	$("#btnCerrarRaleRCV").prop("disabled", false);
+	$("#btnEliminarRaleRCV").prop("disabled", false);
+	$("#selectRaleRCV").hide();
+
+	// Crear tabla
+	const table = $('&lt;table class="table">').attr(
+		"id",
+		"rale-rcv-filtrado-table"
+	);
+
+	// Crear el encabezado de la tabla
+	const thead = $("&lt;thead>");
+	const headerRow = $("&lt;tr>");
+
+	// Obtener los nombres de las propiedades del primer objeto
+	const headers = Object.keys(data[0]);
+
+	// Recorrer los nombres de las propiedades para agregar encabezados a la tabla
+	headers.forEach((header) => {
+		const headerCell = $('&lt;th scope="col">').text(header);
+		headerCell.appendTo(headerRow);
+	});
+
+	headerRow.appendTo(thead);
+	thead.appendTo(table);
+
+	// Crear el cuerpo de la tabla
+	const tbody = $("&lt;tbody>");
+
+	// Recorrer los objetos y agregar filas a la tabla
+	data.forEach((obj) => {
+		const dataRow = $("&lt;tr>");
+
+		// Recorrer las propiedades de cada objeto y agregar celdas a la fila
+		Object.values(obj).forEach((value) => {
+			const dataCell = $("&lt;td>").text(value);
+			dataCell.appendTo(dataRow);
+		});
+
+		dataRow.appendTo(tbody);
+	});
+
+	tbody.appendTo(table);
+
+	// Mostrar la tabla con el numero de registros que tiene
+	const tableContainer = $("&lt;div>").attr("id", "tb-show-rale-rcv-filtrado");
+	$(`&lt;b >Se encontraron ${data.length} registros de Rale Rcv&lt;b>`).appendTo(
+		tableContainer
+	);
+	table.appendTo(tableContainer);
+	tableContainer.appendTo("#div-registros-rale-rcv");
+});
+
+socket.on("connect", () => {
+	// console.log('Conexión establecida con el servidor');
+});
+
+socket.on("disconnect", () => {
+	// console.log('Conexión perdida con el servidor');
+});
+
+/**
+ * Muestra el resultado de una operación en el elemento con ID 'div-table'.
+ * @param {Object} rslt - El resultado de la operación.
+ * @param {boolean} rslt.status - El estado del resultado. Verdadero si la operación fue exitosa, falso de lo contrario.
+ * @param {string} rslt.msg - El mensaje del resultado que se mostrará en el elemento 'div-table'.
+ */
+function showResult(rslt) {
+	if (rslt.status) {
+		$(`&lt;h3 class="text-success">${rslt.msg}&lt;/h3>`).appendTo("#div-table");
+		$('&lt;img src="imgs/folder_listo.png" class="mt-3">').appendTo(
+			"#div-table"
+		);
+	} else {
+		$(`&lt;h3 class="text-danger">${rslt.msg}&lt;/h3>`).appendTo("#div-table");
+		$('&lt;img src="imgs/X.png" class="mt-3">').appendTo("#div-table");
+	}
+
+	$("#btn_cancelar").prop("disabled", false).text("Salir");
+	$("#btn_insertar").prop("disabled", true);
+}
+
+/**
+ * Muestra los registros de Afil en el elemento con ID 'div-registros-afil'.
+ * Se comunica con el servidor para obtener los registros y activa el modal de visualización.
+ */
+function verRegistrosAfil() {
+	$("#div-registros-afil").empty();
+
+	// Emitir evento al servidor para solicitar los registros de Afil
+	socket.emit("cliente:consultarRegistrosAfil");
+
+	// Mostrar el modal de visualización de Afil
+	$("#verAfilModal").modal("show");
+
+	// Mostrar mensaje de obtención de registros
+	$(`&lt;h3 class="text-primary">Obteniendo registros de Afil&lt;/h3>`).appendTo(
+		"#div-registros-afil"
+	);
+
+	// Deshabilitar los botones de cierre y eliminación de registros de Afil
+	$("#btnCerrarAfil").prop("disabled", true);
+	$("#btnEliminarAfil").prop("disabled", true);
+}
+
+/**
+ * Muestra los registros de Coin en el elemento con ID 'div-registros-coin'.
+ * Se comunica con el servidor para obtener los registros y activa el modal de visualización.
+ */
+function verRegistrosCoin() {
+	$("#div-registros-coin").empty();
+
+	// Emitir evento al servidor para solicitar los registros de Coin
+	socket.emit("cliente:consultarRegistrosCoin");
+
+	// Mostrar el modal de visualización de Coin
+	$("#verCoinModal").modal("show");
+
+	// Mostrar mensaje de obtención de registros
+	$(`&lt;h3 class="text-primary">Obteniendo registros de Coin&lt;/h3>`).appendTo(
+		"#div-registros-coin"
+	);
+
+	// Deshabilitar los botones de cierre y eliminación de registros de Coin
+	$("#btnCerrarCoin").prop("disabled", true);
+	$("#btnEliminarCoin").prop("disabled", true);
+}
+
+/**
+ * Muestra los registros de Rale COP.
+ */
+function verRegistrosRaleCOP() {
+	$("#div-registros-rale-cop").empty();
+
+	// Emite un evento para consultar los registros de Rale COP al servidor.
+	socket.emit("cliente:consultarRegistrosRaleCOP");
+
+	// Muestra el modal para ver los registros de Rale COP.
+	$("#verRaleCOPModal").modal("show");
+
+	// Agrega un encabezado al contenedor de registros de Rale COP.
+	$(
+		`&lt;h3 class="text-primary">Obteniendo registros de Rale COP&lt;/h3>`
+	).appendTo("#div-registros-rale-cop");
+
+	// Deshabilita el botón de cerrar Rale COP.
+	$("#btnCerrarRaleCOP").prop("disabled", true);
+
+	// Deshabilita el botón de eliminar Rale COP.
+	$("#btnEliminarRaleCop").prop("disabled", true);
+}
+
+/**
+ * Muestra los registros de Rale RCV.
+ */
+function verRegistrosRaleRCV() {
+	$("#div-registros-rale-rcv").empty();
+
+	// Emite un evento para consultar los registros de Rale RCV al servidor.
+	socket.emit("cliente:consultarRegistrosRaleRCV");
+
+	// Muestra el modal para ver los registros de Rale RCV.
+	$("#verRaleRCVModal").modal("show");
+
+	// Agrega un encabezado al contenedor de registros de Rale RCV.
+	$(
+		`&lt;h3 class="text-primary">Obteniendo registros de Rale RCV&lt;/h3>`
+	).appendTo("#div-registros-rale-rcv");
+
+	// Deshabilita el botón de cerrar Rale RCV.
+	$("#btnCerrarRaleRCV").prop("disabled", true);
+
+	// Deshabilita el botón de eliminar Rale RCV.
+	$("#btnEliminarRaleRCV").prop("disabled", true);
+}
+</code></pre>
+				</article>
+			</section>
+		</div>
+
+		<nav>
+			<h2><a href="index.html">Home</a></h2>
+			<h3>Global</h3>
+			<ul>
+				<li>
+					<a href="global.html#actualizarEstadoBoton"
+						>actualizarEstadoBoton</a
+					>
+				</li>
+				<li>
+					<a href="global.html#agruparArchivos">agruparArchivos</a>
+				</li>
+				<li><a href="global.html#fillFilters">fillFilters</a></li>
+				<li><a href="global.html#fillStats">fillStats</a></li>
+				<li>
+					<a href="global.html#generarCitatorio">generarCitatorio</a>
+				</li>
+				<li><a href="global.html#generarGastos">generarGastos</a></li>
+				<li><a href="global.html#generarInforme">generarInforme</a></li>
+				<li>
+					<a href="global.html#generarMandamiento"
+						>generarMandamiento</a
+					>
+				</li>
+				<li>
+					<a href="global.html#generarReportes">generarReportes</a>
+				</li>
+				<li><a href="global.html#getConfronta">getConfronta</a></li>
+				<li><a href="global.html#getGraphics">getGraphics</a></li>
+				<li><a href="global.html#getRales">getRales</a></li>
+				<li><a href="global.html#getWorkDays">getWorkDays</a></li>
+				<li>
+					<a href="global.html#itemSeleccionado">itemSeleccionado</a>
+				</li>
+				<li><a href="global.html#obtenerAfil">obtenerAfil</a></li>
+				<li><a href="global.html#obtenerTotales">obtenerTotales</a></li>
+				<li><a href="global.html#processAfil">processAfil</a></li>
+				<li><a href="global.html#processCoin">processCoin</a></li>
+				<li><a href="global.html#processRale">processRale</a></li>
+				<li><a href="global.html#sequelize">sequelize</a></li>
+				<li><a href="global.html#showGraphics">showGraphics</a></li>
+				<li><a href="global.html#showResult">showResult</a></li>
+				<li><a href="global.html#showTable">showTable</a></li>
+				<li><a href="global.html#socket">socket</a></li>
+				<li>
+					<a href="global.html#statusSeleccionado"
+						>statusSeleccionado</a
+					>
+				</li>
+				<li><a href="global.html#subirArchivo">subirArchivo</a></li>
+				<li>
+					<a href="global.html#tipoSeleccionado">tipoSeleccionado</a>
+				</li>
+				<li><a href="global.html#updateFilters">updateFilters</a></li>
+				<li><a href="global.html#validarCP">validarCP</a></li>
+				<li><a href="global.html#validarRFC">validarRFC</a></li>
+				<li>
+					<a href="global.html#verPatronesAsignados"
+						>verPatronesAsignados</a
+					>
+				</li>
+				<li>
+					<a href="global.html#verPatronesNoAsignados"
+						>verPatronesNoAsignados</a
+					>
+				</li>
+				<li>
+					<a href="global.html#verRegistrosAfil">verRegistrosAfil</a>
+				</li>
+				<li>
+					<a href="global.html#verRegistrosCoin">verRegistrosCoin</a>
+				</li>
+				<li>
+					<a href="global.html#verRegistrosRaleCOP"
+						>verRegistrosRaleCOP</a
+					>
+				</li>
+				<li>
+					<a href="global.html#verRegistrosRaleRCV"
+						>verRegistrosRaleRCV</a
+					>
+				</li>
+			</ul>
+		</nav>
+
+		<br class="clear" />
+
+		<footer>
+			Documentation generated by
+			<a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Jul
+			18 2023 14:13:01 GMT-0500 (hora de verano central)
+		</footer>
+
+		<script>
+			prettyPrint();
+		</script>
+		<script src="scripts/linenumber.js"></script>
+	</body>
+</html>
