@@ -39,7 +39,8 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Función para generar un informe
+
+// Función para generar un informe diario de ejecutor
 export async function generarInforme(req, res) {
   try {
     // Obtener datos de formulario
@@ -47,9 +48,11 @@ export async function generarInforme(req, res) {
     const { type, folioSua, resultadosDiligencia } = req.body;
 
     // Validar si es uno o varios registros y actualizar en la bd
+    //Es sólo un registro
     if (typeof nom_cred == "string") {
+
+      // Actualizar si es un rale cop en la tabla rale cop
       if (type == "cop") {
-        // Actualizar si es un rale cop en la tabla rale cop
         const resCop = await RaleCop.update(
           {
             folioSua: folioSua,
@@ -60,20 +63,9 @@ export async function generarInforme(req, res) {
             where: { nom_cred: nom_cred },
           }
         )
-          .then(() => {
-            console.log(
-              "Base de datos actualizada para el credito: ",
-              nom_cred
-            );
-          })
-          .catch((e) => {
-            console.log(
-              "No se pudo actualizar la Base de datos para el credito: ",
-              nom_cred
-            );
-          });
+
+      // Actualizar si es un rale rcv en la tabla rale rcv
       } else if (type == "rcv") {
-        // Actualizar si es un rale rcv en la tabla rale rcv
         const resRcv = await RaleRcv.update(
           {
             folioSua: folioSua,
@@ -84,30 +76,19 @@ export async function generarInforme(req, res) {
             where: { nom_cred: nom_cred },
           }
         )
-          .then(() => {
-            console.log(
-              "Base de datos actualizada para el credito: ",
-              nom_cred
-            );
-          })
-          .catch((e) => {
-            console.log(
-              "No se pudo actualizar la Base de datos para el credito: ",
-              nom_cred
-            );
-          });
       }
-    } else {
-      // Se enviaron varios registros
+    } 
+    // Se enviaron varios registros
+    else {
+      // Obtener los datos de cada credito
       for (let index = 0; index < nom_cred.length; index++) {
-        // Obtener los datos de cada credito
         const value = type[index];
         const nomCredValue = nom_cred[index];
         const folioSuaValue = folioSua[index];
         const resultadosDValue = resultadosDiligencia[index];
 
+        // Actualizar si es un rale cop en la tabla rale cop
         if (value === "cop") {
-          // Actualizar si es un rale cop en la tabla rale cop
           const resCop = await RaleCop.update(
             {
               folioSua: folioSuaValue,
@@ -118,22 +99,9 @@ export async function generarInforme(req, res) {
               where: { nom_cred: nomCredValue },
             }
           )
-            .then(() => {
-              console.log(
-                "Base de datos actualizada para el credito: ",
-                nom_cred
-              );
-            })
-            .catch((e) => {
-              console.log(
-                "No se pudo actualizar la Base de datos para el credito: ",
-                nom_cred,
-                " | Error: ",
-                e
-              );
-            });
+
+        // Actualizar si es un rale rcv en la tabla rale rcv
         } else if (value === "rcv") {
-          // Actualizar si es un rale rcv en la tabla rale rcv
           const resRcv = await RaleRcv.update(
             {
               folioSua: folioSuaValue,
@@ -144,20 +112,6 @@ export async function generarInforme(req, res) {
               where: { nom_cred: nomCredValue },
             }
           )
-            .then(() => {
-              console.log(
-                "Base de datos actualizada para el credito: ",
-                nom_cred
-              );
-            })
-            .catch((e) => {
-              console.log(
-                "No se pudo actualizar la Base de datos para el credito: ",
-                nom_cred,
-                " | Error: ",
-                e
-              );
-            });
         }
       }
     }
@@ -182,7 +136,7 @@ export async function generarInforme(req, res) {
   // Obtener la fecha actual
   const currentDate = new Date();
 
-  // Obtener el día, mes y año
+  // Obtener el día, mes y año separdos. 
   const day = currentDate.getDate();
   const month = currentDate.getMonth() + 1;
   const year = currentDate.getFullYear();
@@ -228,8 +182,10 @@ export async function generarInforme(req, res) {
   };
 
   // Verificar la cantidad de registros que selecciono
+  //Sólo selecciono un registro
   if (typeof reg_pat == "string") {
-    //Sólo selecciono un registro
+
+    //Variables
     var celda;
 
     //Combinar y centrar las columnas F17 a K17
@@ -239,21 +195,21 @@ export async function generarInforme(req, res) {
       horizontal: "center",
     };
 
-    //Celda A17:
+    //Llenar celda A17 (Registro patronal):
     celda = worksheet.getCell("A17");
     celda.value = reg_pat;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda B17
+    //Llenar celda B17 (Crédito):
     celda = worksheet.getCell("B17");
     celda.value = nom_cred;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda C17
+    //Llenar celda C17 (Periodo):
     const [yearP, monthP, dayP] = periodo.split("-");
     celda = worksheet.getCell("C17");
     celda.value = `${monthP}/${yearP}`;
@@ -261,28 +217,32 @@ export async function generarInforme(req, res) {
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda D17
+    //Llenar celda D17 (Importe):
     celda = worksheet.getCell("D17");
     celda.value = `$${importe}`;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda E17
+    //Llenar celda E17 (Folio Sua):
     celda = worksheet.getCell("E17");
     celda.value = folioSua;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda F17
+    //Llenar celda F17 (Resultado de la diligencia):
     celda = worksheet.getCell("F17");
     celda.value = resultadosDiligencia;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
-  } else {
-    //Selecciono más de un registro
+
+  } 
+  //Selecciono más de un registro
+  else {
+
+    //Variables
     var celda;
     var fila;
 
@@ -356,21 +316,18 @@ export async function generarInforme(req, res) {
   // Guardar el archivo modificado
   await workbook.xlsx.writeFile(outputFilePath);
 
-  console.log("Archivo modificado guardado: ", outputFilePath);
-
   // Descargar el archivo modificado
   const fileContent = fs.readFileSync(outputFilePath);
 
-  // Establecer las cabeceras de la respuesta
+  // Mostrar la descarga del archivo
   res.setHeader(
     "Content-Type",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   );
   res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
-
-  // Enviar el archivo al cliente
   res.send(fileContent);
 }
+
 
 // Función para generar un archivo con los gastos de ejecutor.
 export async function generarGastos(req, res) {
@@ -380,9 +337,11 @@ export async function generarGastos(req, res) {
     const { type, cobrado, gastos } = req.body;
 
     // Validar si es uno o varios registros y actualizar en la bd
+    // Selecciono sólo un registro
     if (typeof nom_cred == "string") {
+
+      // Actualizar si es un rale cop en la tabla rale cop
       if (type == "cop") {
-        // Actualizar si es un rale cop en la tabla rale cop
         const resCop = await RaleCop.update(
           {
             cobrado_patron: cobrado,
@@ -392,22 +351,9 @@ export async function generarGastos(req, res) {
             where: { nom_cred: nom_cred },
           }
         )
-          .then(() => {
-            console.log(
-              "Base de datos actualizada para el credito: ",
-              nom_cred
-            );
-          })
-          .catch((e) => {
-            console.log(
-              "No se pudo actualizar la Base de datos para el credito: ",
-              nom_cred,
-              " | Error: ",
-              e
-            );
-          });
+
+      // Actualizar si es un rale rcv en la tabla rale rcv
       } else if (type == "rcv") {
-        // Actualizar si es un rale rcv en la tabla rale rcv
         const resRcv = await RaleRcv.update(
           {
             cobrado_patron: cobrado,
@@ -417,31 +363,20 @@ export async function generarGastos(req, res) {
             where: { nom_cred: nom_cred },
           }
         )
-          .then(() => {
-            console.log(
-              "Base de datos actualizada para el credito: ",
-              nom_cred
-            );
-          })
-          .catch((e) => {
-            console.log(
-              "No se pudo actualizar la Base de datos para el credito: ",
-              nom_cred,
-              " | Error: ",
-              e
-            );
-          });
       }
-    } else {
-      // Se enviaron varios registros
+    } 
+    // Se enviaron varios registros
+    else {
       for (let index = 0; index < nom_cred.length; index++) {
+        
+        // Variables
         const value = type[index];
         const nomCredValue = nom_cred[index];
         const cobradoValue = cobrado[index];
         const gastosValue = gastos[index];
 
+        // Actualizar si es un rale cop en la tabla rale cop
         if (value === "cop") {
-          // Actualizar si es un rale cop en la tabla rale cop
           const resCop = await RaleCop.update(
             {
               folioSua: cobradoValue,
@@ -451,22 +386,9 @@ export async function generarGastos(req, res) {
               where: { nom_cred: nomCredValue },
             }
           )
-            .then(() => {
-              console.log(
-                "Base de datos actualizada para el credito: ",
-                nom_cred
-              );
-            })
-            .catch((e) => {
-              console.log(
-                "No se pudo actualizar la Base de datos para el credito: ",
-                nom_cred,
-                " | Error: ",
-                e
-              );
-            });
-        } else if (value === "rcv") {
-          // Actualizar si es un rale rcv en la tabla rale rcv
+        } 
+        // Actualizar si es un rale rcv en la tabla rale rcv
+        else if (value === "rcv") {
           const resRcv = await RaleRcv.update(
             {
               folioSua: cobradoValue,
@@ -476,20 +398,6 @@ export async function generarGastos(req, res) {
               where: { nom_cred: nomCredValue },
             }
           )
-            .then(() => {
-              console.log(
-                "Base de datos actualizada para el credito: ",
-                nom_cred
-              );
-            })
-            .catch((e) => {
-              console.log(
-                "No se pudo actualizar la Base de datos para el credito: ",
-                nom_cred,
-                " | Error: ",
-                e
-              );
-            });
         }
       }
     }
@@ -497,7 +405,7 @@ export async function generarGastos(req, res) {
     console.log("No se pudo actualizar en la bd: ", err);
   }
 
-  // Obtener la sesión del Usuario
+  // Obtener la sesión del Usuario y las variables del req.body
   const { nombre, apellidos } = req.session.user;
   const {
     reg_pat,
@@ -510,13 +418,15 @@ export async function generarGastos(req, res) {
     gastos,
     fechaPago,
   } = req.body;
+
+  // Variables 
   var cellFormat;
   let total = 0;
 
   // Obtener la fecha actual
   const currentDate = new Date();
 
-  // Obtener el día, mes y año
+  // Obtener el día, mes y año por separado
   const day = currentDate.getDate();
   const month = currentDate.getMonth() + 1;
   const year = currentDate.getFullYear();
@@ -534,7 +444,6 @@ export async function generarGastos(req, res) {
   // Obtener la hoja de trabajo deseada
   const worksheet = workbook.getWorksheet("GASTOS");
 
-  //Modificar el contenido del documento
   // Definir el formato de la celda
   cellFormat = {
     font: {
@@ -554,65 +463,68 @@ export async function generarGastos(req, res) {
   };
 
   // Verificar la cantidad de registros que selecciono
+  //Selecciono sólo un registro
   if (typeof reg_pat == "string") {
-    //Selecciono sólo un registro
+
+    //Variables
     var celda;
     var cobradoFormat;
     var gastosFormat;
     var sumaFormat;
     var tabuladorFormat;
     var totalFormat;
+    var tabulador = 0;
 
-    //Celda A10:
+    //Celda A10 (Número consecutivo):
     celda = worksheet.getCell("A10");
     celda.value = "1";
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda B10
+    //Celda B10 (Registro patronal):
     celda = worksheet.getCell("B10");
     celda.value = reg_pat;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda C10
+    //Celda C10 (Patrón);
     celda = worksheet.getCell("C10");
     celda.value = patron;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda D10
+    //Celda D10 (Rubro):
     celda = worksheet.getCell("D10");
     celda.value = type;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda E10
+    //Celda E10 (Rev. Prov / o .I.):
     celda = worksheet.getCell("E10");
     celda.value = provio;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda F10
+    //Celda F10 (Fecha de pago):
     celda = worksheet.getCell("F10");
     celda.value = fechaPago;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda G10
+    //Celda G10 (Crédito):
     celda = worksheet.getCell("G10");
     celda.value = nom_cred;
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda H10
+    //Celda H10 (Periodo):
     const [yearP, monthP, dayP] = periodo.split("-");
     celda = worksheet.getCell("H10");
     celda.value = `${monthP}/${yearP}`;
@@ -620,7 +532,7 @@ export async function generarGastos(req, res) {
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda I10
+    //Celda I10 (Cobrado):
     celda = worksheet.getCell("I10");
     cobradoFormat = parseFloat(cobrado);
     celda.value = cobradoFormat;
@@ -629,7 +541,7 @@ export async function generarGastos(req, res) {
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda J10
+    //Celda J10 (Gastos):
     celda = worksheet.getCell("J10");
     gastosFormat = parseFloat(gastos);
     celda.value = gastosFormat;
@@ -638,7 +550,7 @@ export async function generarGastos(req, res) {
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Celda K10
+    //Celda K10 (Total):
     celda = worksheet.getCell("K10");
     const I10 = worksheet.getCell("J10");
     const J10 = worksheet.getCell("I10");
@@ -651,9 +563,7 @@ export async function generarGastos(req, res) {
     celda.border = cellFormat.border;
 
     // Validar el tabulador.
-    var tabulador = 0;
-
-    switch (true) {
+      switch (true) {
       case sumaFormat <= 37000.99:
         tabulador = 350;
         break;
@@ -668,7 +578,7 @@ export async function generarGastos(req, res) {
         break;
     }
 
-    //Celda L10
+    //Celda L10 (Tabulador):
     celda = worksheet.getCell("L10");
     tabuladorFormat = parseFloat(tabulador);
     celda.value = tabuladorFormat;
@@ -677,28 +587,32 @@ export async function generarGastos(req, res) {
     celda.alignment = cellFormat.alignment;
     celda.border = cellFormat.border;
 
-    //Nombre del ejecutor
+    //Ontener nombre del ejecutor y colocarlo en la celda B15
     celda = reg_pat.length + 15;
     worksheet.getCell("B15").value = nombre + " " + apellidos;
 
-    //Total L11
+    //Total L11 (Total);
     celda = worksheet.getCell("L11");
     celda.value = tabuladorFormat;
     celda.style = { numFmt: '"$"#,##0.00' };
     celda.font = cellFormat.font;
     celda.alignment = cellFormat.alignment;
-  } else {
-    //Selecciono más de un registro
+  } 
+  
+  //Selecciono más de un registro
+  else {
+
+    //Variables
+    const longitudRegPat = reg_pat.length;
+    const tabulador = [];
 
     //Agregar filas debajo de la fila 9, dependiendo de la longitud del reg_pat
-    const longitudRegPat = reg_pat.length;
-
     for (let i = 0; i < longitudRegPat; i++) {
       const fila = 9 + i;
       worksheet.duplicateRow(10, 1, fila);
     }
 
-    // Insertar los valores en la columna B (Registro Patronal)
+    // Insertar los valores en la columna B (Registro Patronal):
     reg_pat.forEach((valor, indice) => {
       const fila = 9 + indice + 1;
       const celda = worksheet.getCell(`B${fila}`);
@@ -708,7 +622,7 @@ export async function generarGastos(req, res) {
       celda.border = cellFormat.border;
     });
 
-    // Insertar los valores en la columna C (Patron)
+    // Insertar los valores en la columna C (Patrón):
     patron.forEach((valor, indice) => {
       const fila = 9 + indice + 1;
       const celda = worksheet.getCell(`C${fila}`);
@@ -718,7 +632,7 @@ export async function generarGastos(req, res) {
       celda.border = cellFormat.border;
     });
 
-    // Insertar los valores en la columna D (Rubro)
+    // Insertar los valores en la columna D (Rubro):
     type.forEach((valor, indice) => {
       const fila = 9 + indice + 1;
       const celda = worksheet.getCell(`D${fila}`);
@@ -728,7 +642,7 @@ export async function generarGastos(req, res) {
       celda.border = cellFormat.border;
     });
 
-    // Insertar los valores en la columna E (Provio)
+    // Insertar los valores en la columna E (Prov. / o .I.):
     provio.forEach((valor, indice) => {
       const fila = 9 + indice + 1;
       const celda = worksheet.getCell(`E${fila}`);
@@ -738,7 +652,7 @@ export async function generarGastos(req, res) {
       celda.border = cellFormat.border;
     });
 
-    // Insertar los valores en la columna F (Fecha de pago)
+    // Insertar los valores en la columna F (Fecha de pago):
     fechaPago.forEach((valor, indice) => {
       const fila = 9 + indice + 1;
       const celda = worksheet.getCell(`F${fila}`);
@@ -748,7 +662,7 @@ export async function generarGastos(req, res) {
       celda.border = cellFormat.border;
     });
 
-    // Insertar los valores en la columna G (Crédito)
+    // Insertar los valores en la columna G (Crédito):
     nom_cred.forEach((valor, indice) => {
       const fila = 9 + indice + 1;
       const celda = worksheet.getCell(`G${fila}`);
@@ -758,7 +672,7 @@ export async function generarGastos(req, res) {
       celda.border = cellFormat.border;
     });
 
-    // Insertar los valores en la columna H (Périodo)
+    // Insertar los valores en la columna H (Périodo):
     periodo.forEach((valor, indice) => {
       const [yearP, monthP, dayP] = valor.split("-");
       const fila = 9 + indice + 1;
@@ -769,7 +683,7 @@ export async function generarGastos(req, res) {
       celda.border = cellFormat.border;
     });
 
-    // Insertar los valores en la columna I (Cobrado)
+    // Insertar los valores en la columna I (Cobrado):
     cobrado.forEach((valor, indice) => {
       const fila = 9 + indice + 1;
       const celda = worksheet.getCell(`I${fila}`);
@@ -781,7 +695,7 @@ export async function generarGastos(req, res) {
       celda.border = cellFormat.border;
     });
 
-    // Insertar los valores en la columna J (Gastos)
+    // Insertar los valores en la columna J (Gastos):
     gastos.forEach((valor, indice) => {
       const fila = 9 + indice + 1;
       const celda = worksheet.getCell(`J${fila}`);
@@ -793,7 +707,7 @@ export async function generarGastos(req, res) {
       celda.border = cellFormat.border;
     });
 
-    // Llenar la columna A, con números consecutivos
+    // Llenar la columna A, con números consecutivos:
     for (let i = 0; i < reg_pat.length; i++) {
       const fila = 10 + i;
       const celda = worksheet.getCell(`A${fila}`);
@@ -803,15 +717,15 @@ export async function generarGastos(req, res) {
       celda.border = cellFormat.border;
     }
 
-    const tabulador = [];
-
     //Llenar la columna K (total) con la suma de I y J y guardar datos numéricos en el arreglo de tabulador.
     for (let i = 0; i < reg_pat.length; i++) {
+      //Variables locales que almacenan las celdas y el número de fila
       const fila = 10 + i;
       const celdaI = worksheet.getCell(`I${fila}`);
       const celdaJ = worksheet.getCell(`J${fila}`);
       const celdaK = worksheet.getCell(`K${fila}`);
 
+      // Sumar los datos, convertir el valor de suma en número flotante y agregar formato de moneda. 
       const suma = Number(celdaI.value) + Number(celdaJ.value);
       sumaFormat = parseFloat(suma);
       celdaK.value = sumaFormat;
@@ -860,7 +774,7 @@ export async function generarGastos(req, res) {
     celdaT.value = totalFormat;
     celdaT.style = { numFmt: '"$"#,##0.00' };
 
-    // Colocar el nombre del ejecutor
+    // Obtener el nombre del ejecutor y agregarlo a una celda específica
     const celda = reg_pat.length + 15;
     worksheet.getCell(`B${celda}`).value = nombre + " " + apellidos;
   }
@@ -872,31 +786,28 @@ export async function generarGastos(req, res) {
   // Guardar el archivo modificado
   await workbook.xlsx.writeFile(outputFilePath);
 
-  console.log("Archivo modificado guardado:", outputFilePath);
-
   // Descargar el archivo modificado
   const fileContent = fs.readFileSync(outputFilePath);
 
-  // Establecer las cabeceras de la respuesta
+  // Mostrar la descarga al usuario
   res.setHeader(
     "Content-Type",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   );
   res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
-
-  // Enviar el archivo al cliente
   res.send(fileContent);
 }
 
+
 // Función para generar Citatorio
 export async function generarCitatorio(req, res) {
-  // Obtener datos enviados del formulario
+
+  // Obtener datos enviados del formulario y crear el un arreglo.
   const opciones = req.body.opcion;
   const datR = {};
 
-  // Validar si es un arreglo
-  if (Array.isArray(opciones)) {
-    // Recorrer el arreglo para cada opción
+  // Validar si es un arreglo, sino lo es, convertirlo a un arreglo y recorrerlo
+  if (Array.isArray(opciones)) { 
     opciones.forEach((opcion, index) => {
       const opcionObjeto = JSON.parse(opcion);
       Object.entries(opcionObjeto).forEach(([clave, valor]) => {
@@ -921,7 +832,7 @@ export async function generarCitatorio(req, res) {
     where: { reg_pat: regRecibido },
   });
 
-  //Realizar la actualización en las tablas de citatorio, cambiando a "Si", el campo de la tabla.
+  //Realizar la actualización en las tablas de citatorio, cambiando a "true" el campo "citatorio". 
   try {
     // Se mando un sólo registro
     if (typeof nomCredRecibido == "string") {
@@ -930,26 +841,16 @@ export async function generarCitatorio(req, res) {
           { citatorio: true },
           { where: { nom_cred: nomCredRecibido } }
         )
-          .then(() => {
-            console.log("Rale cop actualizado | Nom Cred: ", nomCredRecibido);
-          })
-          .catch((e) => {
-            console.log("No se pudo actualizar | Nom Cred: ", nomCredRecibido);
-          });
+
       } else if (tipoRecibido == "rcv") {
         const resRcv = await RaleRcv.update(
           { citatorio: true },
           { where: { nom_cred: nomCredRecibido } }
         )
-          .then(() => {
-            console.log("Rale rcv actualizado | Nom Cred: ", nomCredRecibido);
-          })
-          .catch((e) => {
-            console.log("No se pudo actualizar | Nom Cred: ", nomCredRecibido);
-          });
       }
-    } else {
-      // Se enviaron varios registros
+    } 
+    // Se enviaron varios registros
+    else {
       for (let index = 0; index < nomCredRecibido.length; index++) {
         const value = tipoRecibido[index];
         const nomCredValue = nomCredRecibido[index];
@@ -959,23 +860,12 @@ export async function generarCitatorio(req, res) {
             { citatorio: true },
             { where: { nom_cred: nomCredValue } }
           )
-            .then(() => {
-              console.log("Rale cop actualizado | Nom Cred: ", nomCredValue);
-            })
-            .catch((e) => {
-              console.log("No se pudo actualizar | Nom Cred: ", nomCredValue);
-            });
+
         } else if (value === "rcv") {
           const resRcv = await RaleRcv.update(
             { citatorio: true },
             { where: { nom_cred: nomCredValue } }
           )
-            .then(() => {
-              console.log("Rale rcv actualizado | Nom Cred: ", nomCredValue);
-            })
-            .catch((e) => {
-              console.log("No se pudo actualizar | Nom Cred: ", nomCredValue);
-            });
         }
       }
     }
@@ -983,17 +873,16 @@ export async function generarCitatorio(req, res) {
     console.log("No se pudo actualizar la bd con el citatorio", err);
   }
 
-  // Variables utilizadas.
+  // Variables.
   const dataLength = datR.reg_pat.length;
   var margenIzquierdo = 60;
   var margenSuperior = 0;
   var anchoColumna = 0;
   var altoFila = 30;
-
-
-    // Obtener la fecha actual
-    const currentDate = new Date();
-    const formattedDate = format(currentDate, 'dd-MM-yyyy');
+  
+  // Obtener la fecha actual
+  const currentDate = new Date();
+  const formattedDate = format(currentDate, 'dd-MM-yyyy');
 
   // Crear la sesión del Usuario
   const { nombre, apellidos } = req.session.user;
@@ -1013,7 +902,6 @@ export async function generarCitatorio(req, res) {
     doc.moveDown(3);
   };
   agregarEncabezado();
-
   doc.on("pageAdded", () => {
     agregarEncabezado();
   });
@@ -1029,7 +917,6 @@ export async function generarCitatorio(req, res) {
     });
   };
   agregarPie();
-
   doc.on("pageAdded", () => {
     agregarPie();
   });
@@ -1258,6 +1145,7 @@ export async function generarCitatorio(req, res) {
 
 // Función para generar Mandamiento
 export async function generarMandamiento(req, res) {
+
   // Realizar la destructuración del req.body en arreglos que contengan la información, separada por la categoría.
   const opciones = req.body.opcion;
   const datR = {};
@@ -1300,9 +1188,9 @@ export async function generarMandamiento(req, res) {
 
   const nomEje = nomEjecutores.map((registro) => registro.nombre);
 
-    // Obtener la fecha actual
-    const currentDate = new Date();
-    const formattedDate = format(currentDate, 'dd-MMMM-yyyy', { locale: es });
+  // Obtener la fecha actual
+  const currentDate = new Date();
+  const formattedDate = format(currentDate, 'dd-MMMM-yyyy', { locale: es });
 
   // Crear la sesión del Usuario
   const { nombre, apellidos } = req.session.user;
@@ -1397,18 +1285,18 @@ export async function generarMandamiento(req, res) {
       datosRegistros.push([nomCred, periodo, importeFormateado]);
     }
 
-        // Función para convertir el formato de fecha de "aaaa-mm-dd" a "mm-aaaa"
-        function convertirFormatoFecha(fecha) {
-            const partes = fecha.split('-');
-            const año = partes[0];
-            const mes = partes[1];
-            return `${mes}-${año}`;
-        }
+    // Función para convertir el formato de fecha de "aaaa-mm-dd" a "mm-aaaa"
+    function convertirFormatoFecha(fecha) {
+      const partes = fecha.split('-');
+      const año = partes[0];
+      const mes = partes[1];
+      return `${mes}-${año}`;
+    }
         
-        // Crear la tabla. 
-        const datosTabla = [["CRÉDITO", "PÉRIODO", "IMPORTE"], ...datosRegistros];
-        margenSuperior = 280;
-        anchoColumna = 154;
+    // Crear la tabla. 
+    const datosTabla = [["CRÉDITO", "PÉRIODO", "IMPORTE"], ...datosRegistros];
+    margenSuperior = 280;
+    anchoColumna = 154;
 
     // Dibujar la tabla
     for (let fila = 0; fila < datosTabla.length; fila++) {
@@ -1465,6 +1353,7 @@ export async function generarMandamiento(req, res) {
     .font("Helvetica-Bold")
     .fontSize(11)
     .lineGap(11 * 0.5);
+
   texto = "Lo acuerda y firma";
   anchoTexto = doc.widthOfString(texto);
   posicionX = (doc.page.width - anchoTexto) / 2;
@@ -1474,6 +1363,7 @@ export async function generarMandamiento(req, res) {
   posicionX = (doc.page.width - anchoTexto) / 2;
   doc.text(texto, posicionX);
   texto = "de la Subdelegación";
+  
   doc
     .text(texto, 180, null, { continued: true })
     .fillColor("blue")
@@ -1489,6 +1379,7 @@ export async function generarMandamiento(req, res) {
     .fontSize(9)
     .lineGap(9 * 0.5)
     .fillColor("black");
+
   texto = "Lic. Luis Eduardo Trejo Reséndiz";
   anchoTexto = doc.widthOfString(texto);
   posicionX = (doc.page.width - anchoTexto) / 2;
