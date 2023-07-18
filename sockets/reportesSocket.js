@@ -74,13 +74,13 @@ export function socket(io) {
 			const fechasCOPArray = fechasCOP.map((item) => item.createdAt);
 			const regPatCOPArray = RegPatCop.map((item) => item.reg_pat);
 
-  // Extraer las fechas y los registros patronales del resultado de RaleRCV
-  const fechasRCVArray = fechasRCV.map(item => item.createdAt);
-  const regPatRCVArray = RegPatRcv.map(item => item.reg_pat);
+			// Extraer las fechas y los registros patronales del resultado de RaleRCV
+			const fechasRCVArray = fechasRCV.map((item) => item.createdAt);
+			const regPatRCVArray = RegPatRcv.map((item) => item.reg_pat);
 
-  // Unir los arreglos de fechas y registros, en una sola variable para cada una llamadas fechas y registros
-  const fechas = fechasCOPArray.concat(fechasRCVArray);
-  const registros = regPatCOPArray.concat(regPatRCVArray);
+			// Unir los arreglos de fechas y registros, en una sola variable para cada una llamadas fechas y registros
+			const fechas = fechasCOPArray.concat(fechasRCVArray);
+			const registros = regPatCOPArray.concat(regPatRCVArray);
 
 			socket.emit(
 				"servidor:capturarDatos",

@@ -503,8 +503,7 @@ function agruparArchivos(obj, ordenar) {
 	return ralesNoCobrados;
 }
 
-
-// Funcion para realizar la consulta a la tabla Afil. 
+// Funcion para realizar la consulta a la tabla Afil.
 async function obtenerAfil(registrosAgrupados) {
 	try {
 		const listadoRale = [];
@@ -545,21 +544,20 @@ async function obtenerAfil(registrosAgrupados) {
 	}
 }
 
-// Función para obtener los totales 
-function obtenerTotales (listadoAgrupado){
+// Función para obtener los totales
+function obtenerTotales(listadoAgrupado) {
+	// Variables
+	var listadoTotales = [];
+	var totalCreditos = 0;
+	var totalImporte = 0;
+	var maximoDia = listadoAgrupado[0].max_dias;
 
-  // Variables
-  var listadoTotales = [];
-  var totalCreditos = 0;
-  var totalImporte = 0;
-  var maximoDia = listadoAgrupado[0].max_dias;
-
-  // Recorrer el arreglo de rales agrupados y sumar los valores
-  listadoAgrupado.forEach(function(rale){
-    totalCreditos = totalCreditos + rale.no_creditos;
-    totalImporte = totalImporte + rale.suma_imp;
-    if (rale.max_dias >= maximoDia) maximoDia = rale.max_dias;
-  });
-  listadoTotales.push(totalCreditos, maximoDia, totalImporte)
-  return listadoTotales;
+	// Recorrer el arreglo de rales agrupados y sumar los valores
+	listadoAgrupado.forEach(function (rale) {
+		totalCreditos = totalCreditos + rale.no_creditos;
+		totalImporte = totalImporte + rale.suma_imp;
+		if (rale.max_dias >= maximoDia) maximoDia = rale.max_dias;
+	});
+	listadoTotales.push(totalCreditos, maximoDia, totalImporte);
+	return listadoTotales;
 }
