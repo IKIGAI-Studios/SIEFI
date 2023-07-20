@@ -247,7 +247,7 @@ socket.on("servidor:estGlobalesConfronta", ({ data }) => {
 	// Insertar los resultados a los campos
 	$("#DATES_fec_ini").text(dates.fec_ini);
 	$("#DATES_fec_fin").text(dates.fec_fin);
-	$("#DATES_laborales").text(dates.laborales < 0 ? 0 : dias_lab);
+	$("#DATES_laborales").text(dates.laborales < 0 ? 0 : dates.laborales);
 	$("#DATES_dilig").text(dates.dilig);
 	$("#DATES_pat_dilig").text(dates.pat_dilig);
 	$("#DATES_product").text(dates.productividad + "%");

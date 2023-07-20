@@ -38,6 +38,7 @@
     "pdfkit": "^0.13.0",
     "pdfkit-table": "^0.1.99",
     "sequelize": "^6.31.1",
+    "simaprint-server": "^1.0.0",
     "socket.io": "^4.6.1",
     "xlsx": "^0.18.5"
   }

@@ -294,7 +294,7 @@ export function socket(io) {
 						"PATRON",
 						"DOMICILIO",
 						"LOCALIDAD",
-						"OPORTUNIDAD",
+						"OPORTUNIDAD MÁS AVANZADA",
 						"PROGRAMABLE",
 						"CUENTA_CRED",
 						"MAX_FECHA REAL",
@@ -392,7 +392,7 @@ export function socket(io) {
 				doc.font("Helvetica-Bold")
 					.fontSize(9)
 					.text(
-						`TOTAL MÁXIMO DE IMPORTES: ${datosTotales[0]}\n`,
+						`TOTAL DE IMPORTES: ${datosTotales[0]}\n`,
 						margenIzquierdo,
 						650 + 20
 					)
@@ -458,70 +458,70 @@ function agruparArchivos(obj, ordenar) {
 	var oportunidad;
 	let programable;
 
+	obj.rales = obj.rales.filter((rale) => {
+		return rale.inc == 2 || rale.inc == 31;
+	});
+
 	// Ordenar los registros de los Rales.
 	obj.rales.forEach(function (rale, index) {
-		if (index === 0) {
-			registro_patronal = rale.reg_pat;
-			diasMayores = 0;
-			contadorCreditos = 0;
-			acuImportes = 0;
-			oportunidad = "En tiempo 2";
-		}
-		programable = obj.coin.find(
-			(coin) =>
-				coin.reg_pat == rale.reg_pat &&
-				coin.num_credito == rale.nom_cred
-		);
-		if (rale.reg_pat == registro_patronal && rale.cobrado == false) {
-			contadorCreditos = contadorCreditos + 1;
-			acuImportes = acuImportes + rale.importe;
-			if (rale.dias_rest > diasMayores) diasMayores = rale.dias_rest;
-			if (oportunidad != "Fuera de tiempo") {
-				if (rale.oportunidad == "Fuera de tiempo")
-					oportunidad = rale.oportunidad;
-				else if (rale.oportunidad == "En tiempo 31")
-					oportunidad = rale.oportunidad;
-			}
-		} else {
-			if (
-				!ralesNoCobrados.some(function (obj) {
-					return obj.reg_pat === registro_patronal;
-				})
-			) {
-				ralesNoCobrados.push({
-					reg_pat: registro_patronal,
-					no_creditos: contadorCreditos,
-					max_dias: diasMayores,
-					suma_imp: acuImportes,
-					oportunidad: oportunidad,
-					programable:
-						programable != undefined
-							? programable.estado
-							: "En tiempo 2",
-				});
-			}
-			registro_patronal = rale.reg_pat;
-			contadorCreditos = 1;
-			acuImportes = rale.importe;
-			diasMayores = 0;
-		}
-	});
-	// Agrega el último objeto al arreglo ralesNoCobrados
-	if (
-		!ralesNoCobrados.some(function (obj) {
-			return obj.reg_pat === registro_patronal;
-		})
-	) {
-		ralesNoCobrados.push({
-			reg_pat: registro_patronal,
-			no_creditos: contadorCreditos,
-			max_dias: diasMayores,
-			suma_imp: acuImportes,
-			oportunidad: oportunidad,
-			programable:
-				programable != undefined ? programable.estado : "En tiempo 2",
-		});
-	}
+        if (index === 0) {
+            registro_patronal = rale.reg_pat;
+            diasMayores = rale.dias_rest;
+            contadorCreditos = 0;
+            acuImportes = 0;
+            oportunidad = rale.oportunidad === "Fuera de tiempo" ? rale.oportunidad : "En tiempo 2";
+        }
+    
+        if (rale.reg_pat == registro_patronal) {
+            contadorCreditos = contadorCreditos + 1;
+            acuImportes = acuImportes + rale.importe;
+            if (rale.dias_rest > diasMayores) {
+                diasMayores = rale.dias_rest;
+            }
+            if (oportunidad != "Fuera de tiempo") {
+                if (rale.oportunidad == "Fuera de tiempo")
+                    oportunidad = rale.oportunidad;
+                else if (rale.oportunidad == "En tiempo 31")
+                    oportunidad = rale.oportunidad;
+            }
+        } else {
+            if (
+                !ralesNoCobrados.some(function (obj) {
+                    return obj.reg_pat === registro_patronal;
+                })
+            ) {
+                ralesNoCobrados.push({
+                    reg_pat: registro_patronal,
+                    no_creditos: contadorCreditos,
+                    max_dias: diasMayores,
+                    suma_imp: acuImportes,
+                    oportunidad: oportunidad,
+                    programable: programable != undefined ? programable.estado : "En tiempo 2",
+                });
+            }
+            registro_patronal = rale.reg_pat;
+            contadorCreditos = 1;
+            acuImportes = rale.importe;
+            diasMayores = rale.dias_rest;
+        }
+    });
+    
+    // Agrega el último objeto al arreglo ralesNoCobrados
+    if (
+        !ralesNoCobrados.some(function (obj) {
+            return obj.reg_pat === registro_patronal;
+        })
+    ) {
+        ralesNoCobrados.push({
+            reg_pat: registro_patronal,
+            no_creditos: contadorCreditos,
+            max_dias: diasMayores,
+            suma_imp: acuImportes,
+            oportunidad: oportunidad,
+            programable: programable != undefined ? programable.estado : "En tiempo 2",
+        });
+    }
+    
 
 	//Ordenar dependiendo los días o el importe (true: ordena por días, false: ordena por importe)
 	if (ordenar) {
