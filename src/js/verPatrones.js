@@ -22,7 +22,7 @@ regExis = { rales: [] };
  * Funciones al cargar la página.
  */
 window.onload = function () {
-    $("#spinner").hide();
+	$("#spinner").hide();
 	socket.emit("cliente:consultarRegistrosRaleCOP");
 	socket.emit("cliente:consultarRegistrosRaleRCV");
 	socket.emit("cliente:consultarRegistrosCoin");
@@ -432,20 +432,19 @@ $("#div-frst-selects").on("change", "#dateCOPfrst", function () {
 			if (
 				$("#dateRCVfrst").val() != $(this).val() ||
 				$("#dateCOINfrst").val() != $(this).val()
-			) {
+			)
 				bsAlert(
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
-                $("#spinner").show();
-				// Se manda al socket los valores de los inputs correspondientes.
-				socket.emit("cliente:ejecutorSeleccionadoEstInd", {
-					ejecutor: $("#nombreEjecutor").val(),
-					copDate: $("#dateCOPfrst").val(),
-					rcvDate: $("#dateRCVfrst").val(),
-					coinDate: $("#dateCOINfrst").val(),
-				});
-			}
+			$("#spinner").show();
+			// Se manda al socket los valores de los inputs correspondientes.
+			socket.emit("cliente:ejecutorSeleccionadoEstInd", {
+				ejecutor: $("#nombreEjecutor").val(),
+				copDate: $("#dateCOPfrst").val(),
+				rcvDate: $("#dateRCVfrst").val(),
+				coinDate: $("#dateCOINfrst").val(),
+			});
 		}
 });
 
@@ -472,20 +471,19 @@ $("#div-frst-selects").on("change", "#dateRCVfrst", function () {
 			if (
 				$("#dateCOPfrst").val() != $(this).val() ||
 				$("#dateCOINfrst").val() != $(this).val()
-			) {
+			)
 				bsAlert(
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
-                $("#spinner").show();
-				// Se manda al socket los valores de los inputs correspondientes.
-				socket.emit("cliente:ejecutorSeleccionadoEstInd", {
-					ejecutor: $("#nombreEjecutor").val(),
-					copDate: $("#dateCOPfrst").val(),
-					rcvDate: $("#dateRCVfrst").val(),
-					coinDate: $("#dateCOINfrst").val(),
-				});
-			}
+			$("#spinner").show();
+			// Se manda al socket los valores de los inputs correspondientes.
+			socket.emit("cliente:ejecutorSeleccionadoEstInd", {
+				ejecutor: $("#nombreEjecutor").val(),
+				copDate: $("#dateCOPfrst").val(),
+				rcvDate: $("#dateRCVfrst").val(),
+				coinDate: $("#dateCOINfrst").val(),
+			});
 		}
 });
 
@@ -512,20 +510,19 @@ $("#div-frst-selects").on("change", "#dateCOINfrst", function () {
 			if (
 				$("#dateCOPfrst").val() != $(this).val() ||
 				$("#dateRCVfrst").val() != $(this).val()
-			) {
+			)
 				bsAlert(
 					"Se recomienda utilizar fechas iguales para evitar confusion a la hora de calcular los dias restantes",
 					"warning"
 				);
-                $("#spinner").show();
-				// Se manda al socket los valores de los inputs correspondientes.
-				socket.emit("cliente:ejecutorSeleccionadoEstInd", {
-					ejecutor: $("#nombreEjecutor").val(),
-					copDate: $("#dateCOPfrst").val(),
-					rcvDate: $("#dateRCVfrst").val(),
-					coinDate: $("#dateCOINfrst").val(),
-				});
-			}
+			$("#spinner").show();
+			// Se manda al socket los valores de los inputs correspondientes.
+			socket.emit("cliente:ejecutorSeleccionadoEstInd", {
+				ejecutor: $("#nombreEjecutor").val(),
+				copDate: $("#dateCOPfrst").val(),
+				rcvDate: $("#dateRCVfrst").val(),
+				coinDate: $("#dateCOINfrst").val(),
+			});
 		}
 });
 
@@ -1249,5 +1246,5 @@ function showTable(type) {
 	);
 	tableScrollContainer.appendTo(tableContainer);
 	tableContainer.appendTo("#div-tabla-estadisticas-individuales");
-    $("#spinner").hide();
+	$("#spinner").hide();
 }

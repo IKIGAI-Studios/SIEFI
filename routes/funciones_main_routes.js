@@ -302,15 +302,31 @@ export async function generarInforme(req, res) {
 			celda.border = cellFormat.border;
 		});
 
-		// Insertar los valores en la columna F (Resultado de la diligencia)
-		resultadosDiligencia.forEach((valor, indice) => {
-			fila = 16 + indice + 1;
-			celda = worksheet.getCell(`F${fila}`);
-			celda.value = valor;
-			celda.font = cellFormat.font;
-			celda.alignment = cellFormat.alignment;
-			celda.border = cellFormat.border;
-		});
+		try {
+			// Insertar los valores en la columna F (Resultado de la diligencia)
+			resultadosDiligencia.forEach((valor, indice) => {
+				fila = 17 + indice;
+				celda = worksheet.getCell(`F${fila}`);
+				worksheet.unMergeCells(`G${fila}`);
+				worksheet.unMergeCells(`H${fila}`);
+				worksheet.unMergeCells(`I${fila}`);
+				worksheet.unMergeCells(`J${fila}`);
+				worksheet.unMergeCells(`K${fila}`);
+				worksheet.mergeCells(`F${fila}:K${fila}`);
+
+				worksheet.getCell(`F${fila}`).alignment = {
+					vertical: "middle",
+					horizontal: "center",
+				};
+				celda.value = valor;
+				celda.font = cellFormat.font;
+				celda.alignment = cellFormat.alignment;
+				celda.border = cellFormat.border;
+			});
+		} catch (error) {
+			res.redirect("/login");
+            console.log(error)
+		}
 	}
 
 	// Generar el nombre del archivo con el nombre de usuario y fecha

@@ -16,6 +16,10 @@ let dataStats,
 	regFal = { rales: [] };
 regExis = { rales: [] };
 
+/**
+ * Función que se ejecuta cuando se carga la ventana.
+ * @returns {void}
+ */
 window.onload = function () {
 	$("#spinner").hide();
 	$("#div-tabla-estadisticas-individuales").hide();
@@ -24,6 +28,12 @@ window.onload = function () {
 	socket.emit("cliente:consultarRegistrosCoin");
 };
 
+/**
+ * Función que se ejecuta cuando se recibe el evento "servidor:estIndividuales" desde el socket.
+ * Inicializa variables, inhabilita componentes y llama a otras funciones para llenar los filtros, mostrar la tabla y llenar las estadísticas.
+ * @param {Object} data - Datos recibidos desde el servidor.
+ * @returns {void}
+ */
 socket.on("servidor:estIndividuales", ({ data }) => {
 	dataStats = data;
 	fillFilters();
@@ -34,6 +44,12 @@ socket.on("servidor:estIndividuales", ({ data }) => {
 	$("#dateCOINscnd").prop("disabled", false);
 });
 
+/**
+ * Función que se ejecuta cuando se recibe el evento "servidor:estIndividualesConfronta" desde el socket.
+ * Realiza cálculos y asignaciones de valores para crear las estadísticas individuales de confronta.
+ * @param {Object} data - Datos recibidos desde el servidor.
+ * @returns {void}
+ */
 socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 	confronta = data;
 	var encontrado = false;
@@ -217,6 +233,12 @@ socket.on("servidor:estIndividualesConfronta", ({ data }) => {
 	showTable("confronta");
 });
 
+/**
+ * Función que se ejecuta cuando se recibe el evento "servidor:consultarRegistrosRaleCOP" desde el socket.
+ * Realiza consultas de registros Rale COP y actualiza los elementos HTML correspondientes.
+ * @param {Array} data - Datos recibidos desde el servidor.
+ * @returns {void}
+ */
 socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
 	$("#dateCOPfrst").empty();
 	$("#dateCOPscnd").empty();
@@ -251,6 +273,12 @@ socket.on("servidor:consultarRegistrosRaleCOP", (data) => {
 	$("#dateCOPfrst").prop("disabled", false);
 });
 
+/**
+ * Función que se ejecuta cuando se recibe el evento "servidor:consultarRegistrosRaleRCV" desde el socket.
+ * Realiza consultas de registros Rale RCV y actualiza los elementos HTML correspondientes.
+ * @param {Array} data - Datos recibidos desde el servidor.
+ * @returns {void}
+ */
 socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
 	$("#dateRCVfrst").empty();
 	$("#dateRCVscnd").empty();
@@ -283,6 +311,12 @@ socket.on("servidor:consultarRegistrosRaleRCV", (data) => {
 	$("#dateRCVfrst").prop("disabled", false);
 });
 
+/**
+ * Función que se ejecuta cuando se recibe el evento "servidor:consultarRegistrosCoin" desde el socket.
+ * Realiza consultas de registros COIN y actualiza los elementos HTML correspondientes.
+ * @param {Array} data - Datos recibidos desde el servidor.
+ * @returns {void}
+ */
 socket.on("servidor:consultarRegistrosCoin", (data) => {
 	$("#dateCOINscnd").empty();
 	$("#dateCOINfrst").empty();
@@ -508,6 +542,11 @@ $("#btnListadoPatrones").on("click", function () {
 	bsAlert("No se ha realizado ninguna consulta", "warning");
 });
 
+/**
+ * Función que se ejecuta al llamar al socket para obtener la confronta y estadísticas individuales.
+ * Emite un evento al servidor para solicitar la confronta y estadísticas individuales.
+ * @returns {void}
+ */
 function getConfronta() {
 	$("#spinner").show();
 	$("#div-tabla-estadisticas-individuales").hide();
@@ -518,6 +557,11 @@ function getConfronta() {
 	});
 }
 
+/**
+ * Función que genera y llena dinámicamente elementos de filtro basándose en dataStats.rales.
+ * Los elementos de filtro se agregan a los componentes correspondientes en el documento HTML.
+ * @returns {void}
+ */
 function fillFilters() {
 	$("#inc_fil").empty();
 	$("#btn_fil_inc").prop("disabled", false);
@@ -651,6 +695,11 @@ function fillFilters() {
 	});
 }
 
+/**
+ * Función que obtiene los filtros y llena el objeto cuotas con la información correspondiente.
+ * Además, muestra la información en los componentes correspondientes y realiza operaciones adicionales.
+ * @returns {void}
+ */
 function fillStats() {
 	cuotas.asig = dataStats.rales.filter(
 		(obj) => obj.type === "cuotas" && (obj.inc == 2 || obj.inc == 31)
@@ -887,6 +936,12 @@ function fillStats() {
 	showGraphics("canvas-prod-ind", dates.productividad, "prod");
 }
 
+/**
+ * Función para mostrar gráficos
+ * @param {string} id - El id del elemento canvas.
+ * @param {number} perc - El porcentaje para calcular el ángulo de la flecha.
+ * @param {string} type - El tipo de gráfico: "coin" o cualquier otro.
+ */
 function showGraphics(id, perc, type) {
 	// Obtén el elemento canvas
 	var canvas = document.getElementById(id);
@@ -976,38 +1031,12 @@ function showGraphics(id, perc, type) {
 	ctx.fill();
 }
 
-async function getGraphics() {
-	new Chart($("#canv_coin"), {
-		type: "doughnut",
-		data: {
-			labels: ["No diligenciado", "Diligenciado"],
-			datasets: [
-				{
-					label: "My First Dataset",
-					data: [cuotas.coin, cuotas.coin_dilig],
-					backgroundColor: ["rgb(220, 53, 69)", "rgb(25, 135, 84)"],
-					hoverOffset: 4,
-				},
-			],
-		},
-	});
-
-	new Chart($("#canv_prod"), {
-		type: "doughnut",
-		data: {
-			labels: ["No diligenciado", "Diligenciado"],
-			datasets: [
-				{
-					label: "My First Dataset",
-					data: [dates.dilig, dates.pat_dilig],
-					backgroundColor: ["rgb(220, 53, 69)", "rgb(25, 135, 84)"],
-					hoverOffset: 4,
-				},
-			],
-		},
-	});
-}
-
+/**
+ * Función para obtener los días laborables de un mes y año específicos.
+ * @param {number} month - El número del mes (0-11).
+ * @param {number} year - El año.
+ * @returns {Date[]} - Un array de objetos Date que representan los días laborables del mes y año especificados.
+ */
 function getWorkDays(month, year) {
 	const days = [];
 	const date = new Date(year, month, 1);
@@ -1022,6 +1051,12 @@ function getWorkDays(month, year) {
 	return days;
 }
 
+/**
+ * Función para actualizar los filtros.
+ * @param {string} group - El grupo al que pertenece el registro: "inc", "con" o "res".
+ * @param {any} n - El valor del registro a agregar o eliminar del filtro.
+ * @param {boolean} act - Indica si se debe agregar (true) o eliminar (false) el registro del filtro.
+ */
 function updateFilters(group, n, act) {
 	switch (group) {
 		case "inc":
@@ -1063,6 +1098,10 @@ function updateFilters(group, n, act) {
 	showTable("inicio");
 }
 
+/**
+ * Función para mostrar la tabla de estadísticas individuales.
+ * @param {string} type - El tipo de tabla a mostrar: "inicio" o "confronta".
+ */
 function showTable(type) {
 	let data = type == "inicio" ? dataStats.rales : confronta.rales;
 	$("#div-tabla-estadisticas-individuales").empty();

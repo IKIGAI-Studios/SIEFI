@@ -349,7 +349,7 @@ routes.post("/login", async (req, res) => {
 		}
 	} catch (error) {
 		// Regresar un mensaje de error
-		req.session.loginError = `Error al hacer la consulta | Error: ${error}`;
+		req.session.loginError = `Error al hacer la consula`;
 		res.redirect("/login");
 	}
 });
