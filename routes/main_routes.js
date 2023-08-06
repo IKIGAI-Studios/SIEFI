@@ -6,6 +6,7 @@ import sequelize from "../database.js";
 import RaleCop from "../models/raleCOPModel.js";
 import RaleRcv from "../models/raleRCVModel.js";
 import Coin from "../models/coinModel.js";
+import pc from "picocolors";
 import {
 	generarInforme,
 	generarGastos,
@@ -420,7 +421,10 @@ routes.post("/registerEjecutor", async (req, res) => {
 routes.post("/actualizarEjecutor", async (req, res) => {
 	try {
 		// Obtener datos del formulario enviado
-		const { clave_eje, nombre, status, user, type } = req.body;
+		const { clave_eje, nombre, status, user, type, pass } = req.body;
+        // Encriptar contraseña
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(pass, saltRounds);
 
 		//No ha seleccionado la clave del ejecutor.
 		if (clave_eje == "") {
@@ -439,10 +443,10 @@ routes.post("/actualizarEjecutor", async (req, res) => {
 
 		// Actualizar en la base de datos
 		const actualizarEjecutor = await Ejecutor.update(
-			{ nombre: nombre, status: status, user: user, type: type },
+			{ nombre, status, user, type, pass: hashedPassword },
 			{ where: { clave_eje: clave_eje } }
 		)
-			.then(() => {
+			.then((user) => {
 				req.session.actualizarEjecutor =
 					"Usuario actualizado correctamente";
 				res.redirect("/actualizarEjecutor");
