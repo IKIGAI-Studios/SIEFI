@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
+import pc from "picocolors";
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ const sequelize = new Sequelize(
 sequelize
 	.sync({ force: false })
 	.then(() => {
-		console.info("Connected to MYSQL");
+		console.info(pc.blue("Connected to MYSQL"));
 	})
 	.catch((e) => {
 		console.error(`Error: ${e}`);

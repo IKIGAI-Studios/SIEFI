@@ -5,14 +5,14 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon index --ignore 'src/js/*.js'",
+    "server": "nodemon index --ignore '/src/js/*.js' --ignore '/src/js/**/*.js'",
     "docs": "jsdoc -c jsdoc.json"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/IKIGAI-Studios/SIEFI.git"
   },
-  "author": "",
+  "author": "Universidad Tecnologica de San Juan del Rio",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/IKIGAI-Studios/SIEFI/issues"
@@ -37,6 +37,7 @@
     "nodemon": "^2.0.22",
     "pdfkit": "^0.13.0",
     "pdfkit-table": "^0.1.99",
+    "picocolors": "^1.0.0",
     "sequelize": "^6.31.1",
     "simaprint-server": "^1.0.0",
     "socket.io": "^4.6.1",

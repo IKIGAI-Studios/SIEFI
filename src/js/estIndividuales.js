@@ -1135,20 +1135,27 @@ function showTable(type) {
 	const tbody = $("<tbody>");
 
 	// Recorrer los objetos y agregar filas a la tabla
-	data.forEach((obj) => {
+	data.forEach((obj, i) => {
 		const dataRow = $("<tr>");
-
-		if (obj.type == "rcv") dataRow.addClass("bg-secondary");
-		if (obj.type == "multas") dataRow.addClass("bg-success");
-		if (obj.type == "cuotas") dataRow.addClass("bg-light");
-
+        
+        // ! No deja con css local, unicamente con el traido del cdn
+        // Agregar color a las filas una por una 
+        // if (obj.type == "multas") dataRow.css("background-color", "#198754");
+        // if (obj.type == "cuotas") dataRow.css("background-color", "#0d6efd");
+        // if (obj.type == "rcv") dataRow.css("background-color", "#6c757d");
+        
 		if (!inc.includes(obj.inc)) return;
 		if (!con.includes(obj.type)) return;
-
+                
 		// Recorrer las propiedades de cada objeto y agregar celdas a la fila
 		Object.values(obj).forEach((value) => {
-			const dataCell = $("<td>").text(value);
+            const dataCell = $("<td>").text(value);
 			dataCell.appendTo(dataRow);
+            // *** Este si deja con css local
+            // Agregar color a las celdas una por una porque con el css local no deja por filas
+            if (obj.type == "multas") dataCell.css("background-color", "#198754");
+            if (obj.type == "cuotas") dataCell.css("background-color", "#0d6efd");
+            if (obj.type == "rcv") dataCell.css("background-color", "#6c757d");
 		});
 
 		dataRow.appendTo(tbody);

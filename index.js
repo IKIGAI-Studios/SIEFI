@@ -15,6 +15,7 @@ import { socket as actEjecutorSockets } from './sockets/actEjecutorSockets.js';
 import { socket as reportesSocket } from './sockets/reportesSocket.js';
 import http from 'http';
 import { Server } from 'socket.io'
+import pc from "picocolors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -43,7 +44,7 @@ estGlobalesSockets(io); // Configura los sockets de estadisticas globales en el 
 reportesSocket(io); // Configura los sockets de reportes en el servidor
 
 httpServer.listen(port, () => {
-    console.log(`Server in port http://localhost:${port}`);
+    console.log(`Server in port` + pc.blue(` http://localhost:${port}`));
 });
     
 app.use('/', express.static(path.join(__dirname, '/public')));

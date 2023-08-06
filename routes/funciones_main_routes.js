@@ -11,6 +11,8 @@ import fs from "fs";
 import Afil63 from "../models/afilModel.js";
 import Ejecutor from "../models/ejecutorModel.js";
 import { es } from "date-fns/locale/index.js";
+import path from "path";
+import pc from "picocolors";
 import {
 	parrafo1M,
 	parrafo2M,
@@ -325,7 +327,31 @@ export async function generarInforme(req, res) {
 			});
 		} catch (error) {
 			res.redirect("/login");
-            console.log(error)
+			// Mostrar mensaje especifico para tener que editar la libreria exceljs
+			if (error.message.includes("Cannot merge already merged cells")) {
+				// Obtener la ruta inicial del proyecto
+				const filePath = path.join(
+					__dirname,
+					"../",
+					"node_modules",
+					"exceljs",
+					"lib",
+					"doc",
+					"worksheet.js:565:5"
+				);
+				// Construir el link para abrir el archivo en VSC
+				const link = `file:///${filePath}`;
+				const formattedLink = link.replace(/ /g, "");
+				console.error(
+					pc.red("ERROR: No se puede generar el archivo de Excel.")
+				);
+				console.error(
+					pc.green(
+						`   Para solucionar el problema, puedes comentar las líneas 565-569 en el archivo:`
+					)
+				);
+				console.error(pc.blue(`   ${formattedLink}`));
+			} else console.log(error);
 		}
 	}
 

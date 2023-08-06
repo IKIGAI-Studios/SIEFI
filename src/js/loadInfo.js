@@ -198,6 +198,14 @@ $("#RaleRCV_input").on("change", function (e) {
 });
 
 $("#btn_insertar").on("click", async function (e) {
+	// Validar que se haya seleccionado una fecha
+	let date = $("#load_date").val();
+	if ($("#load_date").val() == "") {
+		alert("Selecciona una fecha");
+		return;
+	} else {
+		date = $("#load_date").val();
+	}
 	$("#div-table").empty();
 
 	$(`<h3 class="text-primary">Insertando en la Base de Datos</h3>`).appendTo(
@@ -211,10 +219,9 @@ $("#btn_insertar").on("click", async function (e) {
 		case "coin":
 			while (i < objCoin.length) {
 				const batch = objCoin.slice(i, i + 1000);
-				// Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
 				await socket.emit(
 					"client:insert-coin",
-					{ coin: batch, lote: i },
+					{ coin: batch, lote: i, date },
 					(res) => {
 						if (i == 0) $("#div-table").empty();
 						showResult(res);
@@ -229,7 +236,12 @@ $("#btn_insertar").on("click", async function (e) {
 				// Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
 				await socket.emit(
 					"client:insert-afil",
-					{ afil: batch, lote: i, lenght: objAfil.length },
+					{
+						afil: batch,
+						lote: i,
+						lenght: objAfil.length,
+						date,
+					},
 					(res) => {
 						if (i == 0) $("#div-table").empty();
 						showResult(res);
@@ -244,7 +256,7 @@ $("#btn_insertar").on("click", async function (e) {
 				// Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
 				await socket.emit(
 					"client:insert-rale-cop",
-					{ rale: batch, lote: i },
+					{ rale: batch, lote: i, date },
 					(res) => {
 						if (i == 0) $("#div-table").empty();
 						showResult(res);
@@ -259,7 +271,7 @@ $("#btn_insertar").on("click", async function (e) {
 				// Aquí puedes emitir el lote a través de sockets o realizar cualquier otra operación con él
 				await socket.emit(
 					"client:insert-rale-rcv",
-					{ rale: batch, lote: i },
+					{ rale: batch, lote: i, date },
 					(res) => {
 						if (i == 0) $("#div-table").empty();
 						showResult(res);
@@ -388,8 +400,15 @@ socket.on("server:result-coin", (data) => {
 	objCoin = data;
 	insrt = "coin";
 
-    // Mostrar un input para que el usuario eliga la fecha con la que se insertara en al BD
-    // TODO HACER ESO JASKDJKASDJ
+	// Mostrar un input para que el usuario eliga la fecha con la que se insertara en al BD
+	// TODO HACER ESO JASKDJKASDJ
+	// Agregar input para la fecha
+	const form = $('<div class="form-group">').attr("id", "div-fecha");
+	$('<label for="load_date">').text("Fecha del archivo").appendTo(form);
+	$(
+		'<input type="date" class="form-control" id="load_date" required>'
+	).appendTo(form);
+	form.appendTo("#div-table");
 
 	const table = $('<table class="table">').attr("id", "coin-table");
 
@@ -456,6 +475,14 @@ socket.on("server:result-afil", (data) => {
 	// Guardar el objeto
 	objAfil = data;
 	insrt = "afil";
+
+	// Agregar input para la fecha
+	const form = $('<div class="form-group">').attr("id", "div-fecha");
+	$('<label for="load_date">').text("Fecha del archivo").appendTo(form);
+	$(
+		'<input type="date" class="form-control" id="load_date" required>'
+	).appendTo(form);
+	form.appendTo("#div-table");
 
 	const table = $('<table class="table">').attr("id", "coin-table");
 
@@ -607,6 +634,14 @@ socket.on("server:result-rale-cop", (data) => {
 	objRaleCOP = data;
 	insrt = "raleCOP";
 
+	// Agregar input para la fecha
+	const form = $('<div class="form-group">').attr("id", "div-fecha");
+	$('<label for="load_date">').text("Fecha del archivo").appendTo(form);
+	$(
+		'<input type="date" class="form-control" id="load_date" required>'
+	).appendTo(form);
+	form.appendTo("#div-table");
+
 	// Crear tabla
 	const table = $('<table class="table">').attr("id", "rale-cop-table");
 
@@ -756,6 +791,14 @@ socket.on("server:result-rale-rcv", (data) => {
 	// Guardar el objeto
 	objRaleRCV = data;
 	insrt = "raleRCV";
+
+	// Agregar input para la fecha
+	const form = $('<div class="form-group">').attr("id", "div-fecha");
+	$('<label for="load_date">').text("Fecha del archivo").appendTo(form);
+	$(
+		'<input type="date" class="form-control" id="load_date" required>'
+	).appendTo(form);
+	form.appendTo("#div-table");
 
 	// Crear tabla
 	const table = $('<table class="table">').attr("id", "rale-rcv-table");

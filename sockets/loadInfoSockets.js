@@ -71,96 +71,106 @@ export function socket(io) {
 		 * @param {object} data - Datos del archivo coin y lote.
 		 * @param {Array} data.coin - Datos del archivo coin.
 		 * @param {number} data.lote - Número de lote.
+		 * @param {string} data.date - Fecha de carga.
 		 * @param {Function} callback - Función de devolución de llamada para manejar el resultado.
 		 */
-		socket.on("client:insert-coin", async ({ coin, lote }, callback) => {
-			try {
-				let coinValidado = []; // Arreglo para almacenar el coin validado
-				let registrosNoInsertados = []; // Arreglo para almacenar los reg_pat no insertados
+		socket.on(
+			"client:insert-coin",
+			async ({ coin, lote, date }, callback) => {
+				try {
+					let coinValidado = []; // Arreglo para almacenar el coin validado
+					let registrosNoInsertados = []; // Arreglo para almacenar los reg_pat no insertados
 
-				// Recorrer el coin para asignar los nombres del objeto
-				coin.forEach((reg, i) => {
-					const regValid = {
-						id_coin: null,
-						deleg_control: reg["deleg_control"],
-						subdeleg_control: reg["subdeleg_control"],
-						deleg_emi: reg["deleg_emision"],
-						subdeleg_emi: reg["subdeleg_emision"],
-						reg_pat: reg["rp"],
-						escencial: reg["esencial"],
-						clasificacion: reg["clasificacion"],
-						cve_mov_p: reg["cve_mov_pat"],
-						fec_mov: reg["fecha_mov_pat"],
-						razon_social: reg["razon_social"],
-						num_credito: reg["num_credito"],
-						periodo: reg["periodo"],
-						importe: reg["importe"],
-						tipo_documento: reg["tipo_documento"],
-						seguro: reg["seguro"],
-						dias_estancia: reg["dias_estancia"],
-						incidencia: reg["incidencia"],
-						fec_incidencia: reg["fecha_incidencia"],
-						estado: reg["estado"],
-						por_importe: reg["POR IMPORTE"],
-						por_antiguedad: reg["POR ANTIGUEDAD"],
-						inc_actual: reg["INC ACTUAL"] ?? null,
-						resultado: reg["RESULTADO"] ?? null,
-					};
-					// Insertar al arreglo de coins ya validados
-					coinValidado.push(regValid);
-				});
+					// Recorrer el coin para asignar los nombres del objeto
+					coin.forEach((reg, i) => {
+						const regValid = {
+							id_coin: null,
+							deleg_control: reg["deleg_control"],
+							subdeleg_control: reg["subdeleg_control"],
+							deleg_emi: reg["deleg_emision"],
+							subdeleg_emi: reg["subdeleg_emision"],
+							reg_pat: reg["rp"],
+							escencial: reg["esencial"],
+							clasificacion: reg["clasificacion"],
+							cve_mov_p: reg["cve_mov_pat"],
+							fec_mov: reg["fecha_mov_pat"],
+							razon_social: reg["razon_social"],
+							num_credito: reg["num_credito"],
+							periodo: reg["periodo"],
+							importe: reg["importe"],
+							tipo_documento: reg["tipo_documento"],
+							seguro: reg["seguro"],
+							dias_estancia: reg["dias_estancia"],
+							incidencia: reg["incidencia"],
+							fec_incidencia: reg["fecha_incidencia"],
+							estado: reg["estado"],
+							por_importe: reg["POR IMPORTE"],
+							por_antiguedad: reg["POR ANTIGUEDAD"],
+							inc_actual: reg["INC ACTUAL"] ?? null,
+							resultado: reg["RESULTADO"] ?? null,
+						};
+						// Insertar al arreglo de coins ya validados
+						coinValidado.push(regValid);
+					});
 
-				// Obtener todos los afil registrados y regresar solo el reg pat como afil
-				const existingRegPats = await Afil.findAll({
-					attributes: ["reg_pat"],
-				}).then((afilRecords) => {
-					return afilRecords.map((afil) => afil.reg_pat);
-				});
+					// Obtener todos los afil registrados y regresar solo el reg pat como afil
+					const existingRegPats = await Afil.findAll({
+						attributes: ["reg_pat"],
+					}).then((afilRecords) => {
+						return afilRecords.map((afil) => afil.reg_pat);
+					});
 
-				// Realiza una promesa para validar todos los registros, haciendo un map para todo el arreglo de rale
-				const validRecords = await Promise.all(
-					coinValidado.map(async (regValid) => {
-						// Obtiene únicamente el reg_pat de ese objeto iterado
-						const { reg_pat } = regValid;
+					// Realiza una promesa para validar todos los registros, haciendo un map para todo el arreglo de rale
+					const validRecords = await Promise.all(
+						coinValidado.map(async (regValid) => {
+							// Obtiene únicamente el reg_pat de ese objeto iterado
+							const { reg_pat } = regValid;
 
-						// Verificar si el valor de reg_pat ya existe en la tabla afil
-						if (!existingRegPats.includes(reg_pat)) {
-							registrosNoInsertados.push(reg_pat); // Almacenar los reg_pat no insertados
-							return undefined;
+							// Verificar si el valor de reg_pat ya existe en la tabla afil
+							if (!existingRegPats.includes(reg_pat)) {
+								registrosNoInsertados.push(reg_pat); // Almacenar los reg_pat no insertados
+								return undefined;
+							}
+
+							return regValid;
+						})
+					);
+
+					// Filtrar los registros válidos para insertar en la tabla RaleCop
+					const recordsToInsert = validRecords.filter(
+						(regValid) => regValid !== undefined
+					);
+
+					let reg_pat_no_ins = [];
+					// Recorrer el arreglo de registros no insertados
+					for (var i = 0; i < registrosNoInsertados.length; i++) {
+						if (
+							reg_pat_no_ins.indexOf(registrosNoInsertados[i]) ===
+							-1
+						) {
+							// Si el elemento no existe en el nuevo array, agregarlo
+							reg_pat_no_ins.push(registrosNoInsertados[i]);
 						}
-
-						return regValid;
-					})
-				);
-
-				// Filtrar los registros válidos para insertar en la tabla RaleCop
-				const recordsToInsert = validRecords.filter(
-					(regValid) => regValid !== undefined
-				);
-
-				let reg_pat_no_ins = [];
-				// Recorrer el arreglo de registros no insertados
-				for (var i = 0; i < registrosNoInsertados.length; i++) {
-					if (
-						reg_pat_no_ins.indexOf(registrosNoInsertados[i]) === -1
-					) {
-						// Si el elemento no existe en el nuevo array, agregarlo
-						reg_pat_no_ins.push(registrosNoInsertados[i]);
 					}
-				}
 
-				// Validar si hay registros que insertar
-				if (recordsToInsert.length > 0) {
-					// Insertar los registros válidos en la tabla RaleCop
-					await Coin.bulkCreate(recordsToInsert, { logging: false })
-						.then(() => {
-							// Si todo fue correcto regresar el callback con la seccion de archivos insertados
-							callback({
-								status: true,
-								msg: `
+					// Validar si hay registros que insertar
+					if (recordsToInsert.length > 0) {
+						// Asignar la fecha de carga a cada registro
+						recordsToInsert.forEach((record) => {
+							record.createdAt = date; // Asignar la fecha a createdAt
+						});
+						// Insertar los registros válidos en la tabla RaleCop y agregar la fecha de carga
+						await Coin.bulkCreate(recordsToInsert, {
+							logging: false,
+						})
+							.then(() => {
+								// Si todo fue correcto regresar el callback con la seccion de archivos insertados
+								callback({
+									status: true,
+									msg: `
                                     Lote [${lote}-${
-									lote + 999
-								}] insertado correctamente
+										lote + 999
+									}] insertado correctamente
                                     ${
 										reg_pat_no_ins.length > 0
 											? `| ${reg_pat_no_ins.length} registros no fueron insertados debido a que no estaban registrados en la tabla afil: ` +
@@ -168,36 +178,37 @@ export function socket(io) {
 											: "Todos los registros patronales fueron insertador correctamente"
 									}
                                 `,
+								});
+							})
+							.catch((e) => {
+								// SI hubo un error mostrar el lote y el error
+								callback({
+									status: false,
+									msg: `No se pudo insertar el lote [${lote}-${
+										lote + 999
+									}]. Error: ${e}`,
+								});
 							});
-						})
-						.catch((e) => {
-							// SI hubo un error mostrar el lote y el error
-							callback({
-								status: false,
-								msg: `No se pudo insertar el lote [${lote}-${
-									lote + 999
-								}]. Error: ${e}`,
-							});
+					} else {
+						// No hay registros válidos para insertar
+						callback({
+							status: false,
+							msg: `No se pudo insertar el lote [${lote}-${
+								lote + 999
+							}]. No hay registros válidos.`,
 						});
-				} else {
-					// No hay registros válidos para insertar
+					}
+				} catch (e) {
+					// Hubo un error en la insercion
 					callback({
 						status: false,
 						msg: `No se pudo insertar el lote [${lote}-${
 							lote + 999
-						}]. No hay registros válidos.`,
+						}]. Error: ${e}`,
 					});
 				}
-			} catch (e) {
-				// Hubo un error en la insercion
-				callback({
-					status: false,
-					msg: `No se pudo insertar el lote [${lote}-${
-						lote + 999
-					}]. Error: ${e}`,
-				});
 			}
-		});
+		);
 
 		/**
 		 * Maneja la inserción de registros AFIL en la base de datos.
@@ -207,7 +218,7 @@ export function socket(io) {
 		 * @param {number} data.length - Longitud total del conjunto de registros a insertar.
 		 * @param {function} callback - Función de devolución de llamada para enviar una respuesta al cliente.
 		 */
-		socket.on("client:insert-afil", ({ afil, lote, lenght }, callback) => {
+		socket.on("client:insert-afil", ({ afil, lote, lenght, date  }, callback) => {
 			let afilValidado = [];
 			// Recorrer todo el objeto para asignarles los nombres que tienen en la bd
 			afil.forEach((reg, i) => {
@@ -225,6 +236,11 @@ export function socket(io) {
 				// Insertar el registro en el arreglo
 				afilValidado.push(regValid);
 			});
+
+            // Asignar la fecha de carga a cada registro
+            recordsToInsert.forEach((record) => {
+                record.createdAt = date; // Asignar la fecha a createdAt
+            });
 
 			// Insertar en la bd todos los registros
 			Afil.bulkCreate(afilValidado)
@@ -257,7 +273,7 @@ export function socket(io) {
 		 */
 		socket.on(
 			"client:insert-rale-cop",
-			async ({ rale, lote }, callback) => {
+			async ({ rale, lote, date }, callback) => {
 				try {
 					let raleValidado = [];
 					let registrosNoInsertados = []; // Arreglo para almacenar los reg_pat no insertados
@@ -328,6 +344,10 @@ export function socket(io) {
 
 					// Si hay registros no insertados, regresar el callback con el mensaje
 					if (recordsToInsert.length > 0) {
+						// Asignar la fecha de carga a cada registro
+						recordsToInsert.forEach((record) => {
+							record.createdAt = date; // Asignar la fecha a createdAt
+						});
 						// Insertar los registros válidos en la tabla RaleCop
 						await RaleCop.bulkCreate(recordsToInsert, {
 							logging: false,
@@ -389,7 +409,7 @@ export function socket(io) {
 		 */
 		socket.on(
 			"client:insert-rale-rcv",
-			async ({ rale, lote }, callback) => {
+			async ({ rale, lote, date }, callback) => {
 				try {
 					let raleValidado = [];
 					let registrosNoInsertados = []; // Arreglo para almacenar los reg_pat no insertados
@@ -460,6 +480,10 @@ export function socket(io) {
 
 					// Si hay registros no insertados, regresar el callback con el mensaje
 					if (recordsToInsert.length > 0) {
+						// Asignar la fecha de carga a cada registro
+						recordsToInsert.forEach((record) => {
+							record.createdAt = date; // Asignar la fecha a createdAt
+						});
 						// Insertar los registros válidos en la tabla RaleCop
 						await RaleRcv.bulkCreate(recordsToInsert, {
 							logging: false,
