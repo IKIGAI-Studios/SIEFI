@@ -388,6 +388,9 @@ socket.on("server:result-coin", (data) => {
 	objCoin = data;
 	insrt = "coin";
 
+    // Mostrar un input para que el usuario eliga la fecha con la que se insertara en al BD
+    // TODO HACER ESO JASKDJKASDJ
+
 	const table = $('<table class="table">').attr("id", "coin-table");
 
 	// Obtener todas las propiedades de los objetos en el conjunto de datos
