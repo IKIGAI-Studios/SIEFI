@@ -54,5 +54,6 @@ app.use("/icons", express.static(join(__dirname, 'src/icons')));
 app.use("/imgs", express.static(join(__dirname, 'src/imgs')));
 app.use("/fonts", express.static(join(__dirname, 'src/fonts')));
 app.use("/js", express.static(join(__dirname, 'src/js')));
+app.use("/const", express.static(join(__dirname, 'src/js/const')));
 app.use("/libs", express.static(join(__dirname, 'src/libs')));
 app.set('view engine', 'ejs');

@@ -1,5 +1,5 @@
 // @ts-nocheck
-const socket = io("http://localhost:3000");
+const socket = io(SERVER_IP + ":" + SERVER_PORT);
 
 /**
  * Actualiza los campos del formulario con la información del ejecutor seleccionado.

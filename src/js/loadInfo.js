@@ -1,5 +1,5 @@
 // Instanciar los sockets
-const socket = io("http://localhost:3000");
+const socket = io(SERVER_IP + ":" + SERVER_PORT);
 
 let objCoin;
 let objAfil;

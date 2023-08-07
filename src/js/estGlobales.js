@@ -1,5 +1,5 @@
 // Obtener los sockets
-const socket = io("http://localhost:3000");
+const socket = io(SERVER_IP + ":" + SERVER_PORT);
 
 // Variables globales
 let dataStats,
