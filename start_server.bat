@@ -3,5 +3,7 @@
 cd C:\Users\erick\Documents\Github\testSiefi\SIEFI\
 @REM Actualizar repositorio de git
 git fetch origin
+@REM Instalar todas las dependencias de node
+npm install
 @REM Ejecutar servidor modo silencioso
 nodemon --quiet index
