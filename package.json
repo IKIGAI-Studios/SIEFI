@@ -5,6 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "fetch_git": "git fetch origin",
+    "server_client_silent": "nodemon index --ignore '/src/js/*.js' --ignore '/src/js/**/*.js'",
     "server": "nodemon --quiet index --ignore '/src/js/*.js' --ignore '/src/js/**/*.js'",
     "docs": "jsdoc -c jsdoc.json"
   },
