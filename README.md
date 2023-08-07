@@ -1,6 +1,6 @@
 # SIEFI
 
-# Sistema Ejecucion Fiscal
+## Sistema Ejecucion Fiscal
 
 <img src="src/imgs/logo-imss.png" alt="IMSS LOGO" width="20%">
 <br><br>
