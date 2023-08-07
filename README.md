@@ -48,10 +48,7 @@ Asegúrate de que la ruta y la estructura del archivo de constantes sean correct
 
 ## Características
 
-Enumera las características clave de tu proyecto aquí.
-
--   Característica 1: Describe la característica.
--   Característica 2: Describe la característica.
+Pendiente... 🚧🚧🚧
 
 ## Contribución
 
