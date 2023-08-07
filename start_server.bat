@@ -2,7 +2,7 @@
 @echo off
 @echo Iniciando servidor SIEFI ...
 @REM Entrar a ruta del proyecto | Cambiar por la ruta del proyecto
-cd C:\Users\gabri\OneDrive\Documents\GitHub\SIEFI\
+cd C:\Users\erick\Documents\Github\testSiefi\SIEFI\
 @REM Actualizar repositorio de git | Opcional
 @REM git fetch origin
 @REM Instalar todas las dependencias de node
@@ -10,5 +10,5 @@ cd C:\Users\gabri\OneDrive\Documents\GitHub\SIEFI\
 @REM npm install
 @REM Limpiar la consola
 cls
-@REM Ejecutar servidor modo silencioso
+@REM Ejecutar servidor modo silencioso desde pm2
 npm run start_server_hidden
