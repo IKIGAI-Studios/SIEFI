@@ -27,7 +27,7 @@ const sequelize = new Sequelize(
 sequelize
 	.sync({ force: false })
 	.then(() => {
-		console.info(pc.blue("Connected to MYSQL"));
+		console.info(pc.cyan("Conexion correcta a la Base de Datos"));
 	})
 	.catch((e) => {
 		console.error(`Error: ${e}`);
