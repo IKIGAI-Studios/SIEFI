@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "stop_server":"pm2 stop index",
+    "stop_server": "pm2 stop index",
     "show_servers": "pm2 list",
     "start_server_hidden": "pm2 start index.js",
     "fetch_git": "git fetch origin",
