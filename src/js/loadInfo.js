@@ -1,5 +1,5 @@
 // Instanciar los sockets
-const socket = io(SERVER_IP + ":" + SERVER_PORT);
+const socket = io();
 
 let objCoin;
 let objAfil;

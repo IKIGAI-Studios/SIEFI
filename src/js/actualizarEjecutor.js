@@ -1,5 +1,5 @@
 // @ts-nocheck
-const socket = io(SERVER_IP + ":" + SERVER_PORT);
+const socket = io();
 
 /**
  * Actualiza los campos del formulario con la información del ejecutor seleccionado.

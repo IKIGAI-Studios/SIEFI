@@ -1,4 +1,4 @@
-const socket = io(SERVER_IP + ":" + SERVER_PORT);
+const socket = io();
 
 // Events
 
