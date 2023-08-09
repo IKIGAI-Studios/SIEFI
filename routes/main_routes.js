@@ -325,14 +325,15 @@ routes.post("/login", async (req, res) => {
 			apellidos,
 			arrNombre = user.nombre.split(" ");
 
-		// Si tiene 1 o 2 nombres
-		if (arrNombre[3]) {
-			nombre = arrNombre[0] + " " + [1];
-			apellidos = arrNombre[2] + " " + [3];
-		} else {
-			nombre = arrNombre[0];
-			apellidos = arrNombre[1] + " " + arrNombre[2];
-		}
+        if (arrNombre.length === 1) {
+            nombre = arrNombre[0];
+        } else if (arrNombre.length === 2) {
+            nombre = arrNombre[0];
+            apellidos = arrNombre[1];
+        } else {
+            nombre = arrNombre.slice(0, arrNombre.length - 2).join(' ');
+            apellidos = arrNombre.slice(arrNombre.length - 2).join(' ');
+        }
 
 		// Crear la sesión del Usuario
 		req.session.user = {
@@ -341,6 +342,9 @@ routes.post("/login", async (req, res) => {
 			clave_eje: user.clave_eje,
 			tipo_usuario: user.type,
 		};
+
+        console.log(req.session.user)
+        console.log(user.nombre)
 
 		// Redireccionar al tipo de usuario
 		if (user.type == "ejecutor") {
@@ -542,7 +546,6 @@ routes.post("/desasignarPatrones", async (req, res) => {
 	try {
 		// Obtener datos del formulario enviado
 		const registros_patA = req.body.patronesA;
-
 		// Validar si es un registro patronal o si son varios
 		if (typeof registros_patA == "string") {
 			// Actualizar un solo reg patronal
@@ -590,6 +593,7 @@ routes.post("/desasignarPatrones", async (req, res) => {
  * @param {string} req.body.nomEje - El nombre del ejecutor.
  */
 routes.post("/asignarPatrones", async (req, res) => {
+    console.log(req.body)
 	try {
 		// Obtener datos del formulario enviado
 		const registros_patNA = req.body.patronesNA;

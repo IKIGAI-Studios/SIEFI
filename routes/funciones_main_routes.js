@@ -389,6 +389,7 @@ export async function generarGastos(req, res) {
 		// Obtener datos enviados del formulario
 		const nom_cred = req.body.nom_cred;
 		const { type, cobrado, gastos } = req.body;
+        console.log(nom_cred)
 
 		// Validar si es uno o varios registros y actualizar en la bd
 		// Selecciono sólo un registro
